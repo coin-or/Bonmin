@@ -583,7 +583,7 @@ namespace Bonmin {
         "");
     roptions->setOptionExtraInfo("milp_strategy",64);
 
-    roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Output and Loglevel", RegisteredOptions::BonminCategory);
     roptions->AddBoundedIntegerOption("milp_log_level",
         "specify MILP solver log level.",
         0,4,0,

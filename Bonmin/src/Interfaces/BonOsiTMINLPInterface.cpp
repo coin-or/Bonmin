@@ -71,7 +71,7 @@ register_general_options
       "This will affect the function getWarmStart(), and as a consequence the warm starting in the various algorithms.");
   roptions->setOptionExtraInfo("warm_start",8);
 
-  roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
+  roptions->SetRegisteringCategory("Output and Loglevel", RegisteredOptions::BonminCategory);
   
   roptions->AddBoundedIntegerOption("nlp_log_level",
                                     "specify NLP solver interface log level (independent from ipopt print_level).",
@@ -252,7 +252,7 @@ static void register_OA_options
       );
   roptions->setOptionExtraInfo("oa_rhs_relax",119);
 
-  roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
+  roptions->SetRegisteringCategory("Output and Loglevel", RegisteredOptions::BonminCategory);
 
   roptions->AddLowerBoundedIntegerOption("oa_cuts_log_level",
                                          "level of log when generating OA cuts.",

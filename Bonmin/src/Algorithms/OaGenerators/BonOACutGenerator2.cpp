@@ -295,7 +295,7 @@ namespace Bonmin
                                "");
     roptions->setOptionExtraInfo("oa_decomposition",19);
 
-    roptions->SetRegisteringCategory("Output", RegisteredOptions::BonminCategory);
+    roptions->SetRegisteringCategory("Output and Loglevel", RegisteredOptions::BonminCategory);
     roptions->AddBoundedIntegerOption("oa_log_level",
         "specify OA iterations log level.",
         0,2,1,
