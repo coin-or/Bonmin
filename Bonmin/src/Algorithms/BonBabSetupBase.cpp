@@ -436,7 +436,7 @@ namespace Bonmin
                                      );
     roptions->setOptionExtraInfo("lp_log_level", 119);
 
-    roptions->AddBoundedIntegerOption("nlp_log_at_root"," Specify a different log level "
+    roptions->AddBoundedIntegerOption("nlp_log_at_root","specify a different log level "
                                            "for root relaxation.",
                                             0,12,0,
                                             "");
