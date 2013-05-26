@@ -1,5 +1,4 @@
-\newcommand{\stableVersion}{1.5}
-\newcommand{\releaseVersion}{1.5.0}
+\newcommand{\stableVersion}{1.7}
 %Some frequently used html addresses
 
 %Documentation Pages
@@ -53,8 +52,9 @@
 \href{bib.html\##1}{[#2]}
 }
 }
-\newcommand{\footlink}[2]{\href{#1}{#2}\latex{\footnote{#1}}}
-\def\htmlanchor#1{\HCode{<a id="#1"></a>}}
+\newcommand{\footlink}[2]{\href{#1}{#2}\latex{\footnote{\url{#1}}}}
+\def\htmlanchor#1{\latexhtml{}{\HCode{<a id="}#1\HCode{"></a>}}}
+\newcommand{\doilink}[1]{\href{http://dx.doi.org/#1}{doi:\detokenize{#1}}}
 
 
 %Put into a colored background for verbatim
@@ -118,11 +118,15 @@
 %Panels of links
 \newcommand{\NavigationPanels}{
 \HCode{<div id="header"> }
-\HCode{  <h1 id="siteName"><TT> <big> BONMIN Options </big> </tt> reference manual</h1> }
+\HCode{  <h1 id="siteName"><TT> <big> BONMIN </big> </tt> Users' Manual</h1> }
 \HCode{  <div id="globalNav"> }
-\HCode{	<a href="options_list_bonmin.html">Bonmin</a> | }
-\HCode{	<a href="options_list_ipopt.html">Ipopt</a> |}
-\HCode{	<a href="options_list_filter.html">Filter-SQP</a> | }
+\HCode{	<a href="Intro.html">Introduction</a> | }
+\HCode{	<a href="Obtain.html">Download</a> |}
+\HCode{	<a href="Install.html">Install</a> | }
+\HCode{	<a href="use.html">Use</a> | }
+\HCode{	<a href="options_set.html">Setting Options</a> | }
+\HCode{	<a href="options_list.html">Options List</a> | }
+\HCode{	<a href="bib.html">Bibliography</a> |}
 \HCode{  </div> }
 \HCode{  </div> }
 \HCode{<div id="leftPanel">}

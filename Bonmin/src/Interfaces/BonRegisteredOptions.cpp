@@ -48,7 +48,8 @@ namespace Bonmin{
        switch (*i) {
          case ' ':
          case '\t':
-           ret_val +='_';
+         case '_':
+           //ret_val +='_';
            break;
          default:
            ret_val += *i;
@@ -286,8 +287,7 @@ namespace Bonmin{
      }
      
      os<<"<tr>"<<std::endl
-       <<"<td> <a href=\"#sec:"<<makeSpaceLess((*i)->Name())<<"\">"
-       <<((*i)->Name())<<"</a> </td>"<<std::endl
+       <<"<td>"<<((*i)->Name())<<"</td>"<<std::endl
        <<"<td>"<<OptionType2Char((*i)->Type())<<"</td>"<<std::endl
        //<<"<td>"<<defaultAsString(*i)<<"</td>"<<std::endl
        <<"<td> "<<( (isValidForBBB((*i)->Name()))? '+' : '-' )<<"</td>"<<std::endl
@@ -326,7 +326,7 @@ namespace Bonmin{
            registeringCategory = (*i)->RegisteringCategory();
              os<<"\\subsection{"<<registeringCategory<<"}"<<std::endl;      
              os<<"\\label{sec:"<<makeSpaceLess(registeringCategory)<<"}"<<std::endl;
-             //os<<"\\htmlanchor{sec:"<<makeSpaceLess(registeringCategory)<<"}"<<std::endl;
+             os<<"\\htmlanchor{sec:"<<makeSpaceLess(registeringCategory)<<"}"<<std::endl;
            }
        
            (*i)->OutputLatexDescription(jnlst);
