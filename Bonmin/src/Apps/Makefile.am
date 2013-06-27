@@ -72,9 +72,11 @@ BonNodeSolver_DEPENDENCIES = \
 ########################################################################
 
 install-exec-hook:
-	test -s bonmin.exe.manifest && \
-	mt -manifest bonmin.exe.manifest -outputresource:bonmin.exe;\
-	cp bonmin.exe $(bindir)/bonmin.exe
+	if COIN_CXX_IS_CL
+		test -s bonmin.exe.manifest && \
+		mt -manifest bonmin.exe.manifest -outputresource:bonmin.exe;\
+		cp bonmin.exe $(bindir)/bonmin.exe
+	endif
 
 ########################################################################
 #                            Astyle stuff                              #

@@ -20907,7 +20907,7 @@ fi
     _pkg_min_version=0.16.0
     echo "$as_me:$LINENO: checking pkg-config is at least version $_pkg_min_version" >&5
 echo $ECHO_N "checking pkg-config is at least version $_pkg_min_version... $ECHO_C" >&6
-    if "$PKG_CONFIG" --atleast-pkgconfig-version $_pkg_min_version; then
+    if $PKG_CONFIG --atleast-pkgconfig-version $_pkg_min_version; then
       echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
     else
@@ -20919,7 +20919,7 @@ echo "${ECHO_T}no" >&6
 
   # check if pkg-config supports the short-errors flag
   if test -n "$PKG_CONFIG" && \
-    "$PKG_CONFIG" --atleast-pkgconfig-version 0.20; then
+    $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
     pkg_short_errors=" --short-errors "
   else
     pkg_short_errors=""
@@ -21133,9 +21133,9 @@ if test $coin_has_coindepend = notGiven; then
 
 
 if test -n "$PKG_CONFIG" ; then
-  if "$PKG_CONFIG" --exists "cbc osi-clp ipopt"; then
-    COINDEPEND_VERSIONS=`"$PKG_CONFIG" --modversion "cbc osi-clp ipopt" 2>/dev/null | tr '\n' ' '`
-     cflags=`"$PKG_CONFIG" --cflags "cbc osi-clp ipopt" 2>/dev/null`
+  if $PKG_CONFIG --exists "cbc osi-clp ipopt"; then
+    COINDEPEND_VERSIONS=`$PKG_CONFIG --modversion "cbc osi-clp ipopt" 2>/dev/null | tr '\n' ' '`
+     cflags=`$PKG_CONFIG --cflags "cbc osi-clp ipopt" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
 	# but only do this if is not trivial
@@ -21144,8 +21144,8 @@ if test -n "$PKG_CONFIG" ; then
       cflags=`echo $cflags | sed -e 's/-I\([^ ]*\)/-I\`${CYGPATH_W} \1\`/g'`
     fi
     COINDEPEND_CFLAGS="$cflags"
-    COINDEPEND_LIBS=`"$PKG_CONFIG" --libs "cbc osi-clp ipopt" 2>/dev/null`
-    COINDEPEND_DATA=`"$PKG_CONFIG" --variable=datadir "cbc osi-clp ipopt" 2>/dev/null`
+    COINDEPEND_LIBS=`$PKG_CONFIG --libs "cbc osi-clp ipopt" 2>/dev/null`
+    COINDEPEND_DATA=`$PKG_CONFIG --variable=datadir "cbc osi-clp ipopt" 2>/dev/null`
      coin_has_coindepend=yes
         echo "$as_me:$LINENO: result: yes: $COINDEPEND_VERSIONS" >&5
 echo "${ECHO_T}yes: $COINDEPEND_VERSIONS" >&6
@@ -21167,7 +21167,7 @@ echo "${ECHO_T}yes: $COINDEPEND_VERSIONS" >&6
 
 
   else
-    COINDEPEND_PKG_ERRORS=`"$PKG_CONFIG" $pkg_short_errors --errors-to-stdout --print-errors "cbc osi-clp ipopt"`
+    COINDEPEND_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "cbc osi-clp ipopt"`
       coin_has_coindepend=notGiven
         echo "$as_me:$LINENO: result: not given: $COINDEPEND_PKG_ERRORS" >&5
 echo "${ECHO_T}not given: $COINDEPEND_PKG_ERRORS" >&6
@@ -21213,8 +21213,6 @@ projtoprocess="cbc osi-clp ipopt"
 allproj=""
 allpcfiles=""
 allpcifiles=""
-echo "$as_me:$LINENO: checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects" >&5
-echo $ECHO_N "checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects... $ECHO_C" >&6
 while test "x$projtoprocess" != x ; do
 
   for proj in $projtoprocess ; do
@@ -21652,9 +21650,9 @@ if test $coin_has_asl = notGiven; then
 
 
 if test -n "$PKG_CONFIG" ; then
-  if "$PKG_CONFIG" --exists "ipoptamplinterface"; then
-    ASL_VERSIONS=`"$PKG_CONFIG" --modversion "ipoptamplinterface" 2>/dev/null | tr '\n' ' '`
-     cflags=`"$PKG_CONFIG" --cflags "ipoptamplinterface" 2>/dev/null`
+  if $PKG_CONFIG --exists "ipoptamplinterface"; then
+    ASL_VERSIONS=`$PKG_CONFIG --modversion "ipoptamplinterface" 2>/dev/null | tr '\n' ' '`
+     cflags=`$PKG_CONFIG --cflags "ipoptamplinterface" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
 	# but only do this if is not trivial
@@ -21663,8 +21661,8 @@ if test -n "$PKG_CONFIG" ; then
       cflags=`echo $cflags | sed -e 's/-I\([^ ]*\)/-I\`${CYGPATH_W} \1\`/g'`
     fi
     ASL_CFLAGS="$cflags"
-    ASL_LIBS=`"$PKG_CONFIG" --libs "ipoptamplinterface" 2>/dev/null`
-    ASL_DATA=`"$PKG_CONFIG" --variable=datadir "ipoptamplinterface" 2>/dev/null`
+    ASL_LIBS=`$PKG_CONFIG --libs "ipoptamplinterface" 2>/dev/null`
+    ASL_DATA=`$PKG_CONFIG --variable=datadir "ipoptamplinterface" 2>/dev/null`
      coin_has_asl=yes
         echo "$as_me:$LINENO: result: yes: $ASL_VERSIONS" >&5
 echo "${ECHO_T}yes: $ASL_VERSIONS" >&6
@@ -21686,7 +21684,7 @@ echo "${ECHO_T}yes: $ASL_VERSIONS" >&6
 
 
   else
-    ASL_PKG_ERRORS=`"$PKG_CONFIG" $pkg_short_errors --errors-to-stdout --print-errors "ipoptamplinterface"`
+    ASL_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "ipoptamplinterface"`
       coin_has_asl=notGiven
         echo "$as_me:$LINENO: result: not given: $ASL_PKG_ERRORS" >&5
 echo "${ECHO_T}not given: $ASL_PKG_ERRORS" >&6
@@ -21732,8 +21730,6 @@ projtoprocess="ipoptamplinterface"
 allproj=""
 allpcfiles=""
 allpcifiles=""
-echo "$as_me:$LINENO: checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects" >&5
-echo $ECHO_N "checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects... $ECHO_C" >&6
 while test "x$projtoprocess" != x ; do
 
   for proj in $projtoprocess ; do
@@ -22184,9 +22180,9 @@ if test $coin_has_osicpx = notGiven; then
 
 
 if test -n "$PKG_CONFIG" ; then
-  if "$PKG_CONFIG" --exists "osi-cplex"; then
-    OSICPX_VERSIONS=`"$PKG_CONFIG" --modversion "osi-cplex" 2>/dev/null | tr '\n' ' '`
-     cflags=`"$PKG_CONFIG" --cflags "osi-cplex" 2>/dev/null`
+  if $PKG_CONFIG --exists "osi-cplex"; then
+    OSICPX_VERSIONS=`$PKG_CONFIG --modversion "osi-cplex" 2>/dev/null | tr '\n' ' '`
+     cflags=`$PKG_CONFIG --cflags "osi-cplex" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
 	# but only do this if is not trivial
@@ -22195,8 +22191,8 @@ if test -n "$PKG_CONFIG" ; then
       cflags=`echo $cflags | sed -e 's/-I\([^ ]*\)/-I\`${CYGPATH_W} \1\`/g'`
     fi
     OSICPX_CFLAGS="$cflags"
-    OSICPX_LIBS=`"$PKG_CONFIG" --libs "osi-cplex" 2>/dev/null`
-    OSICPX_DATA=`"$PKG_CONFIG" --variable=datadir "osi-cplex" 2>/dev/null`
+    OSICPX_LIBS=`$PKG_CONFIG --libs "osi-cplex" 2>/dev/null`
+    OSICPX_DATA=`$PKG_CONFIG --variable=datadir "osi-cplex" 2>/dev/null`
      coin_has_osicpx=yes
         echo "$as_me:$LINENO: result: yes: $OSICPX_VERSIONS" >&5
 echo "${ECHO_T}yes: $OSICPX_VERSIONS" >&6
@@ -22218,7 +22214,7 @@ echo "${ECHO_T}yes: $OSICPX_VERSIONS" >&6
 
 
   else
-    OSICPX_PKG_ERRORS=`"$PKG_CONFIG" $pkg_short_errors --errors-to-stdout --print-errors "osi-cplex"`
+    OSICPX_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "osi-cplex"`
       coin_has_osicpx=notGiven
         echo "$as_me:$LINENO: result: not given: $OSICPX_PKG_ERRORS" >&5
 echo "${ECHO_T}not given: $OSICPX_PKG_ERRORS" >&6
@@ -22264,8 +22260,6 @@ projtoprocess="osi-cplex"
 allproj=""
 allpcfiles=""
 allpcifiles=""
-echo "$as_me:$LINENO: checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects" >&5
-echo $ECHO_N "checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects... $ECHO_C" >&6
 while test "x$projtoprocess" != x ; do
 
   for proj in $projtoprocess ; do
@@ -22895,9 +22889,9 @@ if test $coin_has_filtersqp = notGiven; then
 
 
 if test -n "$PKG_CONFIG" ; then
-  if "$PKG_CONFIG" --exists "coinfiltersqp"; then
-    FILTERSQP_VERSIONS=`"$PKG_CONFIG" --modversion "coinfiltersqp" 2>/dev/null | tr '\n' ' '`
-     cflags=`"$PKG_CONFIG" --cflags "coinfiltersqp" 2>/dev/null`
+  if $PKG_CONFIG --exists "coinfiltersqp"; then
+    FILTERSQP_VERSIONS=`$PKG_CONFIG --modversion "coinfiltersqp" 2>/dev/null | tr '\n' ' '`
+     cflags=`$PKG_CONFIG --cflags "coinfiltersqp" 2>/dev/null`
     # pkg-config cannot handle spaces, so CYGPATH_W cannot be put into .pc files
 	# thus, we modify the cflags extracted from pkg-config by putting CYGPATH_W behind -I's
 	# but only do this if is not trivial
@@ -22906,8 +22900,8 @@ if test -n "$PKG_CONFIG" ; then
       cflags=`echo $cflags | sed -e 's/-I\([^ ]*\)/-I\`${CYGPATH_W} \1\`/g'`
     fi
     FILTERSQP_CFLAGS="$cflags"
-    FILTERSQP_LIBS=`"$PKG_CONFIG" --libs "coinfiltersqp" 2>/dev/null`
-    FILTERSQP_DATA=`"$PKG_CONFIG" --variable=datadir "coinfiltersqp" 2>/dev/null`
+    FILTERSQP_LIBS=`$PKG_CONFIG --libs "coinfiltersqp" 2>/dev/null`
+    FILTERSQP_DATA=`$PKG_CONFIG --variable=datadir "coinfiltersqp" 2>/dev/null`
      coin_has_filtersqp=yes
         echo "$as_me:$LINENO: result: yes: $FILTERSQP_VERSIONS" >&5
 echo "${ECHO_T}yes: $FILTERSQP_VERSIONS" >&6
@@ -22929,7 +22923,7 @@ echo "${ECHO_T}yes: $FILTERSQP_VERSIONS" >&6
 
 
   else
-    FILTERSQP_PKG_ERRORS=`"$PKG_CONFIG" $pkg_short_errors --errors-to-stdout --print-errors "coinfiltersqp"`
+    FILTERSQP_PKG_ERRORS=`$PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "coinfiltersqp"`
       coin_has_filtersqp=notGiven
         echo "$as_me:$LINENO: result: not given: $FILTERSQP_PKG_ERRORS" >&5
 echo "${ECHO_T}not given: $FILTERSQP_PKG_ERRORS" >&6
@@ -22975,8 +22969,6 @@ projtoprocess="coinfiltersqp"
 allproj=""
 allpcfiles=""
 allpcifiles=""
-echo "$as_me:$LINENO: checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects" >&5
-echo $ECHO_N "checking in directories $COIN_PKG_CONFIG_PATH_UNINSTALLED for projects... $ECHO_C" >&6
 while test "x$projtoprocess" != x ; do
 
   for proj in $projtoprocess ; do
@@ -23510,7 +23502,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:23513:" \
+echo "$as_me:23505:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -24158,7 +24150,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:24161: \"$ac_link\") >&5
+(eval echo $as_me:24153: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -24236,7 +24228,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:24239: \"$ac_link\") >&5
+(eval echo $as_me:24231: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
