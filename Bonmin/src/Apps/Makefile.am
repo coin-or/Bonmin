@@ -68,6 +68,15 @@ BonNodeSolver_DEPENDENCIES = \
 	$(ASL_DEPENDENCIES)
 
 ########################################################################
+#                     Installing manifest (MSVC++)                     #
+########################################################################
+
+install-exec-hook:
+	test -s bonmin.exe.manifest && \
+	mt -manifest bonmin.exe.manifest -outputresource:bonmin.exe;\
+	cp bonmin.exe $(bindir)/bonmin.exe
+
+########################################################################
 #                            Astyle stuff                              #
 ########################################################################
 
