@@ -570,6 +570,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@COIN_CXX_IS_CL_FALSE@install-exec-hook:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool \
@@ -641,12 +642,10 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 #                     Installing manifest (MSVC++)                     #
 ########################################################################
 
-install-exec-hook:
-	if COIN_CXX_IS_CL
-		test -s bonmin.exe.manifest && \
-		mt -manifest bonmin.exe.manifest -outputresource:bonmin.exe;\
-		cp bonmin.exe $(bindir)/bonmin.exe
-	endif
+@COIN_CXX_IS_CL_TRUE@install-exec-hook:
+@COIN_CXX_IS_CL_TRUE@	test -s bonmin.exe.manifest && \
+@COIN_CXX_IS_CL_TRUE@	mt -manifest bonmin.exe.manifest -outputresource:bonmin.exe;\
+@COIN_CXX_IS_CL_TRUE@	cp bonmin.exe $(bindir)/bonmin.exe
 
 astyle: $(ASTYLE_FILES)
 
