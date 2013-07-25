@@ -71,11 +71,13 @@ BonNodeSolver_DEPENDENCIES = \
 #                     Installing manifest (MSVC++)                     #
 ########################################################################
 
+if COIN_HAS_ASL
 if COIN_CXX_IS_CL
 install-exec-hook:
 	test -s bonmin.exe.manifest && \
 	mt -manifest bonmin.exe.manifest -outputresource:bonmin.exe;\
 	cp bonmin.exe $(bindir)/bonmin.exe
+endif
 endif
 
 ########################################################################
