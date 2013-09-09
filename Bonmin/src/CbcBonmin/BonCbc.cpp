@@ -597,75 +597,95 @@ namespace Bonmin
       OsiSolverInterface * solver = 
              (s.nonlinearSolver() == s.continuousSolver())? 
              model_.solver() : s.nonlinearSolver();
-      if(solver->isProvenPrimalInfeasible()){
+      if(! solver->isProvenOptimal()){
          bestSolution_ = NULL;
+         if ( solver->isProvenPrimalInfeasible () ) {
+           status = TMINLP::INFEASIBLE;
+           mipStatus_ = ProvenInfeasible;
+           bestObj_ = DBL_MAX;
+           bestBound_ = DBL_MAX;
+         }
+         else if ( solver->isProvenDualInfeasible () ) {
+           status = TMINLP::CONTINUOUS_UNBOUNDED;
+           mipStatus_ = UnboundedOrInfeasible;
+           bestObj_ = - DBL_MAX;
+           bestBound_ = - DBL_MAX;
+         }
+         else {
+           mipStatus_ = NoSolutionKnown;
+           bestObj_ = DBL_MAX;
+           bestBound_ = - DBL_MAX;
+         }
       }
       else {
          bestSolution_ = new double[solver->getNumCols()];
          CoinCopyN(solver->getColSolution(), solver->getNumCols(),
             bestSolution_);
          bestObj_ = bestBound_ = solver->getObjValue();
+          status = TMINLP::SUCCESS;
+          mipStatus_ = FeasibleOptimal;
       }
     }
-
-    if (bonBabInfoPtr->bestSolution2().size() > 0) {
-      assert((int) bonBabInfoPtr->bestSolution2().size() == s.nonlinearSolver()->getNumCols());
-      if (bestSolution_)
-        delete [] bestSolution_;
-      bestSolution_ = new double[s.nonlinearSolver()->getNumCols()];
-      std::copy(bonBabInfoPtr->bestSolution2().begin(), bonBabInfoPtr->bestSolution2().end(),
-          bestSolution_);
-      bestObj_ = (bonBabInfoPtr->bestObj2());
-       (*s.nonlinearSolver()->messageHandler())<<"\nReal objective function: "
-                                            <<bestObj_<<CoinMessageEol;
-    }
-    else if (model_.bestSolution()) {
-      if (bestSolution_)
-        delete [] bestSolution_;
-      bestSolution_ = new double[s.nonlinearSolver()->getNumCols()];
-      CoinCopyN(model_.bestSolution(), s.nonlinearSolver()->getNumCols(), bestSolution_);
-    }
-    if(remaining_time <= 0.){
-      status = TMINLP::LIMIT_EXCEEDED;
-      if (bestSolution_) {
-        mipStatus_ = Feasible;
-      }
-      else {
-        mipStatus_ = NoSolutionKnown;
-      }
-    }
-    else if (model_.status() == 0) {
-      if(model_.isContinuousUnbounded()){
-        status = TMINLP::CONTINUOUS_UNBOUNDED;
-        mipStatus_ = UnboundedOrInfeasible;
-      }
-      else
-      if (bestSolution_) {
-        status = TMINLP::SUCCESS;
-        mipStatus_ = FeasibleOptimal;
-      }
-      else {
-        status = TMINLP::INFEASIBLE;
-        mipStatus_ = ProvenInfeasible;
-      }
-    }
-    else if (model_.status() == 1 || model_.status() == 5) {
-      status = model_.status() == 1 ? TMINLP::LIMIT_EXCEEDED : TMINLP::USER_INTERRUPT;
-      if (bestSolution_) {
-        mipStatus_ = Feasible;
-      }
-      else {
-        mipStatus_ = NoSolutionKnown;
-      }
+    else {
+      if (bonBabInfoPtr->bestSolution2().size() > 0) {
+         assert((int) bonBabInfoPtr->bestSolution2().size() == s.nonlinearSolver()->getNumCols());
+         if (bestSolution_)
+           delete [] bestSolution_;
+         bestSolution_ = new double[s.nonlinearSolver()->getNumCols()];
+         std::copy(bonBabInfoPtr->bestSolution2().begin(), bonBabInfoPtr->bestSolution2().end(),
+             bestSolution_);
+         bestObj_ = (bonBabInfoPtr->bestObj2());
+          (*s.nonlinearSolver()->messageHandler())<<"\nReal objective function: "
+                                               <<bestObj_<<CoinMessageEol;
+       }
+       else if (model_.bestSolution()) {
+         if (bestSolution_)
+           delete [] bestSolution_;
+         bestSolution_ = new double[s.nonlinearSolver()->getNumCols()];
+         CoinCopyN(model_.bestSolution(), s.nonlinearSolver()->getNumCols(), bestSolution_);
+       }
+       if(remaining_time <= 0.){
+         status = TMINLP::LIMIT_EXCEEDED;
+         if (bestSolution_) {
+           mipStatus_ = Feasible;
+         }
+         else {
+           mipStatus_ = NoSolutionKnown;
+         }
+       }
+       else if (model_.status() == 0) {
+         if(model_.isContinuousUnbounded()){
+           status = TMINLP::CONTINUOUS_UNBOUNDED;
+           mipStatus_ = UnboundedOrInfeasible;
+         }
+         else
+         if (bestSolution_) {
+           status = TMINLP::SUCCESS;
+           mipStatus_ = FeasibleOptimal;
+         }
+         else {
+           status = TMINLP::INFEASIBLE;
+           mipStatus_ = ProvenInfeasible;
+         }
+       }
+       else if (model_.status() == 1 || model_.status() == 5) {
+         status = model_.status() == 1 ? TMINLP::LIMIT_EXCEEDED : TMINLP::USER_INTERRUPT;
+         if (bestSolution_) {
+           mipStatus_ = Feasible;
+         }
+         else {
+           mipStatus_ = NoSolutionKnown;
+         }
     }
     else if (model_.status()==2) {
       status = TMINLP::MINLP_ERROR;
     }
-    s.nonlinearSolver()->model()->finalize_solution(status,
-        s.nonlinearSolver()->getNumCols(),
-        bestSolution_,
-        bestObj_);
   }
+  s.nonlinearSolver()->model()->finalize_solution(status,
+     s.nonlinearSolver()->getNumCols(),
+     bestSolution_,
+     bestObj_);
+}
 
 
   /** return the best known lower bound on the objective value*/
