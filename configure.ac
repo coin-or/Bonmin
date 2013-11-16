@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Bonmin],[1.7],[bonmin@lists.coin-or.org])
+AC_INIT([Bonmin],[1.7.3],[bonmin@lists.coin-or.org])
 
 AC_COPYRIGHT([
 Copyright 2006 International Business Machines and others.
