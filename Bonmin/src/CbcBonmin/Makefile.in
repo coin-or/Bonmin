@@ -44,6 +44,11 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @COIN_HAS_ASL_TRUE@am__append_1 = libbonminampl.la
+@DEPENDENCY_LINKING_TRUE@am__append_2 = $(BONMINLIB_LIBS)
+@DEPENDENCY_LINKING_TRUE@am__append_3 = $(BONMINLIB_LIBS) \
+@DEPENDENCY_LINKING_TRUE@	$(BONMINAMPLINTERFACELIB_LIBS)
+
+@DEPENDENCY_LINKING_TRUE@am__append_4 = libbonmin.la
 subdir = src/CbcBonmin
 DIST_COMMON = $(includecoin_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -65,9 +70,20 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includecoindir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
+am__DEPENDENCIES_1 = ../Algorithms/libbonalgorithms.la \
+	../Interfaces/libbonmininterfaces.la \
+	Heuristics/libbonheuristics.la
+am__DEPENDENCIES_2 =
+@DEPENDENCY_LINKING_TRUE@am__DEPENDENCIES_3 = $(am__DEPENDENCIES_2)
 am_libbonmin_la_OBJECTS = BonCbc.lo BonCbcNlpStrategy.lo BonCbcNode.lo \
 	BonBabInfos.lo BonGuessHeuristic.lo BonDiver.lo
 libbonmin_la_OBJECTS = $(am_libbonmin_la_OBJECTS)
+@DEPENDENCY_LINKING_TRUE@am__DEPENDENCIES_4 = libbonmin.la
+am__DEPENDENCIES_5 = ../Algorithms/Ampl/libbonamplsetup.la \
+	../Interfaces/Ampl/libbonamplinterface.la \
+	$(am__DEPENDENCIES_4)
+@DEPENDENCY_LINKING_TRUE@am__DEPENDENCIES_6 = $(am__DEPENDENCIES_2) \
+@DEPENDENCY_LINKING_TRUE@	$(am__DEPENDENCIES_2)
 am_libbonminampl_la_OBJECTS =
 libbonminampl_la_OBJECTS = $(am_libbonminampl_la_OBJECTS)
 @COIN_HAS_ASL_TRUE@am_libbonminampl_la_rpath = -rpath $(libdir)
@@ -89,7 +105,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libbonmin_la_SOURCES) $(libbonminampl_la_SOURCES)
+SOURCES = $(libbonmin_la_SOURCES) $(libbonminampl_la_SOURCES) \
+	$(nodist_EXTRA_libbonminampl_la_SOURCES)
 DIST_SOURCES = $(libbonmin_la_SOURCES) $(libbonminampl_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -188,6 +205,8 @@ DBG_CXXFLAGS = @DBG_CXXFLAGS@
 DBG_FFLAGS = @DBG_FFLAGS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DEPENDENCY_LINKING_FALSE = @DEPENDENCY_LINKING_FALSE@
+DEPENDENCY_LINKING_TRUE = @DEPENDENCY_LINKING_TRUE@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -326,12 +345,12 @@ libbonmin_la_SOURCES = \
 	BonGuessHeuristic.cpp BonGuessHeuristic.hpp \
 	BonDiver.cpp BonDiver.hpp
 
-libbonmin_la_LIBADD = \
+libbonmin_la_LIBADD = $(libbonmin_la_DEPENDENCIES) $(am__append_2)
+libbonmin_la_DEPENDENCIES = \
 	../Algorithms/libbonalgorithms.la \
 	../Interfaces/libbonmininterfaces.la \
          Heuristics/libbonheuristics.la
 
-libbonmin_la_DEPENDENCIES = $(libbonmin_la_LIBADD)
 
 # This is for libtool
 libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
@@ -342,11 +361,17 @@ libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
 
 # List all source files, including headers
 libbonminampl_la_SOURCES = 
-libbonminampl_la_LIBADD = \
-	../Algorithms/Ampl/libbonamplsetup.la \
-	../Interfaces/Ampl/libbonamplinterface.la 
 
-libbonminampl_la_DEPENDENCIES = $(libbonminampl_la_LIBADD)
+# Dummy C++ source to cause C++ linking
+nodist_EXTRA_libbonminampl_la_SOURCES = dummy.cpp 
+
+# List all additionally required libraries
+libbonminampl_la_LIBADD = $(libbonminampl_la_DEPENDENCIES) \
+	$(am__append_3)
+
+# List all dependency libraries
+libbonminampl_la_DEPENDENCIES = ../Algorithms/Ampl/libbonamplsetup.la \
+	../Interfaces/Ampl/libbonamplinterface.la $(am__append_4)
 
 # This is for libtool
 libbonminampl_la_LDFLAGS = $(LT_LDFLAGS)
@@ -465,7 +490,7 @@ clean-libLTLIBRARIES:
 libbonmin.la: $(libbonmin_la_OBJECTS) $(libbonmin_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(libbonmin_la_LDFLAGS) $(libbonmin_la_OBJECTS) $(libbonmin_la_LIBADD) $(LIBS)
 libbonminampl.la: $(libbonminampl_la_OBJECTS) $(libbonminampl_la_DEPENDENCIES) 
-	$(LINK) $(am_libbonminampl_la_rpath) $(libbonminampl_la_LDFLAGS) $(libbonminampl_la_OBJECTS) $(libbonminampl_la_LIBADD) $(LIBS)
+	$(CXXLINK) $(am_libbonminampl_la_rpath) $(libbonminampl_la_LDFLAGS) $(libbonminampl_la_OBJECTS) $(libbonminampl_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -479,6 +504,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonCbcNode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonDiver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonGuessHeuristic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dummy.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
