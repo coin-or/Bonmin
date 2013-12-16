@@ -29,12 +29,15 @@ libbonmin_la_SOURCES = \
 	BonGuessHeuristic.cpp BonGuessHeuristic.hpp \
 	BonDiver.cpp BonDiver.hpp
 
-libbonmin_la_LIBADD = \
+libbonmin_la_LIBADD = $(libbonmin_la_DEPENDENCIES)
+if DEPENDENCY_LINKING
+libbonmin_la_LIBADD += $(BONMINLIB_LIBS)
+endif
+
+libbonmin_la_DEPENDENCIES = \
 	../Algorithms/libbonalgorithms.la \
 	../Interfaces/libbonmininterfaces.la \
          Heuristics/libbonheuristics.la
-
-libbonmin_la_DEPENDENCIES = $(libbonmin_la_LIBADD)
 
 # This is for libtool
 libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
@@ -46,11 +49,23 @@ libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
 # List all source files, including headers
 libbonminampl_la_SOURCES =
 
-libbonminampl_la_LIBADD = \
+# Dummy C++ source to cause C++ linking
+nodist_EXTRA_libbonminampl_la_SOURCES = dummy.cpp 
+
+# List all additionally required libraries
+libbonminampl_la_LIBADD = $(libbonminampl_la_DEPENDENCIES)
+if DEPENDENCY_LINKING
+libbonminampl_la_LIBADD += $(BONMINLIB_LIBS) \
+	$(BONMINAMPLINTERFACELIB_LIBS)
+endif
+
+# List all dependency libraries
+libbonminampl_la_DEPENDENCIES = \
 	../Algorithms/Ampl/libbonamplsetup.la \
 	../Interfaces/Ampl/libbonamplinterface.la 
-
-libbonminampl_la_DEPENDENCIES = $(libbonminampl_la_LIBADD)
+if DEPENDENCY_LINKING
+libbonminampl_la_DEPENDENCIES += libbonmin.la
+endif
 
 # This is for libtool
 libbonminampl_la_LDFLAGS = $(LT_LDFLAGS)
