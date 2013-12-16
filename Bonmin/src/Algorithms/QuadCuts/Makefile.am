@@ -70,7 +70,8 @@ includecoin_HEADERS = \
             BonQuadRow.hpp \
             BonTMatrix.hpp \
             BonTMINLPLinObj.hpp \
-            BonTMINLP2Quad.hpp
+            BonTMINLP2Quad.hpp \
+            BonLinearCutsGenerator.hpp
 
 
 ########################################################################
