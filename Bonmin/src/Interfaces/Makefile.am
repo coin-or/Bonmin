@@ -83,7 +83,8 @@ includecoin_HEADERS = \
      BonStrongBranchingSolver.hpp \
      BonTMINLP2OsiLP.hpp \
      BonTypes.hpp \
-     BonRegisteredOptions.hpp
+     BonRegisteredOptions.hpp \
+     BonExitCodes.hpp
 
 install-exec-local:
 	$(install_sh_DATA) config_bonmin.h $(DESTDIR)$(includecoindir)/BonminConfig.h
