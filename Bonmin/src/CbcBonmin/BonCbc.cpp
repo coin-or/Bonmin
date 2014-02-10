@@ -498,8 +498,10 @@ namespace Bonmin
       OsiTMINLPInterface * tnlpSolver = dynamic_cast<OsiTMINLPInterface *>(model_.solver());
       // Primal dual point is not copied if one (supposedely a better one) has already been put into the solver.
       if(tnlpSolver->problem()->has_x_init() != 2){
-        model_.solver()->setColSolution(colsol);
-        model_.solver()->setRowPrice(duals);
+        if( colsol != NULL )
+          model_.solver()->setColSolution(colsol);
+        if( duals != NULL )
+          model_.solver()->setRowPrice(duals);
       }
 #else
       OsiTMINLPInterface * tnlpSolver = dynamic_cast<OsiTMINLPInterface *>(model_.solver());

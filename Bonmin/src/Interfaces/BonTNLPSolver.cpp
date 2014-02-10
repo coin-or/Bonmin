@@ -251,7 +251,7 @@ TNLPSolver::UnsolvedError::writeDiffFiles(const std::string prefix) const{
       (problem may be solvable).*/
   bool 
   TNLPSolver::isRecoverable(ReturnStatus &r){
-    return (r >=0 || (r != illDefinedProblem && r != illegalOption && r != computationError && r != timeLimit) );
+    return (r >=0 || (r != illDefinedProblem && r != notEnoughFreedom && r != illegalOption && r != computationError && r != timeLimit) );
   }
 
 /** Initialize the options and the journalist.*/
