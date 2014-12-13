@@ -1,6 +1,6 @@
 /* Copyright (C) 2011
  * All Rights Reserved.
- * This code is published under the Eclipse Public License.
+ * This code is published under the Common Public License.
  *
  * $Id$
  *
