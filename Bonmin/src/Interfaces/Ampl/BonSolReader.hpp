@@ -1,6 +1,6 @@
 // (C) Copyright CNRS 2011
 // All Rights Reserved.
-// This code is published under the Common Public License.
+// This code is published under the Eclipse Public License.
 //
 // Authors :
 // Pierre Bonami, LIF, CNRS,

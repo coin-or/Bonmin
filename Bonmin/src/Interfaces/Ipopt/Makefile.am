@@ -1,6 +1,6 @@
 # Copyright (C) 2006 International Business Machines and others.
 # All Rights Reserved.
-# This file is distributed under the Common Public License.
+# This file is distributed under the Eclipse Public License.
 
 ## $Id: Makefile.am 83 2006-10-23 16:53:13Z pbonami $
 

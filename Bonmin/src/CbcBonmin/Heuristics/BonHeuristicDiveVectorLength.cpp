@@ -1,6 +1,6 @@
 // Copyright (C) 2007, International Business Machines Corporation and others. 
 // All Rights Reserved.
-// This code is published under the Common Public License.
+// This code is published under the Eclipse Public License.
 //
 // Authors :
 // Joao P. Goncalves, International Business Machines Corporation

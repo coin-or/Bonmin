@@ -2,7 +2,7 @@
 // Carnegie Mellon University 2004, 2007
 //
 // All Rights Reserved.
-// This code is published under the Common Public License.
+// This code is published under the Eclipse Public License.
 //
 // Authors :
 // Carl D. Laird, Carnegie Mellon University,

@@ -1,5 +1,5 @@
 // (C) Copyright CNRS
-// This code is published under the Common Public License.
+// This code is published under the Eclipse Public License.
 //
 // Authors :
 // Pierre Bonami, LIF Université de la Méditérannée-CNRS

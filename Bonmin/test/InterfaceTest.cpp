@@ -1,6 +1,6 @@
 // (C) Copyright Carnegie Mellon University 2005, 2007
 // All Rights Reserved.
-// This code is published under the Common Public License.
+// This code is published under the Eclipse Public License.
 //
 // Authors :
 // P. Bonami, Carnegie Mellon University

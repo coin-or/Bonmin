@@ -4,8 +4,8 @@ Bonmin (Basic Open-source Nonlinear Mixed INteger programming) is an
 open-source code for solving general MINLP (Mixed Integer NonLinear
 Programming) problems.
 
-It is distributed on COINOR (www.coin-or.org) under the CPL (Common Public
-License). The CPL is a license approved by the OSI (Open Source
+It is distributed on COIN-OR (www.coin-or.org) under the EPL (Eclipse Public
+License). The EPL is a license approved by the OSI (Open Source
 Initiative), thus Bonmin is OSI Certified Open Source Software.
 
 Bonmin features several algorithms
@@ -56,7 +56,7 @@ DEPENDENCIES : Bonmin depends on the following external software : -
 COIN-OR software : CoinUtils, Cbc, Cgl, Clp, Ipopt
 - Others : blas, lapck, HSL.
 
-EXTERNAL RESSOURCES : COIN-OR : www.coin-or.org Common Public License :
+EXTERNAL RESSOURCES : COIN-OR : www.coin-or.org Eclipse Public License :
 http://www.opensource.org/licenses/cpl.php
 
 IBM-CMU Open Source MINLP web page :

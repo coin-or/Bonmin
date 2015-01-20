@@ -1,6 +1,6 @@
 // (C) Copyright CNRS 2008
 // All Rights Reserved.
-// This code is published under the Common Public License.
+// This code is published under the Eclipse Public License.
 //
 // Authors :
 // P. Bonami, CNRS

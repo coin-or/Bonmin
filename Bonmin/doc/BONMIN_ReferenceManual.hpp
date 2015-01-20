@@ -6,7 +6,7 @@
 bonmin is an open source code for solving general MINLP (Mixed Integer
 Non-Linear Programming) problems.
 It is distributed on <A HREF='http://www.coin-or.org'> COIN-OR </A> under the
-<A HREF='http://www.opensource.org/licenses/cpl.php'> CPL (Common Public
+<A HREF='http://opensource.org/licenses/EPL-1.0'> EPL (Eclipse Public
 License) </A>. bonmin is a C++ code</p>
 
 <p>
