@@ -351,6 +351,7 @@ EXTRA_DIST = doc/Bonmin_ReferenceManual.hpp \
 ########################################################################
 pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = bonmin.pc $(am__append_2)
+addlibsdir = $(DESTDIR)$(datadir)/coin/doc/Bonmin
 
 ########################################################################
 #                         Maintainer Stuff                             #
@@ -767,6 +768,8 @@ info: info-recursive
 info-am:
 
 install-data-am: install-pkgconfiglibDATA
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 
 install-exec-am: install-exec-local
 
@@ -796,6 +799,8 @@ ps-am:
 
 uninstall-am: uninstall-info-am uninstall-local \
 	uninstall-pkgconfiglibDATA
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) uninstall-hook
 
 uninstall-info: uninstall-info-recursive
 
@@ -806,15 +811,15 @@ uninstall-info: uninstall-info-recursive
 	distclean-generic distclean-libtool distclean-recursive \
 	distclean-tags distcleancheck distdir distuninstallcheck dvi \
 	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-exec install-exec-am \
-	install-exec-local install-info install-info-am install-man \
-	install-pkgconfiglibDATA install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-generic mostlyclean-libtool \
-	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-info-am uninstall-local \
-	uninstall-pkgconfiglibDATA
+	install-data install-data-am install-data-hook install-exec \
+	install-exec-am install-exec-local install-info \
+	install-info-am install-man install-pkgconfiglibDATA \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am uninstall-hook \
+	uninstall-info-am uninstall-local uninstall-pkgconfiglibDATA
 
 
 ########################################################################
@@ -851,6 +856,16 @@ astyle:
 	cd src/Interfaces/Ampl; $(MAKE) astyle
 	cd src/Interfaces/Filter; $(MAKE) astyle
 	cd src/Interfaces/Ipopt; $(MAKE) astyle
+
+install-data-hook:
+	@$(mkdir_p) "$(addlibsdir)"
+@COIN_HAS_PKGCONFIG_TRUE@	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@:$(DESTDIR)$(pkgconfiglibdir) \
+@COIN_HAS_PKGCONFIG_TRUE@	$(PKG_CONFIG) --libs bonmin > $(addlibsdir)/bonmin_addlibs.txt
+@COIN_CXX_IS_CL_TRUE@@COIN_HAS_PKGCONFIG_FALSE@	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libbonmin.lib @BONMINLIB_LIBS_INSTALLED@" > $(addlibsdir)/bonmin_addlibs.txt
+@COIN_CXX_IS_CL_FALSE@@COIN_HAS_PKGCONFIG_FALSE@	echo -L@abs_lib_dir@ -lbonmin @BONMINLIB_LIBS_INSTALLED@ > $(addlibsdir)/bonmin_addlibs.txt
+
+uninstall-hook:
+	rm -f $(addlibsdir)/bonmin_addlibs.txt
 
 install-doc: $(DocFiles)
 	test -z "$(DocInstallDir)" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)"
