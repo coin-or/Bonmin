@@ -78,7 +78,7 @@ astyle:
 	cd src/Interfaces/Ampl; $(MAKE) astyle
 	cd src/Interfaces/Filter; $(MAKE) astyle
 	cd src/Interfaces/Ipopt; $(MAKE) astyle
-
+	
 ########################################################################
 #                  Installation of the .pc file                        #
 ########################################################################
@@ -88,24 +88,6 @@ pkgconfiglib_DATA = bonmin.pc
 if COIN_HAS_ASL
 pkgconfiglib_DATA += bonminamplinterface.pc
 endif
-
-addlibsdir = $(DESTDIR)$(datadir)/coin/doc/Bonmin
-
-install-data-hook:
-	@$(mkdir_p) "$(addlibsdir)"
-if COIN_HAS_PKGCONFIG
-	PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@:$(DESTDIR)$(pkgconfiglibdir) \
-	$(PKG_CONFIG) --libs bonmin > $(addlibsdir)/bonmin_addlibs.txt
-else
-if COIN_CXX_IS_CL
-	echo "-libpath:`$(CYGPATH_W) @abs_lib_dir@` libbonmin.lib @BONMINLIB_LIBS_INSTALLED@" > $(addlibsdir)/bonmin_addlibs.txt
-else
-	echo -L@abs_lib_dir@ -lbonmin @BONMINLIB_LIBS_INSTALLED@ > $(addlibsdir)/bonmin_addlibs.txt
-endif
-endif
-
-uninstall-hook:
-	rm -f $(addlibsdir)/bonmin_addlibs.txt
 
 ########################################################################
 #                         Maintainer Stuff                             #
