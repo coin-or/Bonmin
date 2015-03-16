@@ -62,6 +62,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/bonmin-uninstalled.pc.in \
 	$(srcdir)/bonmin.pc.in $(top_srcdir)/configure \
+	$(top_srcdir)/doxydoc/doxygen.conf.in \
 	$(top_srcdir)/examples/CppExample/Makefile.in \
 	$(top_srcdir)/examples/CppExample/MyBonmin.cpp \
 	$(top_srcdir)/examples/CppExample/MyTMINLP.cpp \
@@ -86,7 +87,8 @@ CONFIG_HEADER = $(top_builddir)/src/Interfaces/config.h \
 	$(top_builddir)/src/Interfaces/config_bonmin.h
 CONFIG_CLEAN_FILES = examples/OptionDocGen/Makefile \
 	examples/CppExample/Makefile bonmin.pc bonmin-uninstalled.pc \
-	bonminamplinterface.pc bonminamplinterface-uninstalled.pc
+	doxydoc/doxygen.conf bonminamplinterface.pc \
+	bonminamplinterface-uninstalled.pc
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -407,6 +409,8 @@ bonmin.pc: $(top_builddir)/config.status $(srcdir)/bonmin.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bonmin-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/bonmin-uninstalled.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+doxydoc/doxygen.conf: $(top_builddir)/config.status $(top_srcdir)/doxydoc/doxygen.conf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 bonminamplinterface.pc: $(top_builddir)/config.status $(top_srcdir)/src/CbcBonmin/bonminamplinterface.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bonminamplinterface-uninstalled.pc: $(top_builddir)/config.status $(top_srcdir)/src/CbcBonmin/bonminamplinterface-uninstalled.pc.in
@@ -574,7 +578,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/src/CbcBonmin $(distdir)/test $(distdir)/test/CppExample
+	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/doc $(distdir)/doxydoc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/src/CbcBonmin $(distdir)/test $(distdir)/test/CppExample
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \

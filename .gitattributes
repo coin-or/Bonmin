@@ -25,6 +25,7 @@ Bonmin/doc/option_pages/options_list_TEMPLATE.tex -text
 Bonmin/doc/option_pages/options_list_bonmin_content.tex -text
 Bonmin/doc/option_pages/options_list_filter_content.tex -text
 Bonmin/doc/option_pages/options_list_ipopt_content.tex -text
+Bonmin/doxydoc/doxygen.conf.in -text
 Bonmin/examples/CppExample/Mybonmin.opt -text
 Bonmin/examples/OptionDocGen/DocGen.cpp -text
 Bonmin/examples/OptionDocGen/Makefile.in -text

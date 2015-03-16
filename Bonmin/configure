@@ -20468,7 +20468,7 @@ fi;
 if test "$dependency_linking" = auto; then
   # On Cygwin and AIX, building DLLs doesn't work
   dependency_linking=no
-  if test x"$enable_shared" = xyes; then
+  if test x"$coin_disable_shared" = xno; then
     case $build in
       *-cygwin* | *-mingw*)
         case "$CC" in
@@ -24653,7 +24653,7 @@ fi
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile src/Apps/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/QuadCuts/Makefile src/Algorithms/OaGenerators/Makefile src/CbcBonmin/Heuristics/Makefile examples/OptionDocGen/Makefile experimental/Separable/Makefile experimental/RobotBonmin/Makefile test/Makefile examples/CppExample/Makefile bonmin.pc bonmin-uninstalled.pc"
+                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile src/Apps/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/QuadCuts/Makefile src/Algorithms/OaGenerators/Makefile src/CbcBonmin/Heuristics/Makefile examples/OptionDocGen/Makefile experimental/Separable/Makefile experimental/RobotBonmin/Makefile test/Makefile examples/CppExample/Makefile bonmin.pc bonmin-uninstalled.pc doxydoc/doxygen.conf"
 
 
 if test $coin_has_asl = yes ; then
@@ -25417,6 +25417,7 @@ do
   "examples/CppExample/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/CppExample/Makefile" ;;
   "bonmin.pc" ) CONFIG_FILES="$CONFIG_FILES bonmin.pc" ;;
   "bonmin-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES bonmin-uninstalled.pc" ;;
+  "doxydoc/doxygen.conf" ) CONFIG_FILES="$CONFIG_FILES doxydoc/doxygen.conf" ;;
   "bonminamplinterface.pc" ) CONFIG_FILES="$CONFIG_FILES bonminamplinterface.pc:src/CbcBonmin/bonminamplinterface.pc.in" ;;
   "bonminamplinterface-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES bonminamplinterface-uninstalled.pc:src/CbcBonmin/bonminamplinterface-uninstalled.pc.in" ;;
   "test/MyBonmin.cpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp" ;;
