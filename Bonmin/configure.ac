@@ -161,6 +161,12 @@ AC_CONFIG_LINKS([test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp
                  test/MyTMINLP.cpp:examples/CppExample/MyTMINLP.cpp
                  test/MyTMINLP.hpp:examples/CppExample/MyTMINLP.hpp])
 
+#############################################################################
+#                  Check for doxygen                                        #
+#############################################################################
+
+AC_COIN_DOXYGEN(CoinUtils Osi Clp Cgl Cbc Ipopt)
+
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
