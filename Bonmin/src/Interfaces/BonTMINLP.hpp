@@ -351,7 +351,7 @@ namespace Bonmin
      SimpleConcave/** Constraint is concave of the simple form y >= F(x).*/};
 
    /** Structure for marked non-convex constraints. With possibility of
-       storing index of a constraint relaxing the non-convex constraint*/
+       storing index of a constraint relaxing the non-convex constraint*/
    struct MarkedNonConvex {
       /** Default constructor gives "safe" values.*/
 	 MarkedNonConvex():
