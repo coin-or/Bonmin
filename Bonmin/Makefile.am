@@ -48,7 +48,7 @@ EXTRA_DIST = \
 #                           Extra Targets                              #
 ########################################################################
 
-.PHONY: doc test unitTest userman astyle nodeSolver
+.PHONY: doc test unitTest userman astyle nodeSolver doxydoc
 
 test: unitTest
 
@@ -62,6 +62,20 @@ doc:	userman
 
 userman: $(top_srcdir)/doc/BONMIN_UsersManual.tex
 	cd $(top_srcdir)/doc && pdflatex BONMIN_UsersManual.tex
+
+# Doxygen documentation
+
+doxydoc:
+	doxygen doxydoc/doxygen.conf
+
+clean-doxydoc:
+	( cd doxydoc ; rm -rf html *.log *.tag )
+
+clean-local: clean-doxydoc
+	if test -r test/Makefile; then cd test; $(MAKE) clean; fi
+
+distclean-local:
+	if test -r test/Makefile; then cd test; $(MAKE) distclean; fi
 
 install-exec-local: install-doc
 
@@ -78,7 +92,7 @@ astyle:
 	cd src/Interfaces/Ampl; $(MAKE) astyle
 	cd src/Interfaces/Filter; $(MAKE) astyle
 	cd src/Interfaces/Ipopt; $(MAKE) astyle
-	
+
 ########################################################################
 #                  Installation of the .pc file                        #
 ########################################################################
