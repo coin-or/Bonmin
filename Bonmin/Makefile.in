@@ -62,6 +62,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/bonmin-uninstalled.pc.in \
 	$(srcdir)/bonmin.pc.in $(top_srcdir)/configure \
+	$(top_srcdir)/doxydoc/doxygen.conf.in \
 	$(top_srcdir)/examples/CppExample/Makefile.in \
 	$(top_srcdir)/examples/CppExample/MyBonmin.cpp \
 	$(top_srcdir)/examples/CppExample/MyTMINLP.cpp \
@@ -86,7 +87,8 @@ CONFIG_HEADER = $(top_builddir)/src/Interfaces/config.h \
 	$(top_builddir)/src/Interfaces/config_bonmin.h
 CONFIG_CLEAN_FILES = examples/OptionDocGen/Makefile \
 	examples/CppExample/Makefile bonmin.pc bonmin-uninstalled.pc \
-	bonminamplinterface.pc bonminamplinterface-uninstalled.pc
+	doxydoc/doxygen.conf bonminamplinterface.pc \
+	bonminamplinterface-uninstalled.pc
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -181,8 +183,12 @@ COIN_HAS_COINDEPEND_FALSE = @COIN_HAS_COINDEPEND_FALSE@
 COIN_HAS_COINDEPEND_TRUE = @COIN_HAS_COINDEPEND_TRUE@
 COIN_HAS_CPX_FALSE = @COIN_HAS_CPX_FALSE@
 COIN_HAS_CPX_TRUE = @COIN_HAS_CPX_TRUE@
+COIN_HAS_DOXYGEN_FALSE = @COIN_HAS_DOXYGEN_FALSE@
+COIN_HAS_DOXYGEN_TRUE = @COIN_HAS_DOXYGEN_TRUE@
 COIN_HAS_FILTERSQP_FALSE = @COIN_HAS_FILTERSQP_FALSE@
 COIN_HAS_FILTERSQP_TRUE = @COIN_HAS_FILTERSQP_TRUE@
+COIN_HAS_LATEX_FALSE = @COIN_HAS_LATEX_FALSE@
+COIN_HAS_LATEX_TRUE = @COIN_HAS_LATEX_TRUE@
 COIN_HAS_OSICPX_FALSE = @COIN_HAS_OSICPX_FALSE@
 COIN_HAS_OSICPX_TRUE = @COIN_HAS_OSICPX_TRUE@
 COIN_HAS_PKGCONFIG_FALSE = @COIN_HAS_PKGCONFIG_FALSE@
@@ -298,6 +304,13 @@ build_alias = @build_alias@
 build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
+coin_doxy_excludes = @coin_doxy_excludes@
+coin_doxy_logname = @coin_doxy_logname@
+coin_doxy_tagfiles = @coin_doxy_tagfiles@
+coin_doxy_tagname = @coin_doxy_tagname@
+coin_doxy_usedot = @coin_doxy_usedot@
+coin_have_doxygen = @coin_have_doxygen@
+coin_have_latex = @coin_have_latex@
 datadir = @datadir@
 exec_prefix = @exec_prefix@
 have_autoconf = @have_autoconf@
@@ -361,8 +374,10 @@ DISTCLEANFILES = Test/*.$(OBJEXT) Test/unitTest$(EXEEXT) \
 	Test/CppExample/*.$(OBJEXT) \
 	Test/CppExample/CppExample$(EXEEXT) Test/testtoy.nl \
 	$(am__append_4) $(VPATH_DISTCLEANFILES)
-DocFiles = README AUTHORS LICENSE
+DocFiles = README AUTHORS LICENSE 
 DocInstallDir = $(datadir)/coin/doc/$(PACKAGE_NAME)
+COIN_HAS_DOXYGEN = @COIN_HAS_DOXYGEN_TRUE@TRUE
+COIN_HAS_LATEX = @COIN_HAS_LATEX_TRUE@TRUE
 all: all-recursive
 
 .SUFFIXES:
@@ -406,6 +421,8 @@ examples/CppExample/Makefile: $(top_builddir)/config.status $(top_srcdir)/exampl
 bonmin.pc: $(top_builddir)/config.status $(srcdir)/bonmin.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bonmin-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/bonmin-uninstalled.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+doxydoc/doxygen.conf: $(top_builddir)/config.status $(top_srcdir)/doxydoc/doxygen.conf.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bonminamplinterface.pc: $(top_builddir)/config.status $(top_srcdir)/src/CbcBonmin/bonminamplinterface.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
@@ -574,7 +591,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/doc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/src/CbcBonmin $(distdir)/test $(distdir)/test/CppExample
+	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/doc $(distdir)/doxydoc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/src/CbcBonmin $(distdir)/test $(distdir)/test/CppExample
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -748,13 +765,13 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
 distclean-am: clean-am distclean-generic distclean-libtool \
-	distclean-tags
+	distclean-local distclean-tags
 
 dvi: dvi-recursive
 
@@ -800,28 +817,28 @@ uninstall-am: uninstall-info-am uninstall-local \
 uninstall-info: uninstall-info-recursive
 
 .PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am am--refresh check \
-	check-am clean clean-generic clean-libtool clean-recursive \
-	ctags ctags-recursive dist dist-all dist-bzip2 dist-gzip \
-	dist-shar dist-tarZ dist-zip distcheck distclean \
-	distclean-generic distclean-libtool distclean-recursive \
-	distclean-tags distcleancheck distdir distuninstallcheck dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-exec install-exec-am \
-	install-exec-local install-info install-info-am install-man \
-	install-pkgconfiglibDATA install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-generic mostlyclean-libtool \
-	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-info-am uninstall-local \
-	uninstall-pkgconfiglibDATA
+	check-am clean clean-generic clean-libtool clean-local \
+	clean-recursive ctags ctags-recursive dist dist-all dist-bzip2 \
+	dist-gzip dist-shar dist-tarZ dist-zip distcheck distclean \
+	distclean-generic distclean-libtool distclean-local \
+	distclean-recursive distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-exec \
+	install-exec-am install-exec-local install-info \
+	install-info-am install-man install-pkgconfiglibDATA \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am uninstall-info-am \
+	uninstall-local uninstall-pkgconfiglibDATA
 
 
 ########################################################################
 #                           Extra Targets                              #
 ########################################################################
 
-.PHONY: doc test unitTest userman astyle nodeSolver
+.PHONY: doc test unitTest userman astyle nodeSolver doxydoc
 
 test: unitTest
 
@@ -835,6 +852,20 @@ doc:	userman
 
 userman: $(top_srcdir)/doc/BONMIN_UsersManual.tex
 	cd $(top_srcdir)/doc && pdflatex BONMIN_UsersManual.tex
+
+# Doxygen documentation
+
+doxydoc:
+	doxygen doxydoc/doxygen.conf
+
+clean-doxydoc:
+	( cd doxydoc ; rm -rf html *.log *.tag )
+
+clean-local: clean-doxydoc
+	if test -r test/Makefile; then cd test; $(MAKE) clean; fi
+
+distclean-local:
+	if test -r test/Makefile; then cd test; $(MAKE) distclean; fi
 
 install-exec-local: install-doc
 
@@ -852,12 +883,100 @@ astyle:
 	cd src/Interfaces/Filter; $(MAKE) astyle
 	cd src/Interfaces/Ipopt; $(MAKE) astyle
 
-install-doc: $(DocFiles)
+doxygen-docs: 
+	if test "$(COIN_HAS_DOXYGEN)" = TRUE; then \
+	  if test -d "doxydoc/"; then \
+	    doxygen doxydoc/doxygen.conf;\
+	  fi;\
+	fi
+
+pdf-doxygen-docs: doxygen-docs
+	if test "$(COIN_HAS_DOXYGEN)" = TRUE; then \
+	  if test -d "doxydoc/latex"; then \
+       	    if test "$(COIN_HAS_LATEX)" = TRUE; then \
+	      cd doxydoc/latex;\
+	      $(MAKE) pdf;\
+	      cd -;\
+	    fi;\
+	  fi;\
+	fi
+
+clean-doxygen-docs:
+	if test -d "doxydoc/"; then \
+	  cd doxydoc ;\
+	  rm -rf html latex *.log *.tag;\
+	fi
+
+install-doxygen-docs: doxygen-docs
+	if test "$(COIN_HAS_DOXYGEN)" = TRUE; then \
+	  if test -d "doxydoc/"; then \
+	    test -d "$(DESTDIR)$(DocInstallDir)/doxydoc" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)/doxydoc"; \
+	    $(INSTALL_DATA) @coin_doxy_tagname@ "$(DESTDIR)$(DocInstallDir)/@coin_doxy_tagname@";\
+	    if test -f "doxydoc/latex/refman.pdf"; then \
+	      $(INSTALL_DATA) doxydoc/latex/refman.pdf "$(DESTDIR)$(DocInstallDir)";\
+	    fi;\
+	    if test -d "doxydoc/html"; then \
+	      test -d "$(DESTDIR)$(DocInstallDir)/doxydoc/search/" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)/doxydoc/search/"; \
+	      $(INSTALL_DATA) doxydoc/html/*.* "$(DESTDIR)$(DocInstallDir)/doxydoc";\
+	      $(INSTALL_DATA) doxydoc/html/search/*.* "$(DESTDIR)$(DocInstallDir)/doxydoc/search";\
+            fi;\
+          fi;\
+        fi
+
+uninstall-doxygen-docs:
+	if test -d "$(DESTDIR)$(DocInstallDir)/doxydoc/"; then \
+	  rm -rf "$(DESTDIR)$(DocInstallDir)/doxydoc/"; \
+	fi
+	if test -f "$(DESTDIR)$(DocInstallDir)/refman.pdf"; then \
+	  rm -f "$(DESTDIR)$(DocInstallDir)/refman.pdf"; \
+	fi
+
+all-doxygen-docs:
+	for dir in $(subdirs) ; do \
+	  do_project=true;\
+	  for proj in $(COIN_SKIP_DOXYGEN); do\
+	    if test $$dir = $$proj; then\
+	      do_project=false;\
+	    fi;\
+	  done;\
+	  if test -r $$dir/doxydoc & $$do_project = true; then \
+	    (cd $$dir ; $(MAKE) doxygen-docs) \
+	  fi ; \
+	done ; 
+
+clean-all-doxygen-docs:
+	for dir in $(subdirs) ; do \
+	  if test -r $$dir/doxydoc ; then \
+	    (cd $$dir ; $(MAKE) clean-doxygen-docs) \
+	  fi ; \
+	done ; 
+
+install-all-doxygen-docs: all-doxygen-docs
+	for dir in $(subdirs) ; do \
+	  do_project=true;\
+	  for proj in $(COIN_SKIP_DOXYGEN); do\
+	    if test $$dir = $$proj; then\
+	      do_project=false;\
+	    fi;\
+	  done;\
+	  if test -r $$dir/doxydoc & $$do_project = true; then \
+	    (cd $$dir ; $(MAKE) install-doxygen-docs) \
+	  fi ; \
+	done ; 
+
+uninstall-all-doxygen-docs:
+	for dir in $(subdirs) ; do \
+	  if test -r $$dir/doxydoc ; then \
+	    (cd $$dir ; $(MAKE) uninstall-doxygen-docs) \
+	  fi ; \
+	done ; 
+
+install-doc: $(DocFiles) 
 	test -z "$(DocInstallDir)" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)"
 	for file in $(DocFiles); do \
 	  if test -f "$$file"; then dir=; else dir="$(srcdir)/"; fi; \
 	  if test -f "$$dir$$file"; then $(INSTALL_DATA) "$$dir$$file" "$(DESTDIR)$(DocInstallDir)/$$file"; fi; \
-	done
+	done 
 
 uninstall-doc:
 	for file in $(DocFiles); do \
