@@ -108,7 +108,7 @@ namespace Bonmin
 
     private:
         /** Journlist *info_/
-        Ipopt::SmartPtr<const Ipopt::Journalist> jnlst_;
+        Ipopt::SmartPtr<const Ipopt::Journalist> jnlst_; */
 
         /** @name Information about the problem */
         //@{

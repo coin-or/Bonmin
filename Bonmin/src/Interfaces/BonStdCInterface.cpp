@@ -241,7 +241,6 @@ Bool ReadBonminOptFile( BonminProblem bonmin_problem, char* file_path )
     std::string file_path_str( file_path );
     if( file_path_str.compare( "" ) == 0 )
     {
-        file_path = "bonmin.opt";
         bonmin_problem->bonmin_setup.readOptionsFile();
     }
     else
@@ -253,8 +252,9 @@ Bool ReadBonminOptFile( BonminProblem bonmin_problem, char* file_path )
 
 Bool OpenBonminOutputFile(BonminProblem bonmin_problem, char* file_name, Int print_level)
 {
-    std::string name(file_name);
-    EJournalLevel level = EJournalLevel(print_level);
+    // TODO
+    // std::string name(file_name);
+    // EJournalLevel level = EJournalLevel(print_level);
     // return (Bool) bonmin_problem->bonmin_setup.options()->OpenOutputFile(name, level);
     return ( Bool )true;
 }
@@ -311,7 +311,7 @@ Int BonminSolve(
 , Number* mult_x_U
 , UserDataPtr user_data)
 {
-
+    // TODO return a meaningful status code
     // Initialize and process options
     // ApplicationReturnStatus retval = ipopt_problem->app->Initialize();
     // if (retval!=Solve_Succeeded) {
@@ -449,4 +449,6 @@ Int BonminSolve(
         <<std::endl
         <<E.message()<<std::endl;
     }
+    
+    return 0;
 }
