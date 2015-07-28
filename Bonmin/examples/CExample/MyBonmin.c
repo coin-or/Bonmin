@@ -8,8 +8,9 @@
 // Date :  07.06.2015
 
 #include "MyBonmin.h"
-#include <assert.h>
 
+#include <assert.h>
+#include <stdlib.h>
 
 Bool eval_f(Index n, Number* x, Bool new_x,
                             Number* obj_value, UserDataPtr user_data)
