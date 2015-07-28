@@ -63,6 +63,7 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/Makefile.in $(srcdir)/bonmin-uninstalled.pc.in \
 	$(srcdir)/bonmin.pc.in $(top_srcdir)/configure \
 	$(top_srcdir)/doxydoc/doxygen.conf.in \
+	$(top_srcdir)/examples/CExample/Makefile.in \
 	$(top_srcdir)/examples/CppExample/Makefile.in \
 	$(top_srcdir)/examples/CppExample/MyBonmin.cpp \
 	$(top_srcdir)/examples/CppExample/MyTMINLP.cpp \
@@ -86,9 +87,9 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/Interfaces/config.h \
 	$(top_builddir)/src/Interfaces/config_bonmin.h
 CONFIG_CLEAN_FILES = examples/OptionDocGen/Makefile \
-	examples/CppExample/Makefile bonmin.pc bonmin-uninstalled.pc \
-	doxydoc/doxygen.conf bonminamplinterface.pc \
-	bonminamplinterface-uninstalled.pc
+	examples/CppExample/Makefile examples/CExample/Makefile \
+	bonmin.pc bonmin-uninstalled.pc doxydoc/doxygen.conf \
+	bonminamplinterface.pc bonminamplinterface-uninstalled.pc
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -418,6 +419,8 @@ examples/OptionDocGen/Makefile: $(top_builddir)/config.status $(top_srcdir)/exam
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 examples/CppExample/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/CppExample/Makefile.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+examples/CExample/Makefile: $(top_builddir)/config.status $(top_srcdir)/examples/CExample/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 bonmin.pc: $(top_builddir)/config.status $(srcdir)/bonmin.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bonmin-uninstalled.pc: $(top_builddir)/config.status $(srcdir)/bonmin-uninstalled.pc.in
@@ -591,7 +594,7 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/doc $(distdir)/doxydoc $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/src/CbcBonmin $(distdir)/test $(distdir)/test/CppExample
+	$(mkdir_p) $(distdir)/. $(distdir)/BuildTools $(distdir)/doc $(distdir)/doxydoc $(distdir)/examples/CExample $(distdir)/examples/CppExample $(distdir)/examples/OptionDocGen $(distdir)/src/CbcBonmin $(distdir)/test $(distdir)/test/CppExample
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -888,6 +891,10 @@ doxygen-docs:
 	  if test -d "doxydoc/"; then \
 	    doxygen doxydoc/doxygen.conf;\
 	  fi;\
+	fi
+
+pdf-doxygen-docs: doxygen-docs
+	if test "$(COIN_HAS_DOXYGEN)" = TRUE; then \
 	  if test -d "doxydoc/latex"; then \
        	    if test "$(COIN_HAS_LATEX)" = TRUE; then \
 	      cd doxydoc/latex;\
@@ -906,13 +913,13 @@ clean-doxygen-docs:
 install-doxygen-docs: doxygen-docs
 	if test "$(COIN_HAS_DOXYGEN)" = TRUE; then \
 	  if test -d "doxydoc/"; then \
+	    test -d "$(DESTDIR)$(DocInstallDir)/doxydoc" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)/doxydoc"; \
 	    $(INSTALL_DATA) @coin_doxy_tagname@ "$(DESTDIR)$(DocInstallDir)/@coin_doxy_tagname@";\
-	    test -d "$(DocInstallDir)/doxydoc" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)/doxydoc"; \
 	    if test -f "doxydoc/latex/refman.pdf"; then \
 	      $(INSTALL_DATA) doxydoc/latex/refman.pdf "$(DESTDIR)$(DocInstallDir)";\
 	    fi;\
 	    if test -d "doxydoc/html"; then \
-	      test -d "$(DocInstallDir)/doxydoc/search/" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)/doxydoc/search/"; \
+	      test -d "$(DESTDIR)$(DocInstallDir)/doxydoc/search/" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)/doxydoc/search/"; \
 	      $(INSTALL_DATA) doxydoc/html/*.* "$(DESTDIR)$(DocInstallDir)/doxydoc";\
 	      $(INSTALL_DATA) doxydoc/html/search/*.* "$(DESTDIR)$(DocInstallDir)/doxydoc/search";\
             fi;\

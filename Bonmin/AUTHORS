@@ -11,7 +11,7 @@
  Pietro Belotti (Lehigh).
  Stefan Vigerske (Humboldt-University, found and fixed many bugs when developping the GAMSlink for Bonmin)
  Hassan Hijazi (Orange Labs, experimental code for separable problems + various improvements)
-  
+ Shaurya Sharma (Elliptic Labs AS, contributor of C-interface, https://github.com/shaurya0/BonminCInterface)
 
 We would also like to acknoweldge  <br>
  L.T. Biegler (Carnegie Mellon University)  <br>

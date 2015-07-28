@@ -4071,7 +4071,7 @@ echo "$as_me: Will use MPI C++ compiler $MPICXX" >&6;}
   CXX="$MPICXX"
 fi
 
-# correct the LD variable in a build with MS or intel compiler
+# correct the LD variable in a build with MS or Intel-windows compiler
 case "$CXX" in
   clang* ) ;;
   cl* | */cl* | CL* | */CL* | icl* | */icl* | ICL* | */ICL*)
@@ -23665,10 +23665,14 @@ echo "$as_me: Will use MPI Fortran compiler $MPIF77" >&6;}
 fi
 
 # correct the LD variable if we use the intel fortran compiler in windows
-case "$F77" in
-  ifort* | */ifort* | IFORT* | */IFORT*)
-    LD=link
-    ;;
+case $build in
+  *-cygwin* | *-mingw*)
+    case "$F77" in
+      ifort* | */ifort* | IFORT* | */IFORT*)
+        LD=link
+      ;;
+    esac
+  ;;
 esac
 
 ac_ext=c
@@ -23733,7 +23737,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_verb"
-(eval echo $as_me:23736: \"$ac_link\") >&5
+(eval echo $as_me:23740: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -23811,7 +23815,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FFLAGS
 FFLAGS="$FFLAGS $ac_cv_prog_f77_v"
-(eval echo $as_me:23814: \"$ac_link\") >&5
+(eval echo $as_me:23818: \"$ac_link\") >&5
 ac_f77_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_f77_v_output" >&5
 FFLAGS=$ac_save_FFLAGS
@@ -24878,7 +24882,7 @@ done
 #                   Finishing up by writing all the output                   #
 ##############################################################################
 
-                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile src/Apps/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/QuadCuts/Makefile src/Algorithms/OaGenerators/Makefile src/CbcBonmin/Heuristics/Makefile examples/OptionDocGen/Makefile experimental/Separable/Makefile experimental/RobotBonmin/Makefile test/Makefile examples/CppExample/Makefile bonmin.pc bonmin-uninstalled.pc doxydoc/doxygen.conf"
+                                                                                                                                                                                                                            ac_config_files="$ac_config_files Makefile src/Apps/Makefile src/CbcBonmin/Makefile src/Interfaces/Makefile src/Interfaces/Ipopt/Makefile src/Interfaces/Filter/Makefile src/Interfaces/Ampl/Makefile src/Algorithms/Makefile src/Algorithms/Ampl/Makefile src/Algorithms/Branching/Makefile src/Algorithms/QuadCuts/Makefile src/Algorithms/OaGenerators/Makefile src/CbcBonmin/Heuristics/Makefile examples/OptionDocGen/Makefile experimental/Separable/Makefile experimental/RobotBonmin/Makefile test/Makefile examples/CppExample/Makefile examples/CExample/Makefile bonmin.pc bonmin-uninstalled.pc doxydoc/doxygen.conf"
 
 
 if test $coin_has_asl = yes ; then
@@ -25654,6 +25658,7 @@ do
   "experimental/RobotBonmin/Makefile" ) CONFIG_FILES="$CONFIG_FILES experimental/RobotBonmin/Makefile" ;;
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
   "examples/CppExample/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/CppExample/Makefile" ;;
+  "examples/CExample/Makefile" ) CONFIG_FILES="$CONFIG_FILES examples/CExample/Makefile" ;;
   "bonmin.pc" ) CONFIG_FILES="$CONFIG_FILES bonmin.pc" ;;
   "bonmin-uninstalled.pc" ) CONFIG_FILES="$CONFIG_FILES bonmin-uninstalled.pc" ;;
   "doxydoc/doxygen.conf" ) CONFIG_FILES="$CONFIG_FILES doxydoc/doxygen.conf" ;;

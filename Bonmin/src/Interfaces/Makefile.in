@@ -63,10 +63,10 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 @COIN_HAS_FILTERSQP_TRUE@	Filter/libfilterinterface.la
 am_libbonmininterfaces_la_OBJECTS = BonAuxInfos.lo BonBoundsReader.lo \
 	BonColReader.lo BonCutStrengthener.lo BonStartPointReader.lo \
-	BonOsiTMINLPInterface.lo BonTMINLP2TNLP.lo BonTMINLP2OsiLP.lo \
-	BonTMINLP.lo BonTNLPSolver.lo BonTNLP2FPNLP.lo \
-	BonBranchingTQP.lo BonStrongBranchingSolver.lo \
-	BonRegisteredOptions.lo
+	BonOsiTMINLPInterface.lo BonTMINLP2TNLP.lo BonStdCInterface.lo \
+	BonStdInterfaceTMINLP.lo BonTMINLP2OsiLP.lo BonTMINLP.lo \
+	BonTNLPSolver.lo BonTNLP2FPNLP.lo BonBranchingTQP.lo \
+	BonStrongBranchingSolver.lo BonRegisteredOptions.lo
 libbonmininterfaces_la_OBJECTS = $(am_libbonmininterfaces_la_OBJECTS)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -344,6 +344,8 @@ libbonmininterfaces_la_SOURCES = \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
 	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
 	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
+	BonStdCInterface.h BonStdCInterface.cpp \
+	BonStdInterfaceTMINLP.cpp BonStdInterfaceTMINLP.hpp \
 	BonTMINLP2OsiLP.cpp BonTMINLP2OsiLP.hpp \
 	BonTMINLP.cpp BonTMINLP.hpp \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
@@ -387,6 +389,7 @@ includecoin_HEADERS = \
      BonAuxInfos.hpp \
      BonTMINLP.hpp \
      BonTNLP2FPNLP.hpp \
+     BonStdCInterface.h \
      BonCutStrengthener.hpp \
      BonTNLPSolver.hpp \
      BonBranchingTQP.hpp \
@@ -426,6 +429,9 @@ ASTYLE_FILES = \
 	BonStrongBranchingSolver.hppbak \
 	BonTMINLP2TNLP.cppbak \
 	BonTMINLP2TNLP.hppbak \
+	BonStdInterfaceTMINLP.cppbak \
+	BonStdInterfaceTMINLP.hppbak \
+	BonStdCInterface.cppbak \
 	BonTMINLP.cppbak \
 	BonTMINLP.hppbak \
 	BonTNLP2FPNLP.cppbak \
@@ -523,6 +529,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOsiTMINLPInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonRegisteredOptions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonStartPointReader.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonStdCInterface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonStdInterfaceTMINLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonStrongBranchingSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTMINLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTMINLP2OsiLP.Plo@am__quote@

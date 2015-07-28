@@ -189,8 +189,9 @@ AC_CONFIG_FILES([Makefile
                  experimental/RobotBonmin/Makefile
                  test/Makefile
                  examples/CppExample/Makefile
+                 examples/CExample/Makefile
                  bonmin.pc bonmin-uninstalled.pc
-		 doxydoc/doxygen.conf])
+                 doxydoc/doxygen.conf])
 
 if test $coin_has_asl = yes ; then
   AC_CONFIG_FILES([bonminamplinterface.pc:src/CbcBonmin/bonminamplinterface.pc.in
