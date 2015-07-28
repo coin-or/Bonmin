@@ -59,7 +59,7 @@ namespace Bonmin
 
         virtual ~StdInterfaceTMINLP();
 
-    	virtual bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
+        virtual bool get_nlp_info(Ipopt::Index& n, Ipopt::Index& m, Ipopt::Index& nnz_jac_g,
             Ipopt::Index& nnz_h_lag, Ipopt::TNLP::IndexStyleEnum& index_style);
 
         virtual bool get_scaling_parameters(Ipopt::Number& obj_scaling,

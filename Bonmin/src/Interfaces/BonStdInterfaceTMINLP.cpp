@@ -345,23 +345,4 @@ namespace Bonmin
             }
         }
     }
-
-    // bool StdInterfaceTMINLP::intermediate_callback(AlgorithmMode mode,
-    //     Index iter, Number obj_value,
-    //     Number inf_pr, Number inf_du,
-    //     Number mu, Number d_norm,
-    //     Number regularization_size,
-    //     Number alpha_du, Number alpha_pr,
-    //     Index ls_trials,
-    //     const IpoptData* ip_data,
-    //     IpoptCalculatedQuantities* ip_cq)
-    // {
-    //     Bool retval = 1;
-    //     if (intermediate_cb_) {
-    //         retval = (*intermediate_cb_)((Index)mode, iter, obj_value, inf_pr, inf_du,
-    //             mu, d_norm, regularization_size, alpha_du,
-    //             alpha_pr, ls_trials, user_data_);
-    //     }
-    //     return (retval!=0);
-    // }
 }
