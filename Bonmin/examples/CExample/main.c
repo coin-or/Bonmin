@@ -50,6 +50,6 @@ int main(int argc, char const *argv[])
                                 mult_g, mult_x_L, mult_x_U, user_data);
 
     FreeBonminProblem(bonmin_problem);
-    printf("Finished\n");
+    printf("Finished: result = %d\n", result);
     return 0;
 }

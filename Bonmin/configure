@@ -24652,7 +24652,7 @@ if test $coin_vpath_config = yes; then
   done
 fi
 
-                              ac_config_links="$ac_config_links test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp test/MyTMINLP.cpp:examples/CppExample/MyTMINLP.cpp test/MyTMINLP.hpp:examples/CppExample/MyTMINLP.hpp"
+                                                            ac_config_links="$ac_config_links test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp test/MyTMINLP.cpp:examples/CppExample/MyTMINLP.cpp test/MyTMINLP.hpp:examples/CppExample/MyTMINLP.hpp test/MyBonminC.c:examples/CExample/MyBonmin.c test/MyBonmin.h:examples/CExample/MyBonmin.h test/main.c:examples/CExample/main.c"
 
 
 #############################################################################
@@ -25667,6 +25667,9 @@ do
   "test/MyBonmin.cpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp" ;;
   "test/MyTMINLP.cpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MyTMINLP.cpp:examples/CppExample/MyTMINLP.cpp" ;;
   "test/MyTMINLP.hpp" ) CONFIG_LINKS="$CONFIG_LINKS test/MyTMINLP.hpp:examples/CppExample/MyTMINLP.hpp" ;;
+  "test/MyBonminC.c" ) CONFIG_LINKS="$CONFIG_LINKS test/MyBonminC.c:examples/CExample/MyBonmin.c" ;;
+  "test/MyBonmin.h" ) CONFIG_LINKS="$CONFIG_LINKS test/MyBonmin.h:examples/CExample/MyBonmin.h" ;;
+  "test/main.c" ) CONFIG_LINKS="$CONFIG_LINKS test/main.c:examples/CExample/main.c" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "src/Interfaces/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/Interfaces/config.h" ;;
   "src/Interfaces/config_bonmin.h" ) CONFIG_HEADERS="$CONFIG_HEADERS src/Interfaces/config_bonmin.h" ;;

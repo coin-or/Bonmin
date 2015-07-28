@@ -64,6 +64,9 @@ DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/bonmin.pc.in $(top_srcdir)/configure \
 	$(top_srcdir)/doxydoc/doxygen.conf.in \
 	$(top_srcdir)/examples/CExample/Makefile.in \
+	$(top_srcdir)/examples/CExample/MyBonmin.c \
+	$(top_srcdir)/examples/CExample/MyBonmin.h \
+	$(top_srcdir)/examples/CExample/main.c \
 	$(top_srcdir)/examples/CppExample/Makefile.in \
 	$(top_srcdir)/examples/CppExample/MyBonmin.cpp \
 	$(top_srcdir)/examples/CppExample/MyTMINLP.cpp \

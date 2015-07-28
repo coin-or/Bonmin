@@ -159,7 +159,10 @@ AC_COIN_VPATH_LINK(test/bonmin.opt)
 AC_COIN_VPATH_LINK(test/mytoy.nl)
 AC_CONFIG_LINKS([test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp
                  test/MyTMINLP.cpp:examples/CppExample/MyTMINLP.cpp
-                 test/MyTMINLP.hpp:examples/CppExample/MyTMINLP.hpp])
+                 test/MyTMINLP.hpp:examples/CppExample/MyTMINLP.hpp
+                 test/MyBonminC.c:examples/CExample/MyBonmin.c
+                 test/MyBonmin.h:examples/CExample/MyBonmin.h
+                 test/main.c:examples/CExample/main.c])
 
 #############################################################################
 #                  Check for doxygen                                        #
