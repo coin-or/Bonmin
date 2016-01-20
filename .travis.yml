@@ -8,8 +8,8 @@ addons:
 
 before_install:
     - git clone https://gist.github.com/tkralphs/13d4529b4d4e8889f3a6 scripts
-    - bash scripts/get.dependencies.sh fetch 2> /dev/null
+    - bash scripts/get.dependencies.sh fetch &> /dev/null
 
-install: bash scripts/get.dependencies.sh build 2> /dev/null
+install: bash scripts/get.dependencies.sh build &> /dev/null
 
 script: make test
