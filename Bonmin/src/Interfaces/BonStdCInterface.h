@@ -1,11 +1,12 @@
-// (C) Copyright Shaurya Sharma
-// All Rights Reserved.
-// This code is published under the Eclipse Public License.
-//
-// Authors :
-// S. Sharma
-//
-// Date :  07.06.2015
+/* (C) Copyright Shaurya Sharma
+   All Rights Reserved.
+   This code is published under the Eclipse Public License.
+
+   Authors :
+   S. Sharma
+
+   Date :  07.06.2015
+*/
 
 #ifndef __BONSTDCINTERFACE_H__
 #define __BONSTDCINTERFACE_H__
