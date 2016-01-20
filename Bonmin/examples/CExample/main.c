@@ -39,6 +39,7 @@ int main(int argc, char const *argv[])
     Number *mult_x_L = (Number*)malloc(n*sizeof(Number));
     Number *mult_x_U = (Number*)malloc(n*sizeof(Number));
     UserDataPtr user_data = NULL;
+    Int result = 0;
 
     bonmin_problem = CreateBonminProblem(n, x_L, x_U, m, g_L, g_U, nnz_jac_g, nnz_h_lag,
                         index_style, &eval_f, &eval_g, &eval_grad_f,
@@ -47,8 +48,8 @@ int main(int argc, char const *argv[])
     AddBonminStrOption(bonmin_problem, "bonmin.algorithm", "B-OA");
 
 
-    Int result = BonminSolve(bonmin_problem, starting_point, NULL, obj_val,
-                                mult_g, mult_x_L, mult_x_U, user_data);
+    result = BonminSolve(bonmin_problem, starting_point, NULL, obj_val,
+			 mult_g, mult_x_L, mult_x_U, user_data);
 
     FreeBonminProblem(bonmin_problem);
     printf("Finished: result = %d\n", result);
