@@ -32,7 +32,6 @@ libbonmininterfaces_la_SOURCES = \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
 	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
 	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
-	BonStdCInterface.h BonStdCInterface.cpp \
 	BonStdInterfaceTMINLP.cpp BonStdInterfaceTMINLP.hpp \
 	BonTMINLP2OsiLP.cpp BonTMINLP2OsiLP.hpp \
 	BonTMINLP.cpp BonTMINLP.hpp \
@@ -41,6 +40,8 @@ libbonmininterfaces_la_SOURCES = \
 	BonBranchingTQP.cpp BonBranchingTQP.hpp \
 	BonStrongBranchingSolver.cpp BonStrongBranchingSolver.hpp \
         BonRegisteredOption.hpp BonRegisteredOptions.cpp
+
+#BonStdCInterface.h BonStdCInterface.cpp
 
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la 
@@ -79,7 +80,6 @@ includecoin_HEADERS = \
      BonAuxInfos.hpp \
      BonTMINLP.hpp \
      BonTNLP2FPNLP.hpp \
-     BonStdCInterface.h \
      BonCutStrengthener.hpp \
      BonTNLPSolver.hpp \
      BonBranchingTQP.hpp \
@@ -88,6 +88,7 @@ includecoin_HEADERS = \
      BonTypes.hpp \
      BonRegisteredOptions.hpp \
      BonExitCodes.hpp
+# BonStdCInterface.h
 
 install-exec-local:
 	$(install_sh_DATA) config_bonmin.h $(DESTDIR)$(includecoindir)/BonminConfig.h
@@ -126,7 +127,6 @@ ASTYLE_FILES = \
 	BonTMINLP2TNLP.hppbak \
 	BonStdInterfaceTMINLP.cppbak \
 	BonStdInterfaceTMINLP.hppbak \
-	BonStdCInterface.cppbak \
 	BonTMINLP.cppbak \
 	BonTMINLP.hppbak \
 	BonTNLP2FPNLP.cppbak \
@@ -135,6 +135,7 @@ ASTYLE_FILES = \
 	BonTNLPSolver.hppbak \
 	BonTypes.hppbak
 
+#BonStdCInterface.cppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

@@ -63,7 +63,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 @COIN_HAS_FILTERSQP_TRUE@	Filter/libfilterinterface.la
 am_libbonmininterfaces_la_OBJECTS = BonAuxInfos.lo BonBoundsReader.lo \
 	BonColReader.lo BonCutStrengthener.lo BonStartPointReader.lo \
-	BonOsiTMINLPInterface.lo BonTMINLP2TNLP.lo BonStdCInterface.lo \
+	BonOsiTMINLPInterface.lo BonTMINLP2TNLP.lo \
 	BonStdInterfaceTMINLP.lo BonTMINLP2OsiLP.lo BonTMINLP.lo \
 	BonTNLPSolver.lo BonTNLP2FPNLP.lo BonBranchingTQP.lo \
 	BonStrongBranchingSolver.lo BonRegisteredOptions.lo
@@ -125,6 +125,8 @@ ASL_DATA_INSTALLED = @ASL_DATA_INSTALLED@
 ASL_DEPENDENCIES = @ASL_DEPENDENCIES@
 ASL_LIBS = @ASL_LIBS@
 ASL_LIBS_INSTALLED = @ASL_LIBS_INSTALLED@
+
+#BonStdCInterface.cppbak
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
 AUTOCONF = @AUTOCONF@
@@ -344,7 +346,6 @@ libbonmininterfaces_la_SOURCES = \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
 	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
 	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
-	BonStdCInterface.h BonStdCInterface.cpp \
 	BonStdInterfaceTMINLP.cpp BonStdInterfaceTMINLP.hpp \
 	BonTMINLP2OsiLP.cpp BonTMINLP2OsiLP.hpp \
 	BonTMINLP.cpp BonTMINLP.hpp \
@@ -354,6 +355,8 @@ libbonmininterfaces_la_SOURCES = \
 	BonStrongBranchingSolver.cpp BonStrongBranchingSolver.hpp \
         BonRegisteredOption.hpp BonRegisteredOptions.cpp
 
+
+#BonStdCInterface.h BonStdCInterface.cpp
 
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la \
@@ -389,7 +392,6 @@ includecoin_HEADERS = \
      BonAuxInfos.hpp \
      BonTMINLP.hpp \
      BonTNLP2FPNLP.hpp \
-     BonStdCInterface.h \
      BonCutStrengthener.hpp \
      BonTNLPSolver.hpp \
      BonBranchingTQP.hpp \
@@ -431,7 +433,6 @@ ASTYLE_FILES = \
 	BonTMINLP2TNLP.hppbak \
 	BonStdInterfaceTMINLP.cppbak \
 	BonStdInterfaceTMINLP.hppbak \
-	BonStdCInterface.cppbak \
 	BonTMINLP.cppbak \
 	BonTMINLP.hppbak \
 	BonTNLP2FPNLP.cppbak \
@@ -529,7 +530,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonOsiTMINLPInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonRegisteredOptions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonStartPointReader.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonStdCInterface.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonStdInterfaceTMINLP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonStrongBranchingSolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BonTMINLP.Plo@am__quote@
@@ -863,6 +863,7 @@ uninstall-info: uninstall-info-recursive
 	tags tags-recursive uninstall uninstall-am \
 	uninstall-includecoinHEADERS uninstall-info-am uninstall-local
 
+# BonStdCInterface.h
 
 install-exec-local:
 	$(install_sh_DATA) config_bonmin.h $(DESTDIR)$(includecoindir)/BonminConfig.h
