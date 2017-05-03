@@ -32,7 +32,6 @@ libbonmininterfaces_la_SOURCES = \
 	BonStartPointReader.cpp BonStartPointReader.hpp \
 	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
 	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
-	BonStdInterfaceTMINLP.cpp BonStdInterfaceTMINLP.hpp \
 	BonTMINLP2OsiLP.cpp BonTMINLP2OsiLP.hpp \
 	BonTMINLP.cpp BonTMINLP.hpp \
 	BonTNLPSolver.hpp BonTNLPSolver.cpp \
@@ -42,6 +41,7 @@ libbonmininterfaces_la_SOURCES = \
         BonRegisteredOption.hpp BonRegisteredOptions.cpp
 
 #BonStdCInterface.h BonStdCInterface.cpp
+#BonStdInterfaceTMINLP.cpp BonStdInterfaceTMINLP.hpp
 
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la 
@@ -125,8 +125,6 @@ ASTYLE_FILES = \
 	BonStrongBranchingSolver.hppbak \
 	BonTMINLP2TNLP.cppbak \
 	BonTMINLP2TNLP.hppbak \
-	BonStdInterfaceTMINLP.cppbak \
-	BonStdInterfaceTMINLP.hppbak \
 	BonTMINLP.cppbak \
 	BonTMINLP.hppbak \
 	BonTNLP2FPNLP.cppbak \
@@ -136,6 +134,8 @@ ASTYLE_FILES = \
 	BonTypes.hppbak
 
 #BonStdCInterface.cppbak
+#BonStdInterfaceTMINLP.cppbak
+#BonStdInterfaceTMINLP.hppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
