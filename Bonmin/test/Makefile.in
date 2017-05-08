@@ -42,8 +42,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = $(am__EXEEXT_1) CppExample$(EXEEXT) \
-	CExample$(EXEEXT)
+noinst_PROGRAMS = $(am__EXEEXT_1) CppExample$(EXEEXT)
 @COIN_HAS_ASL_TRUE@am__append_1 = unitTest
 @COIN_HAS_ASL_TRUE@am__append_2 = ../src/CbcBonmin/libbonminampl.la $(ASL_LIBS)
 @COIN_HAS_ASL_TRUE@am__append_3 = ../src/CbcBonmin/libbonminampl.la $(ASL_DEPENDENCIES)
@@ -61,11 +60,9 @@ CONFIG_CLEAN_FILES = MyBonmin.cpp MyTMINLP.cpp MyTMINLP.hpp \
 	MyBonminC.c MyBonmin.h main.c
 @COIN_HAS_ASL_TRUE@am__EXEEXT_1 = unitTest$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
-am_CExample_OBJECTS = MyBonminC.$(OBJEXT) main.$(OBJEXT)
-CExample_OBJECTS = $(am_CExample_OBJECTS)
-am__DEPENDENCIES_1 =
 am_CppExample_OBJECTS = MyBonmin.$(OBJEXT) MyTMINLP.$(OBJEXT)
 CppExample_OBJECTS = $(am_CppExample_OBJECTS)
+am__DEPENDENCIES_1 =
 am_unitTest_OBJECTS = InterfaceTest.$(OBJEXT)
 unitTest_OBJECTS = $(am_unitTest_OBJECTS)
 @COIN_HAS_ASL_TRUE@am__DEPENDENCIES_2 =  \
@@ -73,14 +70,6 @@ unitTest_OBJECTS = $(am_unitTest_OBJECTS)
 @COIN_HAS_ASL_TRUE@	$(am__DEPENDENCIES_1)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
@@ -89,10 +78,16 @@ LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(CExample_SOURCES) $(CppExample_SOURCES) \
-	$(unitTest_SOURCES)
-DIST_SOURCES = $(CExample_SOURCES) $(CppExample_SOURCES) \
-	$(unitTest_SOURCES)
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+SOURCES = $(CppExample_SOURCES) $(unitTest_SOURCES)
+DIST_SOURCES = $(CppExample_SOURCES) $(unitTest_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -314,6 +309,7 @@ sol_cc_compiler = @sol_cc_compiler@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 AUTOMAKE_OPTIONS = foreign
+#CExample
 unitTest_SOURCES = \
 	InterfaceTest.cpp 
 
@@ -370,7 +366,7 @@ DISTCLEANFILES = MyBonmin.cpp  MyTMINLP.cpp  MyTMINLP.hpp MyBonmin.cpp  MyBonmin
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .cpp .lo .o .obj
+.SUFFIXES: .cpp .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -407,9 +403,6 @@ clean-noinstPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-CExample$(EXEEXT): $(CExample_OBJECTS) $(CExample_DEPENDENCIES) 
-	@rm -f CExample$(EXEEXT)
-	$(LINK) $(CExample_LDFLAGS) $(CExample_OBJECTS) $(CExample_LDADD) $(LIBS)
 CppExample$(EXEEXT): $(CppExample_OBJECTS) $(CppExample_DEPENDENCIES) 
 	@rm -f CppExample$(EXEEXT)
 	$(CXXLINK) $(CppExample_LDFLAGS) $(CppExample_OBJECTS) $(CppExample_LDADD) $(LIBS)
@@ -425,30 +418,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InterfaceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MyBonmin.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MyBonminC.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MyTMINLP.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
-
-.c.o:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ `$(CYGPATH_W) '$<'`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-.c.lo:
-@am__fastdepCC_TRUE@	if $(LTCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Plo"; else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

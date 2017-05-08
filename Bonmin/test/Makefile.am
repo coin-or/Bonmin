@@ -18,7 +18,8 @@ if COIN_HAS_ASL
 noinst_PROGRAMS += unitTest
 endif
 
-noinst_PROGRAMS += CppExample CExample
+noinst_PROGRAMS += CppExample
+#CExample
 
 unitTest_SOURCES = \
 	InterfaceTest.cpp 

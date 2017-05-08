@@ -92,6 +92,10 @@ extern "C"
 extern "C"
 {
 
+  void F77_FUNC(objgrad,OBJGRAD)() {
+    abort();
+  }
+
 /// Objective function evaluation
   void F77_FUNC(objfun,OBJFUN)(real *x, fint *n, real * f, real *user, fint * iuser, fint * errflag) {
     (*errflag) = !tnlpSolved->eval_f(*n, x, 1, *f);
@@ -123,6 +127,15 @@ extern "C"
       }
       *a++ = values[indice];
     }
+    printf("GRADIENT in");
+    for( int i = 0; i < *n; ++i )
+       printf(" %g", x[i]);
+    printf("\n");
+    printf("  =");
+    a -= *n + nnz;
+    for( int i = 0; i < *n + nnz; ++i )
+       printf(" %g", a[i]);
+    printf("\n");
     delete [] values;
   }
 
@@ -708,7 +721,7 @@ namespace Bonmin
     if(ifail == 3){
       f = rstat[4];
     }
-
+abort();
     cpuTime_ += CoinCpuTime();
   }
 

@@ -12,7 +12,7 @@
 using namespace  Ipopt;
 using namespace Bonmin;
 /** A C++ example for interfacing an MINLP with bonmin.
-   * This class implements the following NLP :
+   * This class implements the following MINLP :
   * \f[ 
     \begin{array}{l}
     \min - x_0 - x_1 - x_2 \\ 
