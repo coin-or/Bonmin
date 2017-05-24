@@ -91,6 +91,9 @@ namespace Bonmin
   bool
   IpoptSolver::Initialize(std::string params_file)
   {
+#ifdef NO_CATCH_ALL
+    app_->RethrowNonIpoptException(true);
+#endif
     Ipopt::ApplicationReturnStatus status =
       app_->Initialize(params_file);
     if (status != Ipopt::Solve_Succeeded) {
@@ -105,6 +108,9 @@ namespace Bonmin
   bool
   IpoptSolver::Initialize(std::istream &is)
   {
+#ifdef NO_CATCH_ALL
+    app_->RethrowNonIpoptException(true);
+#endif
     Ipopt::ApplicationReturnStatus status =
       app_->Initialize(is);
     if (status != Ipopt::Solve_Succeeded) {
