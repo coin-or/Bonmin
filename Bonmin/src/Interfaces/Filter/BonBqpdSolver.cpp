@@ -178,11 +178,13 @@ namespace Bonmin
         journalist_->Printf(Ipopt::J_SUMMARY, Ipopt::J_MAIN, "\nEXIT: Not enough memory.\n");
         return false;
       }
+#ifndef NO_CATCH_ALL
       catch (...) {
         Ipopt::IpoptException E("Unknown Exception caught in ipopt", "Unknown File", -1);
         E.ReportException(*journalist_);
         return false;
       }
+#endif
     }
     bool retval = Initialize(is);
     if (is) {
