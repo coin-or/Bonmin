@@ -52,11 +52,11 @@ CppExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES
 ##                      Example C program                             #
 #########################################################################
 
-CExample_SOURCES = MyBonminC.c  MyBonmin.h main.c
+#CExample_SOURCES = MyBonminC.c  MyBonmin.h main.c
 
 # List libraries that need to be linked in
-CExample_LDADD        = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_LIBS)
-CExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES)
+#CExample_LDADD        = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_LIBS)
+#CExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Cygwin
@@ -76,10 +76,11 @@ AM_CPPFLAGS = \
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
 
-test: unitTest$(EXEEXT) CppExample$(EXEEXT) CExample$(EXEEXT)
+#test: unitTest$(EXEEXT) CppExample$(EXEEXT) CExample$(EXEEXT)
+test: unitTest$(EXEEXT) CppExample$(EXEEXT)
 	./unitTest$(EXEEXT)
 	./CppExample$(EXEEXT)
-	./CExample$(EXEEXT)
+#	./CExample$(EXEEXT)
 
 .PHONY: test
 
