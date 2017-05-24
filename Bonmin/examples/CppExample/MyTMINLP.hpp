@@ -20,7 +20,7 @@ using namespace Bonmin;
     (x_1 - \frac{1}{2})^2 + (x_2 - \frac{1}{2})^2 \leq \frac{1}{4} \\
     x_0 - x_1 \leq 0 \\
     x_0 + x_2 + x_3 \leq 2\\
-    x_0 \in \{0,1\}^n \; (x_1, x_2) \in R^2 \; x_3 \in N
+    x_0 \in \{0,1\}^n \; (x_1, x_2) \in R^2 \; x_3 \in \{0,..,5\}
     \end{array}
     \f]
   */
