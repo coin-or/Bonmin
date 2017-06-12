@@ -1,4 +1,5 @@
 * text=auto !eol
+/.travis.yml -text
 Bonmin/AUTHORS -text
 Bonmin/INSTALL -text
 Bonmin/LICENSE -text
@@ -215,6 +216,7 @@ Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip
 /INSTALL -text
 /LICENSE -text
 /README -text
+/appveyor.yml -text
 /config.guess -text
 /config.sub -text
 /configure -text
