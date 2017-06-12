@@ -667,11 +667,13 @@ namespace Bonmin
       journalist_->Printf(Ipopt::J_ERROR, Ipopt::J_MAIN, "\n Not enough memory .... EXIT\n");
       throw -1;
     }
+#ifndef NO_CATCH_ALL
     catch (...) {
       Ipopt::IpoptException E("Uncaught exception in FilterSolver::FilterSolver()",
           "BonFilterSolver.cpp",-1);
       throw E;
     }
+#endif
 
     registerOptions();
   }
@@ -691,11 +693,13 @@ namespace Bonmin
         journalist_->Printf(Ipopt::J_SUMMARY, Ipopt::J_MAIN, "\nEXIT: Not enough memory.\n");
         throw -1;
       }
+#ifndef NO_CATCH_ALL
       catch (...) {
         Ipopt::IpoptException E("Unknown Exception caught in ipopt", "Unknown File", -1);
         E.ReportException(*journalist_);
         throw -1;
       }
+#endif
     }
     readOptionsStream(is);
     if (is) {
