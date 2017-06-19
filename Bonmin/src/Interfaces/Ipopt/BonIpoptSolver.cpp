@@ -33,6 +33,9 @@ namespace Bonmin
   {
     if (createEmpty) return;
     app_ = new Ipopt::IpoptApplication(GetRawPtr(roptions_), options_, journalist_);
+#ifdef NO_CATCH_ALL
+    app_->RethrowNonIpoptException(true);
+#endif
   }
 
   /// Constructor with Passed in journalist, registered options, options
@@ -48,6 +51,9 @@ namespace Bonmin
   {
     roptions_ = roptions;
     app_ = new Ipopt::IpoptApplication(GetRawPtr(roptions), options, journalist);
+#ifdef NO_CATCH_ALL
+    app_->RethrowNonIpoptException(true);
+#endif
   }
 
   /// Constructor with Passed in journalist, registered options, options
@@ -62,6 +68,9 @@ namespace Bonmin
   {
     roptions_ = roptions;
     app_ = new Ipopt::IpoptApplication(GetRawPtr(roptions), options, journalist);
+#ifdef NO_CATCH_ALL
+    app_->RethrowNonIpoptException(true);
+#endif
   }
 
   IpoptSolver::~IpoptSolver()
@@ -75,6 +84,9 @@ namespace Bonmin
     enable_warm_start_(false),
     optimized_before_(false){
       app_ = new Ipopt::IpoptApplication(GetRawPtr(roptions_), options_, journalist_);
+#ifdef NO_CATCH_ALL
+      app_->RethrowNonIpoptException(true);
+#endif
   }
 
   ///virtual constructor
@@ -91,9 +103,6 @@ namespace Bonmin
   bool
   IpoptSolver::Initialize(std::string params_file)
   {
-#ifdef NO_CATCH_ALL
-    app_->RethrowNonIpoptException(true);
-#endif
     Ipopt::ApplicationReturnStatus status =
       app_->Initialize(params_file);
     if (status != Ipopt::Solve_Succeeded) {
@@ -108,9 +117,6 @@ namespace Bonmin
   bool
   IpoptSolver::Initialize(std::istream &is)
   {
-#ifdef NO_CATCH_ALL
-    app_->RethrowNonIpoptException(true);
-#endif
     Ipopt::ApplicationReturnStatus status =
       app_->Initialize(is);
     if (status != Ipopt::Solve_Succeeded) {
