@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type = "text/xsl" href = "http://www.coin-or.org/projects/autoGen.xsl"?>
+<projectData xmlns="coin-or.org" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="coin-or.org http://www.coin-or.org/projects/autoGen.xsd">
+
+	<projectBasics>
+		<projectName>BONMIN</projectName>
+		<projectRepo>Bonmin</projectRepo>
+		<projectDescription>
+                BONMIN (Basic Open-source Nonlinear Mixed INteger programming)
+		is an open-source code for solving general MINLP (Mixed
+		Integer NonLinear Programming) problems.
+		It is distributed on COIN-OR under the CPL (Common Public License).
+                </projectDescription>
+		<projectShortDescription>
+		  An experimental open-source C++ code for solving general
+		  MINLP (Mixed Integer NonLinear Programming) problems.
+		</projectShortDescription>
+
+		<projectManager> Pierre Bonami, pierre.bonami at lif dot univ-mrs dot fr </projectManager>
+		<projectHomePage> http://www.coin-or.org/Bonmin</projectHomePage>
+		<projectLicense> Common Public License 1.0</projectLicense>
+		<projectLicenseURL>http://www.opensource.org/licenses/cpl1.0.php</projectLicenseURL>
+
+		<coinLinkedProjects>
+			<coinProject>
+				<repoName>Cbc</repoName>
+			</coinProject>
+			<coinProject>
+				<repoName>Cgl</repoName>
+			</coinProject>
+			<coinProject>
+				<repoName>Clp</repoName>
+			</coinProject>
+			<coinProject>
+				<repoName>CoinUtils</repoName>
+			</coinProject>
+			<coinProject>
+				<repoName>Ipopt</repoName>
+			</coinProject>
+			<coinProject>
+				<repoName>Osi</repoName>
+			</coinProject>
+		</coinLinkedProjects>
+
+		<otherLinkedPackages>
+		<otherPackage>
+				<packageName>Ampl Solver Library
+                                </packageName>
+				<packageURL>
+                                http://www.netlib.org/ampl/solvers
+                                </packageURL>
+				<requiredOrOptional>Optional
+                                </requiredOrOptional>
+			</otherPackage>
+		<otherPackage>
+				<packageName>Blas
+                                </packageName>
+				<packageURL>
+                                http://www.netlib.org/blas
+                                </packageURL>
+				<requiredOrOptional>Required (any implementation)
+                                </requiredOrOptional>
+			</otherPackage>
+
+			<otherPackage>
+				<packageName>CPLEX
+                                </packageName>
+				<packageURL>
+                                http://www.ilog.com/products/cplex/product/mip.cfm
+                                </packageURL>
+				<requiredOrOptional>Optional 
+                                </requiredOrOptional>
+			</otherPackage>
+
+			<otherPackage>
+				<packageName>Lapack
+                                </packageName>
+				<packageURL>
+                                http://www.netlib.org/lapack
+                                </packageURL>
+				<requiredOrOptional>Optional (any implementation)
+                                </requiredOrOptional>
+			</otherPackage>
+
+		
+			<otherPackage>
+				<packageName>MA27
+                                </packageName>
+				<packageURL>
+                                
+                                </packageURL>
+				<requiredOrOptional>Required
+                                </requiredOrOptional>
+			</otherPackage>
+		</otherLinkedPackages>
+
+		<projectLanguage>C++</projectLanguage>
+
+
+		<!--The following fields describe the development status       -->
+		<!--of the project.                                            -->
+		<!--                                                           -->
+		<!--Fill in your text below (outside the comment block).       -->
+
+		<developmentStatus>
+
+			<activityStatus>Active</activityStatus>
+
+			<!--The maturity level is determined during project    -->
+			<!--review and should have been reported to you.       -->
+			<!--See http://www.coin-or.org/faqs.html#q18 for       -->
+			<!--more information on maturity level.                -->
+			<!--Fill it in like this:                              -->
+			<!--                                                   -->
+			<!--<maturityLevel>5</maturityLevel>                   -->
+			<!--                                                   -->
+
+			<maturityLevel>4</maturityLevel>
+
+			<!-- Do not use these unless you want to override the
+			     automated system.    lh, 141124
+
+			<stableVersionNumber>1.5</stableVersionNumber>
+
+			<releaseNumber>1.4.2</releaseNumber>
+		        -->
+
+		</developmentStatus>
+
+
+		<testedPlatforms>
+
+		       <platform> 
+		          <operatingSystem>Microsoft Windows</operatingSystem>
+		          <compiler>CYGWIN/g++</compiler>                     
+		       </platform>
+
+		       <platform> 
+		          <operatingSystem>Microsoft Windows</operatingSystem>
+		          <compiler>MSys/g++</compiler>                       
+		       </platform>
+
+		       <platform> 
+		          <operatingSystem>Linux</operatingSystem>
+		          <compiler>g++</compiler>                
+		       </platform>
+
+		       <platform> 
+		          <operatingSystem>Mac OSX</operatingSystem>    
+		          <compiler>g++</compiler>                      
+		       </platform>
+		</testedPlatforms>
+		<projectCategories>
+			        <category>
+			            Optimization deterministic nonlinear discrete
+			        </category>
+		</projectCategories>
+	</projectBasics>
+
+	<!-- End of projectData block                                          -->
+		 <leftMenuLinks>
+
+		 		 <documentation>http://www.coin-or.org/Bonmin/Intro.html</documentation>
+
+		 		 <sourceCodeDownload>https://projects.coin-or.org/Bonmin/wiki/GettingStarted</sourceCodeDownload>
+				 <binaryDownload>http://www.coin-or.org/download/binary/Bonmin</binaryDownload>
+		 		 <mailingList>http://list.coin-or.org/mailman/listinfo/Bonmin</mailingList>
+
+		 </leftMenuLinks>
+
+		 <!-- End of projectData block                                          -->
+</projectData>
