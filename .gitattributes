@@ -1,4 +1,6 @@
 * text=auto !eol
+.ci/.travis.pre -text
+.ci/appveyor.pre -text
 .coin-or/projDesc.xml -text
 /.travis.yml -text
 Bonmin/AUTHORS -text
