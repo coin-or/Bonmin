@@ -8,6 +8,7 @@ matrix:
           packages:
             - gfortran
             - liblapack-dev
+      env: ENABLEDEBUG=true
     - os: linux
       dist: bionic
       addons:
@@ -15,31 +16,52 @@ matrix:
           packages:
             - gfortran
             - liblapack-dev
+      env: VISHIDDEN=true
     - os: osx
-      osx_image: xcode11
-      env: OSX=10.14 CC=gcc CXX=g++ 
+      osx_image: xcode11.3
+      env: OSX=10.14 VISHIDDEN=true
       compiler: clang
     - os: osx
-      osx_image: xcode11
-      env: OSX=10.14 
+      osx_image: xcode10.1
+      env: OSX=10.13 ENABLEDEBUG=true
       compiler: clang
     - os: osx
-      osx_image: xcode10
-      env: OSX=10.13 
-      compiler: clang
-    - os: osx
-      osx_image: xcode9.2
-      env: OSX=10.12 
+      osx_image: xcode9.3
+      env: OSX=10.13
       compiler: clang
 
 before_script:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install bash gcc; clang --version; gfortran --version; fi
-  - if [[ "$TRAVIS_OS_NAME $CC" == "osx gcc" ]]; then export CC=gcc-9 ; export CXX=g++-9 ; $CC --version; $CXX --version; fi
-  - cd ..
-  - wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew
-  - export PROJECT_URL=https://github.com/$TRAVIS_REPO_SLUG
-  - export PROJECT=`echo $TRAVIS_REPO_SLUG | cut -d "/" -f 2`
-  - bash ./coinbrew fetch $PROJECT_URL:$TRAVIS_BRANCH --no-prompt --skip-update  > /dev/null 
+  - export VISHIDDEN=false  #${VISHIDDEN:-false}
+  - export ENABLEDEBUG=${ENABLEDEBUG:-false}
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install bash gcc; export CC=gcc-9 ; export CXX=g++-9 ; $CC --version; $CXX --version; gfortran --version; fi
 
 script:
-  - bash ./coinbrew build $PROJECT --no-prompt --verbosity=2 --test
+  - git clone --depth 1 https://github.com/coin-or-tools/ThirdParty-ASL
+  - git clone --depth 1 https://github.com/coin-or-tools/ThirdParty-Metis
+  - git clone --depth 1 https://github.com/coin-or-tools/ThirdParty-Mumps
+  - git clone --depth 1 https://github.com/coin-or/CoinUtils
+  - git clone --depth 1 https://github.com/coin-or/Osi
+  - git clone --depth 1 https://github.com/coin-or/Clp
+  - git clone --depth 1 https://github.com/coin-or/Cgl
+  - git clone --depth 1 https://github.com/coin-or/Cbc
+  - pushd ThirdParty-ASL && ./get.ASL && ./configure --prefix=$HOME/install && make && make install && popd
+  - pushd ThirdParty-Metis && ./get.Metis && ./configure --prefix=$HOME/install && make && make install && popd
+  - pushd ThirdParty-Mumps && ./get.Mumps && ./configure --prefix=$HOME/install && make && make install && popd
+  - pushd CoinUtils/CoinUtils && ./configure --prefix=$HOME/install && make && make install && popd
+  - pushd Osi/Osi && ./configure --prefix=$HOME/install && make && make install && popd
+  - pushd Clp/Clp && ./configure --prefix=$HOME/install && make && make install && popd
+  - pushd Cgl/Cgl && ./configure --prefix=$HOME/install && make && make install && popd
+  - pushd Cbc/Cbc && ./configure --prefix=$HOME/install && make && make install && popd
+  - mkdir build
+  - pushd build
+  - export CFLAGS="-Wall -Wextra -Werror"
+  - export CXXFLAGS="-Wall -Wextra -Werror"
+  - if $VISHIDDEN ; then CFLAGS="$CFLAGS -fvisibility=hidden" ; fi
+  - if $VISHIDDEN ; then CXXFLAGS="$CXXFLAGS -fvisibility=hidden" ; fi
+  - export CFGFLAGS=""
+  - if $ENABLEDEBUG ; then CFGFLAGS="$CFGFLAGS --enable-debug" ; fi
+  - if ! $ENABLEDEBUG ; then CFLAGS="$CFLAGS -DNDEBUG" ; CXXFLAGS="$CXXFLAGS -DNDEBUG" ; fi
+  - ../Bonmin/configure --prefix=$HOME/install $CFGFLAGS
+  - make
+  - make test
+  - make install
