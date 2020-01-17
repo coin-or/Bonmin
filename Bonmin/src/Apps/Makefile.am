@@ -24,8 +24,6 @@ bonmin_SOURCES = BonMin.cpp
 bonmin_LDADD = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la
-#	$(BONMINLIB_LIBS) \
-#	$(ASL_LIBS)
 
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
@@ -48,8 +46,6 @@ BonNodeSolver_SOURCES = BonNodeSolver.cpp
 BonNodeSolver_LDADD = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la
-#	$(BONMINLIB_LIBS) \
-#	$(ASL_LIBS)
 
 ########################################################################
 #                            Astyle stuff                              #

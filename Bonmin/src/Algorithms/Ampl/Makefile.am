@@ -21,8 +21,7 @@ libbonamplsetup_la_SOURCES = BonAmplSetup.cpp
 # This is for libtool
 libbonamplsetup_la_LDFLAGS = $(LT_LDFLAGS)
 
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
+# Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
 	-I$(srcdir)/../OaGenerators \
 	-I$(srcdir)/../Branching \

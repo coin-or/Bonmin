@@ -30,8 +30,8 @@ AM_CPPFLAGS = \
 ########################################################################
 
 robotbonmin_SOURCES = Robot-bonmin.cpp \
-               RobotSetup.cpp \
-               BonNWayChoose.cpp BonNWayObject.cpp
+                      RobotSetup.cpp \
+                      BonNWayChoose.cpp BonNWayObject.cpp
 
 robotbonmin_LDADD = \
 	../../src/Interfaces/Ampl/libbonamplinterface.la \

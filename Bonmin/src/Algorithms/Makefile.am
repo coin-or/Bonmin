@@ -16,7 +16,7 @@ SUBDIRS = \
        QuadCuts
 
 if COIN_HAS_ASL
-SUBDIRS += Ampl
+  SUBDIRS += Ampl
 endif
 
 noinst_LTLIBRARIES = libbonalgorithms.la

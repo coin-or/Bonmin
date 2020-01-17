@@ -44,10 +44,6 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../../Interfaces/Filter \
 	$(BONMINLIB_CFLAGS)
 
-# Currently, the following has to be included for BonChooseVariable.hpp, but
-# we should try to unmangle the connection to Cbc
-#AM_CPPFLAGS += -I$(srcdir)/../../CbcBonmin
-
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################

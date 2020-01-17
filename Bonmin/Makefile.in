@@ -372,24 +372,6 @@ SUBDIRS = src/Interfaces src/Algorithms src/CbcBonmin src/Apps \
 	$(am__append_1)
 
 ########################################################################
-#             Additional files to be included in tarball               #
-########################################################################
-
-# Here we need include all files that are not mentioned in other Makefiles
-EXTRA_DIST = \
-	doc/Bonmin_ReferenceManual.hpp \
-	doc/Bonm-Min_UsersManual.pdf \
-	doc/Bonm-Min_UsersManual.tex \
-	doc/BOUM_Intro.tex \
-	doc/options.tex \
-	test/InterfaceTest.cpp \
-	test/CppExample/MyTMINLP.hpp \
-	test/CppExample/MyTMINLP.cpp \
-	test/CppExample/MyBonmin.cpp \
-	test/mytoy.nl
-
-
-########################################################################
 #                  Installation of the .pc file                        #
 ########################################################################
 pkgconfiglibdir = $(libdir)/pkgconfig

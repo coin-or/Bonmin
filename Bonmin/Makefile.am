@@ -14,9 +14,9 @@ AUTOMAKE_OPTIONS = foreign
 
 # Here list all subdirectories into which to recurse
 SUBDIRS = src/Interfaces \
-	  src/Algorithms \
-	  src/CbcBonmin \
-	  src/Apps
+	src/Algorithms \
+	src/CbcBonmin \
+	src/Apps
 
 # We don't want to compile the test subdirectory, unless the test target is
 # specified.  But we need to list it as subdirectory to make sure that it is
@@ -25,24 +25,6 @@ SUBDIRS = src/Interfaces \
 if ALWAYS_FALSE
   SUBDIRS += test
 endif
-
-########################################################################
-#             Additional files to be included in tarball               #
-########################################################################
-
-# Here we need include all files that are not mentioned in other Makefiles
-
-EXTRA_DIST = \
-	doc/Bonmin_ReferenceManual.hpp \
-	doc/Bonm-Min_UsersManual.pdf \
-	doc/Bonm-Min_UsersManual.tex \
-	doc/BOUM_Intro.tex \
-	doc/options.tex \
-	test/InterfaceTest.cpp \
-	test/CppExample/MyTMINLP.hpp \
-	test/CppExample/MyTMINLP.cpp \
-	test/CppExample/MyBonmin.cpp \
-	test/mytoy.nl
 
 ########################################################################
 #                           Extra Targets                              #
@@ -100,7 +82,7 @@ astyle:
 pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = bonmin.pc
 if COIN_HAS_ASL
-pkgconfiglib_DATA += bonminamplinterface.pc
+  pkgconfiglib_DATA += bonminamplinterface.pc
 endif
 
 ########################################################################
