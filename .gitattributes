@@ -219,11 +219,5 @@ Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip
 /LICENSE -text
 /README -text
 /appveyor.yml -text
-/config.guess -text
-/config.sub -text
-/configure -text
-/depcomp -text
 doxydoc/doxygen.conf -text
 doxydoc/doxygen.conf.in -text
-/install-sh -text
-/missing -text
