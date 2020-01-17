@@ -50,10 +50,10 @@ nodist_EXTRA_libbonminampl_la_SOURCES = dummy.cpp
 
 # List all additionally required libraries
 libbonminampl_la_LIBADD = \
-	libbonmin.la
 	../Algorithms/Ampl/libbonamplsetup.la \
 	../Interfaces/Ampl/libbonamplinterface.la \
-	$(BONMINLIB_LFLAGS) $(BONMINAMPLINTERFACELIB_LFLAGS)
+	libbonmin.la \
+	$(BONMINAMPLINTERFACELIB_LFLAGS)
 
 # This is for libtool
 libbonminampl_la_LDFLAGS = $(LT_LDFLAGS)

@@ -150,7 +150,9 @@ am__v_lt_1 =
 libbonmin_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(libbonmin_la_LDFLAGS) $(LDFLAGS) -o $@
-libbonminampl_la_DEPENDENCIES = libbonmin.la
+libbonminampl_la_DEPENDENCIES = ../Algorithms/Ampl/libbonamplsetup.la \
+	../Interfaces/Ampl/libbonamplinterface.la libbonmin.la \
+	$(am__DEPENDENCIES_1)
 am_libbonminampl_la_OBJECTS =
 libbonminampl_la_OBJECTS = $(am_libbonminampl_la_OBJECTS)
 libbonminampl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
@@ -425,7 +427,10 @@ nodist_EXTRA_libbonminampl_la_SOURCES = dummy.cpp
 
 # List all additionally required libraries
 libbonminampl_la_LIBADD = \
-	libbonmin.la
+	../Algorithms/Ampl/libbonamplsetup.la \
+	../Interfaces/Ampl/libbonamplinterface.la \
+	libbonmin.la \
+	$(BONMINAMPLINTERFACELIB_LFLAGS)
 
 
 # This is for libtool
@@ -863,9 +868,6 @@ uninstall-am: uninstall-includecoinHEADERS uninstall-libLTLIBRARIES
 
 .PRECIOUS: Makefile
 
-	../Algorithms/Ampl/libbonamplsetup.la \
-	../Interfaces/Ampl/libbonamplinterface.la \
-	$(BONMINLIB_LFLAGS) $(BONMINAMPLINTERFACELIB_LFLAGS)
 
 astyle: $(ASTYLE_FILES)
 
