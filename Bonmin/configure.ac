@@ -24,45 +24,51 @@ under the Eclipse Public License.])
 # whether the package is actually there
 AC_CONFIG_SRCDIR(src/CbcBonmin/BonCbc.hpp)
 
-# Where should everything be installed by default?  Here, we want it
-# to be installed directly in 'bin', 'lib', 'include' subdirectories
-# of the directory where configure is run.  The default would be
-# /usr/local.
-AC_PREFIX_DEFAULT([`pwd`])
+# Do some initialization work (version numbers, change prefix default, ...)
+
+AC_COIN_INITIALIZE(Bonmin)
 
 #############################################################################
 #                         Standard build tool stuff                         #
 #############################################################################
 
-# Get the system type
-AC_CANONICAL_BUILD
-
-# If this project depends on external projects, the Externals file in
-# the source root directory contains definition of where to find those
-# externals.  The following macro ensures that those externals are
-# retrieved by svn if they are not there yet.
-AC_COIN_PROJECTDIR_INIT(Bonmin)
-
-# Check if user wants to produce debugging code
-AC_COIN_DEBUG_COMPILE(Bonmin)
-
 # Get the name of the C++ compiler and appropriate compiler options
+
 AC_COIN_PROG_CXX
 
+# Initialize libtool
 
-# Initialize automake and libtool
-AC_COIN_INIT_AUTO_TOOLS
+AC_COIN_PROG_LIBTOOL
+
+# set RPATH_FLAGS to the compiler link flags required to hardcode location
+# of the shared objects (expanded_libdir is set somewhere in configure before)
+# (use in examples Makefile)
+AC_COIN_RPATH_FLAGS([$expanded_libdir])
+
+# Check for cmath/math.h, cfloat/float.h, cieeefp/ieeefp.h
+
+#AC_COIN_CHECK_MATH_HDRS
 
 #############################################################################
 #                           COIN-OR components                              #
 #############################################################################
 
-AC_COIN_CHECK_PACKAGE(CoinDepend, [cbc osi-clp ipopt], [BonminLib])
-if test $coin_has_coindepend != yes ; then
-  AC_MSG_ERROR([Required package Cbc or Ipopt not available.])
+AC_COIN_CHK_PKG(Cbc,[BonminLib])
+if test $coin_has_cbc != yes ; then
+  AC_MSG_ERROR([Required package Cbc is not available.])
 fi
 
-AC_COIN_CHECK_PACKAGE(ASL, [ipoptamplinterface], [BonminAmplInterfaceLib])
+AC_COIN_CHK_PKG(Ipopt,[BonminLib])
+if test $coin_has_ipopt != yes ; then
+  AC_MSG_ERROR([Required package Cbc is not available.])
+fi
+
+AC_COIN_CHK_PKG(OsiClp,[BonminLib],[osi-clp])
+if test $coin_has_osiclp != yes ; then
+  AC_MSG_ERROR([Required package OsiClp is not available.])
+fi
+
+AC_COIN_CHK_PKG(ASL,[BonminAmplInterfaceLib],[ipoptamplinterface])
 
 #AC_COIN_CHECK_PACKAGE(Bcp, [bcp])
 #
@@ -82,30 +88,33 @@ AC_COIN_CHECK_PACKAGE(ASL, [ipoptamplinterface], [BonminAmplInterfaceLib])
 #############################################################################
 
 # Check whether OsiCplex is available
-AC_COIN_CHECK_PACKAGE(OsiCpx, [osi-cplex], [BonminLib])
+AC_COIN_CHK_PKG(OsiCpx,[BonminLib],[osi-cplex])
 
 # To get also the directory where cplex.h can be found, we also check for cplex directly.
-AC_COIN_CHECK_USER_LIBRARY([Cplex], [CPX],[cplex.h],[CPXgetstat])
+AC_COIN_CHK_LIB(Cplex,[BonminLib],[-lcplex -lpthread -lm -ldl],[],[],[CPXgetstat])
 
 #############################################################################
 #                                FilterSQP                                  #
 #############################################################################
 
+#TODO
 # for backward compatibility, map --with-filtersqp to --with-filtersqp-libs
 AC_ARG_WITH([filtersqp],
             AC_HELP_STRING([--with-filtersqp],
                            [specify library for FilterSQP (or BUILD for compilation)]),
             [filtersqp_libs="$withval"])
 
-AC_COIN_CHECK_PACKAGE(FilterSQP, [coinfiltersqp], [BonminLib])
+#AC_COIN_CHECK_PACKAGE(FilterSQP, [coinfiltersqp], [BonminLib])
+coin_has_filtersqp=no
 
 if test $coin_has_filtersqp = yes
 then
+:
   # Get the name of the Fortran compiler and appropriate compiler options
-  AC_COIN_PROG_F77
+  #AC_COIN_PROG_F77
 
   # Find out how to call Fortran from C and determine Fortran runtime libraries
-  AC_COIN_F77_WRAPPERS
+  #AC_COIN_F77_WRAPPERS
 fi
 
 # we want to keep the linking check for FilterSQP, but cannot do this if FilterSQP will be build later (in ThirdParty)
@@ -168,11 +177,14 @@ AC_CONFIG_LINKS([test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp
 #                  Check for doxygen                                        #
 #############################################################################
 
-AC_COIN_DOXYGEN(CoinUtils Osi Clp Cgl Cbc Ipopt)
+#AC_COIN_DOXYGEN(CoinUtils Osi Clp Cgl Cbc Ipopt)
+AC_COIN_DOXYGEN
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
+
+AC_COIN_FINALIZE_FLAGS([BonminLib BonminAmplInterfaceLib])
 
 AC_CONFIG_FILES([Makefile
                  src/Apps/Makefile
@@ -193,13 +205,11 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
                  examples/CppExample/Makefile
                  examples/CExample/Makefile
-                 bonmin.pc bonmin-uninstalled.pc
+                 bonmin.pc
                  doxydoc/doxygen.conf])
 
 if test $coin_has_asl = yes ; then
-  AC_CONFIG_FILES([bonminamplinterface.pc:src/CbcBonmin/bonminamplinterface.pc.in
-                   bonminamplinterface-uninstalled.pc:src/CbcBonmin/bonminamplinterface-uninstalled.pc.in
-                  ])
+  AC_CONFIG_FILES([bonminamplinterface.pc:src/CbcBonmin/bonminamplinterface.pc.in])
 fi
 
 AC_CONFIG_HEADER([src/Interfaces/config.h src/Interfaces/config_bonmin.h])
