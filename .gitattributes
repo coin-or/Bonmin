@@ -4,6 +4,7 @@
 .coin-or/projDesc.xml -text
 /.travis.yml -text
 Bonmin/AUTHORS -text
+Bonmin/Dependencies -text
 Bonmin/INSTALL -text
 Bonmin/LICENSE -text
 Bonmin/README -text
@@ -214,7 +215,6 @@ Bonmin/src/Interfaces/config_default.h -text
 Bonmin/test/bonmin.opt -text
 Bonmin/test/mytoy.nl -text
 Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip
-/Dependencies -text
 /appveyor.yml -text
 doxydoc/doxygen.conf -text
 doxydoc/doxygen.conf.in -text
