@@ -96,9 +96,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @COIN_HAS_ASL_TRUE@am__append_1 = Ampl
-
-# BonSubMipSolver.cpp needs to include cplex.h
-@COIN_HAS_CPLEX_TRUE@am__append_2 = -I`$(CYGPATH_W) $(CPXINCDIR)`
 subdir = src/Algorithms
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -111,6 +108,8 @@ CONFIG_HEADER = $(top_builddir)/src/Interfaces/config.h \
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
+libbonalgorithms_la_DEPENDENCIES = Branching/libbonbranching.la \
+	OaGenerators/libbonoagenerators.la QuadCuts/libbonquadcuts.la
 am_libbonalgorithms_la_OBJECTS = BonBabSetupBase.lo BonBonminSetup.lo \
 	BonSubMipSolver.lo BonCbcLpStrategy.lo BonSolverHelp.lo
 libbonalgorithms_la_OBJECTS = $(am_libbonalgorithms_la_OBJECTS)
@@ -134,6 +133,7 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/Interfaces
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/BonBabSetupBase.Plo \
@@ -159,24 +159,6 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
-AM_V_CC = $(am__v_CC_@AM_V@)
-am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
-am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
-CCLD = $(CC)
-LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CCLD = $(am__v_CCLD_@AM_V@)
-am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
-am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
 SOURCES = $(libbonalgorithms_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
@@ -404,40 +386,38 @@ noinst_LTLIBRARIES = libbonalgorithms.la
 
 # List all source files, including headers
 libbonalgorithms_la_SOURCES = \
-         BonBabSetupBase.cpp BonBabSetupBase.hpp \
-         BonBonminSetup.cpp BonBonminSetup.hpp \
-         BonSubMipSolver.cpp BonSubMipSolver.hpp \
-         BonCbcLpStrategy.cpp BonCbcLpStrategy.hpp \
-         BonSolverHelp.cpp BonSolverHelp.hpp
+         BonBabSetupBase.cpp \
+         BonBonminSetup.cpp \
+         BonSubMipSolver.cpp \
+         BonCbcLpStrategy.cpp \
+         BonSolverHelp.cpp
 
 libbonalgorithms_la_LIBADD = Branching/libbonbranching.la \
 	OaGenerators/libbonoagenerators.la QuadCuts/libbonquadcuts.la
-libbonalgorithms_la_DEPENDENCIES = $(libbonalgorithms_la_LIBADD)
 
 # This is for libtool
 libbonalgorithms_la_LDFLAGS = $(LT_LDFLAGS)
 
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/Branching` -I`$(CYGPATH_W) \
-	$(srcdir)/QuadCuts` -I`$(CYGPATH_W) $(srcdir)/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin` -I`$(CYGPATH_W) \
-	$(srcdir)/../CbcBonmin/Heuristics` -I`$(CYGPATH_W) \
-	$(srcdir)/../Interfaces` -I`$(CYGPATH_W) \
-	$(srcdir)/../Interfaces/Ipopt` -I`$(CYGPATH_W) \
-	$(srcdir)/../Interfaces/Filter` $(BONMINLIB_CFLAGS) \
-	$(am__append_2)
+# Here list all include flags, relative to this "srcdir" directory.
+AM_CPPFLAGS = \
+	-I$(srcdir)/Branching \
+	-I$(srcdir)/QuadCuts \
+	-I$(srcdir)/OaGenerators \
+	-I$(srcdir)/../CbcBonmin \
+	-I$(srcdir)/../CbcBonmin/Heuristics \
+	-I$(srcdir)/../Interfaces \
+	-I$(srcdir)/../Interfaces/Ipopt \
+	-I$(srcdir)/../Interfaces/Filter \
+	$(BONMINLIB_CFLAGS)
 
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+# and that therefore should be installed in 'include/coin-or'
+includecoindir = $(includedir)/coin-or
 includecoin_HEADERS = \
           BonBabSetupBase.hpp \
           BonSubMipSolver.hpp \

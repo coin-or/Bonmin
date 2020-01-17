@@ -96,8 +96,7 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = $(am__EXEEXT_1) CppExample$(EXEEXT)
 @COIN_HAS_ASL_TRUE@am__append_1 = unitTest
-@COIN_HAS_ASL_TRUE@am__append_2 = ../src/CbcBonmin/libbonminampl.la $(ASL_LIBS)
-@COIN_HAS_ASL_TRUE@am__append_3 = ../src/CbcBonmin/libbonminampl.la $(ASL_DEPENDENCIES)
+@COIN_HAS_ASL_TRUE@am__append_2 = ../src/CbcBonmin/libbonminampl.la
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -114,14 +113,14 @@ CONFIG_CLEAN_VPATH_FILES = bonmin.opt mytoy.nl
 PROGRAMS = $(noinst_PROGRAMS)
 am_CppExample_OBJECTS = MyBonmin.$(OBJEXT) MyTMINLP.$(OBJEXT)
 CppExample_OBJECTS = $(am_CppExample_OBJECTS)
+CppExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 am_unitTest_OBJECTS = InterfaceTest.$(OBJEXT)
 unitTest_OBJECTS = $(am_unitTest_OBJECTS)
-@COIN_HAS_ASL_TRUE@am__DEPENDENCIES_1 =  \
-@COIN_HAS_ASL_TRUE@	../src/CbcBonmin/libbonminampl.la
+unitTest_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(am__append_2)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -134,6 +133,7 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src/Interfaces
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/InterfaceTest.Po \
@@ -347,52 +347,40 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 #CExample
-unitTest_SOURCES = \
-	InterfaceTest.cpp 
+unitTest_SOURCES = InterfaceTest.cpp 
 
-
-# List libraries that need to be linked in
-# libs with AMPL interface have to come before ASLLIB
-unitTest_LDADD = $(am__append_2) ../src/CbcBonmin/libbonmin.la \
-	$(BONMINLIB_LIBS)
-unitTest_DEPENDENCIES = $(am__append_3) ../src/CbcBonmin/libbonmin.la \
-	$(BONMINLIB_DEPENDENCIES)
+# list libraries that need to be linked in
+unitTest_LDADD = ../src/CbcBonmin/libbonmin.la $(am__append_2)
 
 #########################################################################
 #########################################################################
 CppExample_SOURCES = MyBonmin.cpp  MyTMINLP.cpp  MyTMINLP.hpp
 
-# List libraries that need to be linked in
-CppExample_LDADD = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_LIBS)
-CppExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES)
+# list libraries that need to be linked in
+CppExample_LDADD = ../src/CbcBonmin/libbonmin.la
 
 #########################################################################
 #########################################################################
 
 #CExample_SOURCES = MyBonminC.c  MyBonmin.h main.c
 
-# List libraries that need to be linked in
-#CExample_LDADD        = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_LIBS)
-#CExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES)
+# list libraries that need to be linked in
+#CExample_LDADD        = ../src/CbcBonmin/libbonmin.la
 
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Cygwin
+# Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
-        -I`$(CYGPATH_W) $(srcdir)/../src/Apps` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Filter` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Ampl` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/CbcBonmin` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Branching` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Ampl` \
-	$(BONMINLIB_CFLAGS) $(ASL_CFLAGS) 
+	-I$(srcdir)/../src/Apps \
+	-I$(srcdir)/../src/Interfaces \
+	-I$(srcdir)/../src/Interfaces/Ipopt \
+	-I$(srcdir)/../src/Interfaces/Filter \
+	-I$(srcdir)/../src/Interfaces/Ampl \
+	-I$(srcdir)/../src/CbcBonmin \
+	-I$(srcdir)/../src/Algorithms \
+	-I$(srcdir)/../src/Algorithms/Branching \
+	-I$(srcdir)/../src/Algorithms/OaGenerators \
+	-I$(srcdir)/../src/Algorithms/Ampl \
+	$(BONMINLIB_CFLAGS) $(BONMINAMPLINTERFACELIB_CFLAGS) 
 
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
 
 ########################################################################
 #                          Cleaning stuff                              #

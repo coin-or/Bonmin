@@ -12,31 +12,22 @@ AUTOMAKE_OPTIONS = foreign
 #                       unitTest for Bonmin                            #
 ########################################################################
 
-noinst_PROGRAMS = 
+noinst_PROGRAMS =
 
 if COIN_HAS_ASL
-noinst_PROGRAMS += unitTest
+  noinst_PROGRAMS += unitTest
 endif
 
 noinst_PROGRAMS += CppExample
 #CExample
 
-unitTest_SOURCES = \
-	InterfaceTest.cpp 
+unitTest_SOURCES = InterfaceTest.cpp 
 
-# List libraries that need to be linked in
-# libs with AMPL interface have to come before ASLLIB
-unitTest_LDADD =
-unitTest_DEPENDENCIES =
-
+# list libraries that need to be linked in
+unitTest_LDADD = ../src/CbcBonmin/libbonmin.la
 if COIN_HAS_ASL
-unitTest_LDADD        += ../src/CbcBonmin/libbonminampl.la $(ASL_LIBS)
-unitTest_DEPENDENCIES += ../src/CbcBonmin/libbonminampl.la $(ASL_DEPENDENCIES)
+  unitTest_LDADD += ../src/CbcBonmin/libbonminampl.la
 endif
-
-unitTest_LDADD        += ../src/CbcBonmin/libbonmin.la $(BONMINLIB_LIBS)
-unitTest_DEPENDENCIES += ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES)
-
 
 #########################################################################
 ##                      Example C++ program                             #
@@ -44,9 +35,8 @@ unitTest_DEPENDENCIES += ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES)
 
 CppExample_SOURCES = MyBonmin.cpp  MyTMINLP.cpp  MyTMINLP.hpp
 
-# List libraries that need to be linked in
-CppExample_LDADD        = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_LIBS)
-CppExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES)
+# list libraries that need to be linked in
+CppExample_LDADD        = ../src/CbcBonmin/libbonmin.la
 
 #########################################################################
 ##                      Example C program                             #
@@ -54,27 +44,22 @@ CppExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES
 
 #CExample_SOURCES = MyBonminC.c  MyBonmin.h main.c
 
-# List libraries that need to be linked in
-#CExample_LDADD        = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_LIBS)
-#CExample_DEPENDENCIES = ../src/CbcBonmin/libbonmin.la $(BONMINLIB_DEPENDENCIES)
+# list libraries that need to be linked in
+#CExample_LDADD        = ../src/CbcBonmin/libbonmin.la
 
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Cygwin
+# Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
-        -I`$(CYGPATH_W) $(srcdir)/../src/Apps` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Filter` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Interfaces/Ampl` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/CbcBonmin` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Branching` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Ampl` \
-	$(BONMINLIB_CFLAGS) $(ASL_CFLAGS) 
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
+	-I$(srcdir)/../src/Apps \
+	-I$(srcdir)/../src/Interfaces \
+	-I$(srcdir)/../src/Interfaces/Ipopt \
+	-I$(srcdir)/../src/Interfaces/Filter \
+	-I$(srcdir)/../src/Interfaces/Ampl \
+	-I$(srcdir)/../src/CbcBonmin \
+	-I$(srcdir)/../src/Algorithms \
+	-I$(srcdir)/../src/Algorithms/Branching \
+	-I$(srcdir)/../src/Algorithms/OaGenerators \
+	-I$(srcdir)/../src/Algorithms/Ampl \
+	$(BONMINLIB_CFLAGS) $(BONMINAMPLINTERFACELIB_CFLAGS) 
 
 #test: unitTest$(EXEEXT) CppExample$(EXEEXT) CExample$(EXEEXT)
 test: unitTest$(EXEEXT) CppExample$(EXEEXT)

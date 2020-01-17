@@ -9,41 +9,30 @@
 AUTOMAKE_OPTIONS = foreign
 
 # What is done in this directory:
-
 bin_PROGRAMS = robotbonmin
 
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
+# Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Apps` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Branching` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Ampl` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin/Heuristics` \
-	$(BONMINLIB_CFLAGS) $(ASL_CFLAGS)
+	-I$(srcdir)/../../src/Apps \
+	-I$(srcdir)/../../src/Algorithms \
+	-I$(srcdir)/../../src/Algorithms/Branching \
+	-I$(srcdir)/../../src/Algorithms/OaGenerators \
+	-I$(srcdir)/../../src/Algorithms/Ampl \
+	-I$(srcdir)/../../src/Interfaces \
+	-I$(srcdir)/../../src/Interfaces/Ipopt \
+	-I$(srcdir)/../../src/Interfaces/Ampl \
+	-I$(srcdir)/../../src/CbcBonmin \
+	-I$(srcdir)/../../src/CbcBonmin/Heuristics \
+	$(BONMINLIB_CFLAGS) $(BONMINAMPLINTERFACELIB_CFLAGS)
 
 ########################################################################
-#                                robotbonmin                                  #
+#                                robotbonmin                           #
 ########################################################################
 
 robotbonmin_SOURCES = Robot-bonmin.cpp \
-               RobotSetup.cpp RobotSetup.hpp \
-               BonNWayChoose.cpp  BonNWayChoose.hpp  BonNWayObject.cpp  BonNWayObject.hpp
+               RobotSetup.cpp \
+               BonNWayChoose.cpp BonNWayObject.cpp
+
 robotbonmin_LDADD = \
 	../../src/Interfaces/Ampl/libbonamplinterface.la \
-	../../src/CbcBonmin/libbonmin.la \
-	$(ASL_LIBS) \
-	$(BONMINLIB_LIBS)
-
-########################################################################
-#                         make distclean stuff                         #
-########################################################################
-
-CLEANFILES = 
-
-DISTCLEANFILES = 
+	../../src/CbcBonmin/libbonmin.la

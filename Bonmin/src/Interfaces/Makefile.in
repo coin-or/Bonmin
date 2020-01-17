@@ -109,6 +109,8 @@ CONFIG_HEADER = config.h config_bonmin.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
+libbonmininterfaces_la_DEPENDENCIES = Ipopt/libipoptinterface.la \
+	$(am__append_3)
 am_libbonmininterfaces_la_OBJECTS = BonAuxInfos.lo BonBoundsReader.lo \
 	BonColReader.lo BonCutStrengthener.lo BonStartPointReader.lo \
 	BonOsiTMINLPInterface.lo BonTMINLP2TNLP.lo BonTMINLP2OsiLP.lo \
@@ -136,6 +138,7 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
+DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/BonAuxInfos.Plo \
@@ -168,24 +171,6 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
-AM_V_CC = $(am__v_CC_@AM_V@)
-am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
-am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
-CCLD = $(CC)
-LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CCLD = $(am__v_CCLD_@AM_V@)
-am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
-am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
 SOURCES = $(libbonmininterfaces_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
@@ -408,7 +393,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 
-#We need to do autothings in the subdirectories for the different interfaces
+# We need to do autothings in the subdirectories for the different interfaces
 SUBDIRS = Ipopt $(am__append_1) $(am__append_2)
 
 ########################################################################
@@ -417,55 +402,50 @@ SUBDIRS = Ipopt $(am__append_1) $(am__append_2)
 
 # Name of the library in this directory
 noinst_LTLIBRARIES = libbonmininterfaces.la 
+
 # List all source files, including headers
 libbonmininterfaces_la_SOURCES = \
-        BonAuxInfos.cpp BonAuxInfos.hpp \
-	BonBoundsReader.cpp BonBoundsReader.hpp \
-	BonColReader.cpp BonColReader.hpp \
-	BonCutStrengthener.cpp BonCutStrengthener.hpp \
-	BonStartPointReader.cpp BonStartPointReader.hpp \
-	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
-	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
-	BonTMINLP2OsiLP.cpp BonTMINLP2OsiLP.hpp \
-	BonTMINLP.cpp BonTMINLP.hpp \
-	BonTNLPSolver.hpp BonTNLPSolver.cpp \
-	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \
-	BonBranchingTQP.cpp BonBranchingTQP.hpp \
-	BonStrongBranchingSolver.cpp BonStrongBranchingSolver.hpp \
-        BonRegisteredOption.hpp BonRegisteredOptions.cpp
+	BonAuxInfos.cpp \
+	BonBoundsReader.cpp \
+	BonColReader.cpp \
+	BonCutStrengthener.cpp \
+	BonStartPointReader.cpp \
+	BonOsiTMINLPInterface.cpp \
+	BonTMINLP2TNLP.cpp \
+	BonTMINLP2OsiLP.cpp \
+	BonTMINLP.cpp \
+	BonTNLPSolver.cpp \
+	BonTNLP2FPNLP.cpp \
+	BonBranchingTQP.cpp \
+	BonStrongBranchingSolver.cpp \
+	BonRegisteredOptions.cpp
 
-
-#BonStdCInterface.h BonStdCInterface.cpp
-#BonStdInterfaceTMINLP.cpp BonStdInterfaceTMINLP.hpp
+#BonStdCInterface.cpp
+#BonStdInterfaceTMINLP.cpp
 
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la \
 	$(am__append_3)
-libbonmininterfaces_la_DEPENDENCIES = $(libbonmininterfaces_la_LIBADD)
 
-# This is for libtool (on Windows)
+# This is for libtool
 libbonmininterfaces_la_LDFLAGS = $(LT_LDFLAGS)
 
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
+# Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms` \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/Branching` \
-	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin` \
+	-I$(srcdir)/../Algorithms \
+	-I$(srcdir)/../Algorithms/OaGenerators \
+	-I$(srcdir)/../Algorithms/Branching \
+	-I$(srcdir)/../CbcBonmin \
 	$(BONMINLIB_CFLAGS)
 
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+# and that therefore should be installed in 'include/coin-or'
+includecoindir = $(includedir)/coin-or
 includecoin_HEADERS = \
      BonOsiTMINLPInterface.hpp \
      BonTMINLP2TNLP.hpp \

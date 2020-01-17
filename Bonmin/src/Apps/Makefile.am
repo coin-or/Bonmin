@@ -23,31 +23,21 @@ bonmin_SOURCES = BonMin.cpp
 
 bonmin_LDADD = \
 	../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la \
-	$(BONMINLIB_LIBS) \
-	$(ASL_LIBS)
+	../CbcBonmin/libbonmin.la
+#	$(BONMINLIB_LIBS) \
+#	$(ASL_LIBS)
 
-bonmin_DEPENDENCIES = \
-	../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la \
-	$(BONMINLIB_DEPENDENCIES) \
-	$(ASL_DEPENDENCIES)
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
+# Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms` \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/Branching` \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/Ampl` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../Interfaces/Ampl` \
-	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin` \
+	-I$(srcdir)/../Algorithms \
+	-I$(srcdir)/../Algorithms/Branching \
+	-I$(srcdir)/../Algorithms/OaGenerators \
+	-I$(srcdir)/../Algorithms/Ampl \
+	-I$(srcdir)/../Interfaces \
+	-I$(srcdir)/../Interfaces/Ipopt \
+	-I$(srcdir)/../Interfaces/Ampl \
+	-I$(srcdir)/../CbcBonmin \
 	$(BONMINLIB_CFLAGS)
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
 
 ########################################################################
 #                              nodeSolver                              #
@@ -57,15 +47,9 @@ BonNodeSolver_SOURCES = BonNodeSolver.cpp
 
 BonNodeSolver_LDADD = \
 	../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la \
-	$(BONMINLIB_LIBS) \
-	$(ASL_LIBS)
-
-BonNodeSolver_DEPENDENCIES = \
-	../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la \
-	$(BONMINLIB_DEPENDENCIES) \
-	$(ASL_DEPENDENCIES)
+	../CbcBonmin/libbonmin.la
+#	$(BONMINLIB_LIBS) \
+#	$(ASL_LIBS)
 
 ########################################################################
 #                            Astyle stuff                              #

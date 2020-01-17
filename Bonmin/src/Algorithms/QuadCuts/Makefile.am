@@ -18,51 +18,36 @@ noinst_LTLIBRARIES = libbonquadcuts.la
 
 # List all source files, including headers
 libbonquadcuts_la_SOURCES = \
-                  BonArraysHelpers.hpp \
                   BonOuterApprox.cpp \
-                  BonOuterApprox.hpp \
                   BonQuadCut.cpp \
-                  BonQuadCut.hpp \
                   BonQuadRow.cpp \
-                  BonQuadRow.hpp \
                   BonTMatrix.cpp \
-                  BonTMatrix.hpp \
-                  BonLinearCutsGenerator.hpp \
                   BonLinearCutsGenerator.cpp \
-                  BonTMINLPLinObj.hpp \
                   BonTMINLPLinObj.cpp \
-                  BonTMINLP2Quad.cpp \
-                  BonTMINLP2Quad.hpp
-
-
-libbonquadcuts_la_DEPENDENCIES = $(libbonquadcuts_la_LIBADD)
+                  BonTMINLP2Quad.cpp
 
 # This is for libtool
 libbonquadcuts_la_LDFLAGS = $(LT_LDFLAGS)
 
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
+# Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../Branching` \
-	-I`$(CYGPATH_W) $(srcdir)/..` \
-	-I`$(CYGPATH_W) $(srcdir)/../OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../../CbcBonmin` \
-	-I`$(CYGPATH_W) $(srcdir)/../../CbcBonmin/Heuristics` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Filter` \
+	-I$(srcdir)/.. \
+	-I$(srcdir)/../Branching \
+	-I$(srcdir)/../OaGenerators \
+	-I$(srcdir)/../../CbcBonmin \
+	-I$(srcdir)/../../CbcBonmin/Heuristics \
+	-I$(srcdir)/../../Interfaces \
+	-I$(srcdir)/../../Interfaces/Ipopt \
+	-I$(srcdir)/../../Interfaces/Filter \
 	$(BONMINLIB_CFLAGS)
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+# and that therefore should be installed in 'include/coin-or'
+includecoindir = $(includedir)/coin-or
 includecoin_HEADERS = \
             BonArraysHelpers.hpp \
             BonOuterApprox.hpp \
@@ -72,7 +57,6 @@ includecoin_HEADERS = \
             BonTMINLPLinObj.hpp \
             BonTMINLP2Quad.hpp \
             BonLinearCutsGenerator.hpp
-
 
 ########################################################################
 #                            Astyle stuff                              #

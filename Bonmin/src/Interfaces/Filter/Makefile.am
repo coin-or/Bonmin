@@ -6,7 +6,6 @@
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
-
 # Source: Bonmin/src/IpoptInterface/Makefile.am
 # Modified for filterInterface
 #          P. Bonami                  IBM    2006-10-02
@@ -22,28 +21,24 @@ noinst_LTLIBRARIES = libfilterinterface.la
 
 # List all source files, including headers
 libfilterinterface_la_SOURCES = \
-	BonBqpdSolver.cpp BonBqpdSolver.hpp \
-	BonBqpdWarmStart.cpp BonBqpdWarmStart.hpp \
-        BonFilterSolver.cpp BonFilterSolver.hpp \
-        BonFilterWarmStart.cpp BonFilterWarmStart.hpp
+	BonBqpdSolver.cpp \
+	BonBqpdWarmStart.cpp \
+	BonFilterSolver.cpp \
+	BonFilterWarmStart.cpp
 
 # This is for libtool
 libfilterinterface_la_LDFLAGS = $(LT_LDFLAGS)
 
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/..` $(BONMINLIB_CFLAGS)
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I..
+# Here list all include flags, relative to this "srcdir" directory.
+AM_CPPFLAGS = -I$(srcdir)/.. $(BONMINLIB_CFLAGS)
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+# and that therefore should be installed in 'include/coin-or'
+includecoindir = $(includedir)/coin-or
 includecoin_HEADERS = \
                   BonFilterSolver.hpp \
                   BonBqpdSolver.hpp \

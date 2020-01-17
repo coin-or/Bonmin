@@ -155,24 +155,6 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
-AM_V_CC = $(am__v_CC_@AM_V@)
-am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
-am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
-CCLD = $(CC)
-LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CCLD = $(am__v_CCLD_@AM_V@)
-am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
-am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
 SOURCES = $(robotbonmin_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -345,41 +327,32 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
+# Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Apps` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Branching` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Algorithms/Ampl` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin` \
-	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin/Heuristics` \
-	$(BONMINLIB_CFLAGS) $(ASL_CFLAGS)
+	-I$(srcdir)/../../src/Apps \
+	-I$(srcdir)/../../src/Algorithms \
+	-I$(srcdir)/../../src/Algorithms/Branching \
+	-I$(srcdir)/../../src/Algorithms/OaGenerators \
+	-I$(srcdir)/../../src/Algorithms/Ampl \
+	-I$(srcdir)/../../src/Interfaces \
+	-I$(srcdir)/../../src/Interfaces/Ipopt \
+	-I$(srcdir)/../../src/Interfaces/Ampl \
+	-I$(srcdir)/../../src/CbcBonmin \
+	-I$(srcdir)/../../src/CbcBonmin/Heuristics \
+	$(BONMINLIB_CFLAGS) $(BONMINAMPLINTERFACELIB_CFLAGS)
 
 
 ########################################################################
-#                                robotbonmin                                  #
+#                                robotbonmin                           #
 ########################################################################
 robotbonmin_SOURCES = Robot-bonmin.cpp \
-               RobotSetup.cpp RobotSetup.hpp \
-               BonNWayChoose.cpp  BonNWayChoose.hpp  BonNWayObject.cpp  BonNWayObject.hpp
+               RobotSetup.cpp \
+               BonNWayChoose.cpp BonNWayObject.cpp
 
 robotbonmin_LDADD = \
 	../../src/Interfaces/Ampl/libbonamplinterface.la \
-	../../src/CbcBonmin/libbonmin.la \
-	$(ASL_LIBS) \
-	$(BONMINLIB_LIBS)
+	../../src/CbcBonmin/libbonmin.la
 
-
-########################################################################
-#                         make distclean stuff                         #
-########################################################################
-CLEANFILES = 
-DISTCLEANFILES = 
 all: all-am
 
 .SUFFIXES:
@@ -591,12 +564,10 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
