@@ -30,9 +30,7 @@ libbonmin_la_SOURCES = \
 	BonDiver.cpp BonDiver.hpp
 
 libbonmin_la_LIBADD = $(libbonmin_la_DEPENDENCIES)
-if DEPENDENCY_LINKING
 libbonmin_la_LIBADD += $(BONMINLIB_LIBS)
-endif
 
 libbonmin_la_DEPENDENCIES = \
 	../Algorithms/libbonalgorithms.la \
@@ -54,18 +52,14 @@ nodist_EXTRA_libbonminampl_la_SOURCES = dummy.cpp
 
 # List all additionally required libraries
 libbonminampl_la_LIBADD = $(libbonminampl_la_DEPENDENCIES)
-if DEPENDENCY_LINKING
 libbonminampl_la_LIBADD += $(BONMINLIB_LIBS) \
 	$(BONMINAMPLINTERFACELIB_LIBS)
-endif
 
 # List all dependency libraries
 libbonminampl_la_DEPENDENCIES = \
 	../Algorithms/Ampl/libbonamplsetup.la \
 	../Interfaces/Ampl/libbonamplinterface.la 
-if DEPENDENCY_LINKING
-libbonminampl_la_DEPENDENCIES += libbonmin.la
-endif
+libbonminampl_la_LIBADD += libbonmin.la
 
 # This is for libtool
 libbonminampl_la_LDFLAGS = $(LT_LDFLAGS)

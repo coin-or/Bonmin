@@ -56,7 +56,7 @@ AM_CPPFLAGS = \
 	$(BONMINLIB_CFLAGS)
 
 # BonSubMipSolver.cpp needs to include cplex.h
-if COIN_HAS_CPX
+if COIN_HAS_CPLEX
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(CPXINCDIR)`
 endif
 

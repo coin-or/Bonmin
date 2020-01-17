@@ -106,6 +106,7 @@ AC_ARG_WITH([filtersqp],
 
 #AC_COIN_CHECK_PACKAGE(FilterSQP, [coinfiltersqp], [BonminLib])
 coin_has_filtersqp=no
+AM_CONDITIONAL(COIN_HAS_FILTERSQP, false)
 
 if test $coin_has_filtersqp = yes
 then

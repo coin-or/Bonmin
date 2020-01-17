@@ -10,6 +10,7 @@ Bonmin/LICENSE -text
 Bonmin/README -text
 Bonmin/bonmin-uninstalled.pc.in -text
 Bonmin/bonmin.pc.in -text
+Bonmin/compile -text
 Bonmin/config.guess -text
 Bonmin/config.sub -text
 Bonmin/configure -text
