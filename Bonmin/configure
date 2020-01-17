@@ -17190,7 +17190,7 @@ $as_echo "#define COIN_HAS_IPOPT 1" >>confdefs.h
   fi
 
 if test $coin_has_ipopt != yes ; then
-  as_fn_error $? "Required package Cbc is not available." "$LINENO" 5
+  as_fn_error $? "Required package Ipopt is not available." "$LINENO" 5
 fi
 
 

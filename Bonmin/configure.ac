@@ -60,7 +60,7 @@ fi
 
 AC_COIN_CHK_PKG(Ipopt,[BonminLib])
 if test $coin_has_ipopt != yes ; then
-  AC_MSG_ERROR([Required package Cbc is not available.])
+  AC_MSG_ERROR([Required package Ipopt is not available.])
 fi
 
 AC_COIN_CHK_PKG(OsiClp,[BonminLib],[osi-clp])

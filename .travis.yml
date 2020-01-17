@@ -44,6 +44,7 @@ script:
   - git clone --depth 1 https://github.com/coin-or/Clp
   - git clone --depth 1 https://github.com/coin-or/Cgl
   - git clone --depth 1 https://github.com/coin-or/Cbc
+  - git clone --depth 1 https://github.com/coin-or/Ipopt
   - pushd ThirdParty-ASL && ./get.ASL && ./configure --prefix=$HOME/install && make && make install && popd
   - pushd ThirdParty-Metis && ./get.Metis && ./configure --prefix=$HOME/install && make && make install && popd
   - pushd ThirdParty-Mumps && ./get.Mumps && ./configure --prefix=$HOME/install && make && make install && popd
@@ -52,6 +53,7 @@ script:
   - pushd Clp/Clp && ./configure --prefix=$HOME/install && make && make install && popd
   - pushd Cgl/Cgl && ./configure --prefix=$HOME/install && make && make install && popd
   - pushd Cbc/Cbc && ./configure --prefix=$HOME/install && make && make install && popd
+  - pushd Ipopt && ./configure --prefix=$HOME/install && make && make install && popd
   - mkdir build
   - pushd build
   - export CFLAGS="-Wall -Wextra -Werror"
