@@ -256,13 +256,12 @@ namespace Bonmin
     /// Get best possible objective function in the tree
     virtual double getBestPossibleObjective();
 
-//#ifdef COIN_HAS_BONMIN
     ///Register the options of the method.
     static void registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);
 
     /// Initialize the method (get options)
     void initialize(BabSetupBase &b);
-//#endif
+
     ///Don't know what this is yet?
     virtual void endSearch()
     {}

@@ -15,7 +15,7 @@
 #include "BonSubMipSolver.hpp"
 #include "BonCbcLpStrategy.hpp"
 
-#ifdef COIN_HAS_CPX
+#ifdef COIN_HAS_OSICPX
 #include "OsiCpxSolverInterface.hpp"
 #endif
 

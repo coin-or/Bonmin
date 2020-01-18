@@ -21,12 +21,6 @@
 #include "CbcModel.hpp"
 #include "CbcStrategy.hpp"
 #include "BonCbcLpStrategy.hpp"
-#ifdef COIN_HAS_CPX
-#include "OsiCpxSolverInterface.hpp"
-#include "cplex.h"
-#define CHECK_CPX_STAT(a,b) if(b) throw CoinError("Error in CPLEX call",__FILE__,a);
-
-#endif
 #include "BonCbc.hpp"
 #include "BonSolverHelp.hpp"
 //The following two are to interupt the solution of sub-mip through CTRL-C

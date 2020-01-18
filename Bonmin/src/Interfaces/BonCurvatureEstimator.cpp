@@ -14,6 +14,8 @@
 #include "IpDenseVector.hpp"
 #include "IpBlas.hpp"
 #include <cmath>
+
+// FIXME these ifdef's don't work here, as Ipopt config header doesn't export them
 #ifdef HAVE_MA27
 # include "IpMa27TSolverInterface.hpp"
 #endif
