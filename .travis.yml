@@ -56,8 +56,8 @@ script:
   - pushd Ipopt && ./configure --prefix=$HOME/install && make && make install && popd
   - mkdir build
   - pushd build
-  - export CFLAGS="-Wall -Wextra -Werror"
-  - export CXXFLAGS="-Wall -Wextra -Werror"
+  - export CFLAGS=""
+  - export CXXFLAGS=""
   - if $VISHIDDEN ; then CFLAGS="$CFLAGS -fvisibility=hidden" ; fi
   - if $VISHIDDEN ; then CXXFLAGS="$CXXFLAGS -fvisibility=hidden" ; fi
   - export CFGFLAGS=""
