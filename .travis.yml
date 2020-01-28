@@ -31,7 +31,7 @@ matrix:
       compiler: clang
 
 before_script:
-  - export VISHIDDEN=false  #${VISHIDDEN:-false}
+  - export VISHIDDEN=${VISHIDDEN:-false}
   - export ENABLEDEBUG=${ENABLEDEBUG:-false}
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install bash gcc; export CC=gcc-9 ; export CXX=g++-9 ; $CC --version; $CXX --version; gfortran --version; fi
 
