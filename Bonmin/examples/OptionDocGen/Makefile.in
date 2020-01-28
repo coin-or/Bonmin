@@ -8,7 +8,7 @@
 
 ##########################################################################
 #    You can modify this example makefile to fit for your own program.   #
-#    Usually, you only need to change the five CHANGEME entries below.   #
+#    Usually, you only need to change the CHANGEME entries below.        #
 ##########################################################################
 
 # CHANGEME: This should be the name of your executable
@@ -31,11 +31,8 @@ VPATH = @srcdir@
 
 ##########################################################################
 #  Usually, you don't have to change anything below.  Note that if you   #
-#  change certain compiler options, you might have to recompile Bonmin.   #
+#  change certain compiler options, you might have to recompile Bonmin.  #
 ##########################################################################
-
-COIN_HAS_PKGCONFIG = @COIN_HAS_PKGCONFIG_TRUE@TRUE
-COIN_CXX_IS_CL = @COIN_CXX_IS_CL_TRUE@TRUE
 
 # C++ Compiler command
 CXX = @CXX@
@@ -46,43 +43,29 @@ CXXFLAGS = @CXXFLAGS@
 # additional C++ Compiler options for linking
 CXXLINKFLAGS = @RPATH_FLAGS@
 
-# Include directories (we use the CYGPATH_W variables to allow compilation with Windows compilers)
-ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
-  INCL = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags bonmin`
-else
-  INCL = @BONMINLIB_CFLAGS_INSTALLED@
-endif
-INCL += $(ADDINCFLAGS)
+# Include directories
+@COIN_HAS_PKGCONFIG_TRUE@INCL = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --cflags bonmin` $(ADDINCFLAGS)
+@COIN_HAS_PKGCONFIG_FALSE@INCL = -I@includedir@/coin-or @BONMINLIB_CFLAGS@ $(ADDINCFLAGS)
 
 # Linker flags
-ifeq ($(COIN_HAS_PKGCONFIG), TRUE)
-  LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs bonmin`
-else
-  ifeq ($(COIN_CXX_IS_CL), TRUE)
-    LIBS = -link -libpath:`$(CYGPATH_W) @abs_lib_dir@` libbonmin.lib @BONMINLIB_LIBS_INSTALLED@
-  else
-    LIBS = -L@abs_lib_dir@ -lbonmin @BONMINLIB_LIBS_INSTALLED@
-  endif
-endif
+# the --static is only necessary when linking against static libs, but we don't know in this template whether that's the case
+@COIN_HAS_PKGCONFIG_TRUE@LIBS = `PKG_CONFIG_PATH=@COIN_PKG_CONFIG_PATH@ @PKG_CONFIG@ --libs bonmin --static`
+@COIN_HAS_PKGCONFIG_FALSE@LIBS = -L@libdir@ -lbonmin @BONMINLIB_LFLAGS@
 
-# The following is necessary under cygwin, if native compilers are used
-CYGPATH_W = @CYGPATH_W@
+# get some directories, so we can expand @libdir@ and @includedir@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
 
 all: $(EXE)
 
-.SUFFIXES: .cpp .c .o .obj
+.SUFFIXES: .cpp .@OBJEXT@
 
 $(EXE): $(OBJS)
-	bla=;\
-	for file in $(OBJS); do bla="$$bla `$(CYGPATH_W) $$file`"; done; \
-	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $$bla $(LIBS) $(ADDLIBS)
+	$(CXX) $(CXXLINKFLAGS) $(CXXFLAGS) -o $@ $(OBJS) $(LIBS) $(ADDLIBS)
 
 clean:
 	rm -rf $(EXE) $(OBJS)
 
-.cpp.o:
+.cpp.@OBJEXT@:
 	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `test -f '$<' || echo '$(SRCDIR)/'`$<
 
-
-.cpp.obj:
-	$(CXX) $(CXXFLAGS) $(INCL) -c -o $@ `if test -f '$<'; then $(CYGPATH_W) '$<'; else $(CYGPATH_W) '$(SRCDIR)/$<'; fi`

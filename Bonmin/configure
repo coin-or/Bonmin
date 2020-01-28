@@ -16525,10 +16525,6 @@ fi
 
 
 
-# Check for cmath/math.h, cfloat/float.h, cieeefp/ieeefp.h
-
-#AC_COIN_CHECK_MATH_HDRS
-
 #############################################################################
 #                           COIN-OR components                              #
 #############################################################################
@@ -18296,7 +18292,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
             ac_confun_name=confun
             ac_objfun_name=objfun
             ac_gradient_name=gradient
-            ac_objgrad_name=objgrad
+            #ac_objgrad_name=objgrad
             ac_hessian_name=hessian
             ;;
           "upper case")
@@ -18304,7 +18300,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
             ac_confun_name=CONFUN
             ac_objfun_name=OBJFUN
             ac_gradient_name=GRADIENT
-            ac_objgrad_name=OBJGRAD
+            #ac_objgrad_name=OBJGRAD
             ac_hessian_name=HESSIAN
             ;;
         esac
@@ -18320,7 +18316,7 @@ $as_echo_n "checking for function $ac_name in $LIBS... " >&6; }
 void $ac_confun_name$ac_underscore(void) {}
              void $ac_objfun_name$ac_underscore(void) {}
              void $ac_gradient_name$ac_underscore(void) {}
-             void $ac_objgrad_name$ac_underscore(void) {}
+             /* void $ac_objgrad_name$ac_underscore(void) {} */
              void $ac_hessian_name$ac_underscore(void) {}
              void $ac_name$ac_underscore();
 int

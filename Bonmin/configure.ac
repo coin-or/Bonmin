@@ -45,10 +45,6 @@ AC_COIN_PROG_LIBTOOL
 # (use in examples Makefile)
 AC_COIN_RPATH_FLAGS([$expanded_libdir])
 
-# Check for cmath/math.h, cfloat/float.h, cieeefp/ieeefp.h
-
-#AC_COIN_CHECK_MATH_HDRS
-
 #############################################################################
 #                           COIN-OR components                              #
 #############################################################################
