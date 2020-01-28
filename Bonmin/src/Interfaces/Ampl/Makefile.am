@@ -29,7 +29,8 @@ libbonamplinterface_la_LDFLAGS = $(LT_LDFLAGS)
 AM_CPPFLAGS = \
         -I$(srcdir)/.. \
         -I$(srcdir)/../Ipopt \
-        $(BONMINLIB_CFLAGS) $(BONMINAMPLINTERFACELIB_CFLAGS)
+        -I$(srcdir)/../Filter \
+        $(BONMINLIB_CFLAGS) $(BONMINAMPLINTERFACELIB_CFLAGS) -DBONMIN_BUILD
 
 ########################################################################
 #                Headers that need to be installed                     #

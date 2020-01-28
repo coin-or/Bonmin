@@ -34,7 +34,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../../Interfaces \
 	-I$(srcdir)/../../CbcBonmin \
 	-I$(srcdir)/.. \
-	$(BONMINLIB_CFLAGS)
+	$(BONMINLIB_CFLAGS) -DBONMIN_BUILD
 
 ########################################################################
 #                Headers that need to be installed                     #

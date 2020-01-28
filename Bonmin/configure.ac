@@ -97,50 +97,74 @@ AC_COIN_CHK_LIB(Cplex,[BonminLib],[-lcplex -lpthread -lm -ldl],[],[],[CPXgetstat
 #                                FilterSQP                                  #
 #############################################################################
 
-#TODO
-# for backward compatibility, map --with-filtersqp to --with-filtersqp-libs
 AC_ARG_WITH([filtersqp],
             AC_HELP_STRING([--with-filtersqp],
-                           [specify library for FilterSQP (or BUILD for compilation)]),
+                           [Linker flags for FilterSQP]),
             [filtersqp_libs="$withval"])
 
-#AC_COIN_CHECK_PACKAGE(FilterSQP, [coinfiltersqp], [BonminLib])
-coin_has_filtersqp=no
-AM_CONDITIONAL(COIN_HAS_FILTERSQP, false)
+if test -n "$filtersqp_libs" ; then
+  AC_LANG_PUSH(C)
+  ac_save_LIBS="$LIBS"
+  LIBS="$filtersqp_libs $LIBS"
+  for ac_extra in "no extra underscore" ; do
+    for ac_case in "lower case" "upper case" ; do
+      for ac_trail in "underscore" "no underscore" ; do
+        case $ac_case in
+          "lower case")
+            ac_name=filtersqp
+            ac_confun_name=confun
+            ac_objfun_name=objfun
+            ac_gradient_name=gradient
+            #ac_objgrad_name=objgrad
+            ac_hessian_name=hessian
+            ;;
+          "upper case")
+            ac_name=FILTERSQP
+            ac_confun_name=CONFUN
+            ac_objfun_name=OBJFUN
+            ac_gradient_name=GRADIENT
+            #ac_objgrad_name=OBJGRAD
+            ac_hessian_name=HESSIAN
+            ;;
+        esac
+        if test "$ac_trail" = underscore ; then
+          ac_underscore=_
+        else
+          ac_underscore=
+        fi
+        AC_MSG_CHECKING([for function $ac_name in $LIBS])
+        AC_LINK_IFELSE(
+          [AC_LANG_PROGRAM(
+            [void $ac_confun_name$ac_underscore(void) {}
+             void $ac_objfun_name$ac_underscore(void) {}
+             void $ac_gradient_name$ac_underscore(void) {}
+             /* void $ac_objgrad_name$ac_underscore(void) {} */
+             void $ac_hessian_name$ac_underscore(void) {}
+             void $ac_name$ac_underscore();],
+            [$ac_name$ac_underscore()])],
+          [filtersqp_namemangling="${ac_case}, ${ac_trail}, ${ac_extra}"
+           ac_success=yes],
+          [ac_success=no])
+        AC_MSG_RESULT([$ac_success])
+        if test $ac_success = yes ; then
+          break 3
+        fi
+      done
+    done
+  done
+  LIBS=$ac_save_LIBS
+  AC_LANG_POP(C)
 
-if test $coin_has_filtersqp = yes
-then
-:
-  # Get the name of the Fortran compiler and appropriate compiler options
-  #AC_COIN_PROG_F77
-
-  # Find out how to call Fortran from C and determine Fortran runtime libraries
-  #AC_COIN_F77_WRAPPERS
+  if test $ac_success = yes ; then
+    AC_COIN_DEFINENAMEMANGLING([FILTERSQP],[$filtersqp_namemangling])
+    BONMINLIB_LFLAGS="$filtersqp_libs $BONMINLIB_LFLAGS"
+    AC_DEFINE(COIN_HAS_FILTERSQP,1,[Define to 1 if FilterSQP is available])
+  else
+    AC_MSG_ERROR([Symbol filterSQP not found with FilterSQP flags $filtersqp_libs.])
+  fi
 fi
 
-# we want to keep the linking check for FilterSQP, but cannot do this if FilterSQP will be build later (in ThirdParty)
-#if test $coin_has_filtersqp = yes ; then
-#  AC_MSG_CHECKING([whether FilterSQP library $FILTERSQP_LIBS works])
-#  SAVE_LIBS="$LIBS"
-#  LIBS="$FILTERSQP_LIBS $FLIBS $LIBS"
-#  AC_LANG_PUSH([Fortran 77])
-#  AC_TRY_LINK([],
-#[      call filterSQP
-#      end
-#      subroutine confun
-#      end
-#      subroutine objfun
-#      end
-#      subroutine gradient
-#      end
-#      subroutine hessian],
-#              [AC_MSG_RESULT([yes])
-#               FILTERSQP_LIBS="$FILTERSQP_LIBS $FLIBS"],
-#              [AC_MSG_RESULT([no])
-#               AC_MSG_ERROR([user supplied FilterSQP library $FILTERSQP_LIBS does not work])])
-#  AC_LANG_POP([Fortran 77])
-#  LIBS="$SAVE_LIBS"
-#fi
+AM_CONDITIONAL(COIN_HAS_FILTERSQP, test -n "$filtersqp_libs")
 
 #############################################################################
 #                           Feasibility Pump                                #

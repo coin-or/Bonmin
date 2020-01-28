@@ -24,7 +24,7 @@ int Bonmin::BqpdSolver::reinit_freq_ = 0;
 int Bonmin::BqpdSolver::m0de_ = 6;
 extern "C"
 {
-  void F77_FUNC(bqpd,BQPD)(fint* n, fint* m, fint* k, fint* kmax,
+  void FILTERSQP_FUNC(bqpd,BQPD)(fint* n, fint* m, fint* k, fint* kmax,
       real* a, fint* la, real* x, real* bl, real* bu,
       real* f, real* fmin, real* g, real* r, real* w,
       real* e, fint* ls, real* alp, fint* lp, fint* mlp,
@@ -35,69 +35,69 @@ extern "C"
   extern struct {
       fint kk,ll,kkk,lll,mxws,mxlws;
     }
-  F77_FUNC(wsc,WSC);
+  FILTERSQP_FUNC(wsc,WSC);
 
   extern struct {
       real eps,tol,emin;
     }
-  F77_FUNC(epsc,EPSC);
+  FILTERSQP_FUNC(epsc,EPSC);
 
   extern struct {
       real sgnf;
       fint nrep,npiv,nres;
     }
-  F77_FUNC(repc,REPC);
+  FILTERSQP_FUNC(repc,REPC);
 
   extern struct {
       fint nup,nfreq;
     }
-  F77_FUNC(refactorc,REFACTORC);
+  FILTERSQP_FUNC(refactorc,REFACTORC);
 
   extern struct {
       real vstep;
     }
-  F77_FUNC(vstepc,VSTEPC);
+  FILTERSQP_FUNC(vstepc,VSTEPC);
 
   extern struct {
       fint phl, phr, phc;
     }
-  F77_FUNC(hessc,HESSC);
+  FILTERSQP_FUNC(hessc,HESSC);
 
   extern struct {
       fint scale_mode, phe;
     }
-  F77_FUNC(scalec,SCALEC);
+  FILTERSQP_FUNC(scalec,SCALEC);
 
   extern struct {
       fint irh1,na,na1,nb,nb1,ka1,kb1,kc1,irg1,lu1,lv,lv1,ll1;
     }
-  F77_FUNC(bqpdc,BQPDC);
+  FILTERSQP_FUNC(bqpdc,BQPDC);
 
   extern struct {
       real alpha;
     }
-  F77_FUNC(alphac,ALPHAC);
+  FILTERSQP_FUNC(alphac,ALPHAC);
 
   extern struct {
       fint ns,ns1,nt,nt1,nu,nu1,nx,nx1,np,np1,nprof,lc;
       fint lc1,li,li1,lm,lm1,lp_,lp1,lq,lq1,lr,lr1,ls_,ls1,lt,lt1;
     }
-  F77_FUNC(sparsec,SPARSEC);
+  FILTERSQP_FUNC(sparsec,SPARSEC);
 
   extern struct {
       fint m1,m2,mp,mq,lastr,irow;
     }
-  F77_FUNC(factorc,FACTORC);
+  FILTERSQP_FUNC(factorc,FACTORC);
 
   extern struct {
       fint mxm1;
     }
-  F77_FUNC(mxm1c,MXM1C);
+  FILTERSQP_FUNC(mxm1c,MXM1C);
 
   extern struct {
       real c;
     }
-  F77_FUNC(minorc,MINORS);
+  FILTERSQP_FUNC(minorc,MINORS);
 }
 
 namespace Bonmin
@@ -276,14 +276,14 @@ namespace Bonmin
 
     // In case BQPD's BLOCK DATA doesn't work, we initialize the COMMON
     // BLOCKs explicitly here
-    F77_FUNC(epsc,EPSC).eps = 1111e-19;
-    F77_FUNC(epsc,EPSC).tol = 1e-12;
-    F77_FUNC(epsc,EPSC).emin = 1.;
-    F77_FUNC(repc,REPC).sgnf = 1e-4;
-    F77_FUNC(repc,REPC).nrep = 2;
-    F77_FUNC(repc,REPC).npiv = 3;
-    F77_FUNC(repc,REPC).nres = 2;
-    F77_FUNC(refactorc,REFACTORC).nfreq = 500;
+    FILTERSQP_FUNC(epsc,EPSC).eps = 1111e-19;
+    FILTERSQP_FUNC(epsc,EPSC).tol = 1e-12;
+    FILTERSQP_FUNC(epsc,EPSC).emin = 1.;
+    FILTERSQP_FUNC(repc,REPC).sgnf = 1e-4;
+    FILTERSQP_FUNC(repc,REPC).nrep = 2;
+    FILTERSQP_FUNC(repc,REPC).npiv = 3;
+    FILTERSQP_FUNC(repc,REPC).nres = 2;
+    FILTERSQP_FUNC(refactorc,REFACTORC).nfreq = 500;
 
     Ipopt::TNLP::IndexStyleEnum index_style;
     Ipopt::Index nv, nc, nnz_jac_g, nnz_hess;
@@ -497,73 +497,73 @@ namespace Bonmin
     times_.warm_start -= CoinCpuTime();
 #endif
     haveHotStart_ = true;
-    irh1 = F77_FUNC(bqpdc,BQPDC).irh1;
-    na = F77_FUNC(bqpdc,BQPDC).na;
-    na1 = F77_FUNC(bqpdc,BQPDC).na1;
-    nb = F77_FUNC(bqpdc,BQPDC).nb;
-    nb1 = F77_FUNC(bqpdc,BQPDC).nb1;
-    ka1 = F77_FUNC(bqpdc,BQPDC).ka1;
-    kb1 = F77_FUNC(bqpdc,BQPDC).kb1;
-    kc1 = F77_FUNC(bqpdc,BQPDC).kc1;
-    irg1 = F77_FUNC(bqpdc,BQPDC).irg1;
-    lu1 = F77_FUNC(bqpdc,BQPDC).lu1;
-    lv = F77_FUNC(bqpdc,BQPDC).lv;
-    lv1 = F77_FUNC(bqpdc,BQPDC).lv1;
-    ll1 = F77_FUNC(bqpdc,BQPDC).ll1;
-    eps = F77_FUNC(epsc,EPSC).eps;
-    tol = F77_FUNC(epsc,EPSC).tol;
-    emin = F77_FUNC(epsc,EPSC).emin;
-    vstep = F77_FUNC(vstepc,VSTEPC).vstep;
-    sgnf = F77_FUNC(repc,REPC).sgnf;
-    nrep = F77_FUNC(repc,REPC).nrep;
-    npiv = F77_FUNC(repc,REPC).npiv;
-    nres = F77_FUNC(repc,REPC).nres;
-    nup = F77_FUNC(refactorc,REFACTORC).nup;
-    nfreq = F77_FUNC(refactorc,REFACTORC).nfreq;
-    alpha = F77_FUNC(alphac,ALPHAC).alpha;
+    irh1 = FILTERSQP_FUNC(bqpdc,BQPDC).irh1;
+    na = FILTERSQP_FUNC(bqpdc,BQPDC).na;
+    na1 = FILTERSQP_FUNC(bqpdc,BQPDC).na1;
+    nb = FILTERSQP_FUNC(bqpdc,BQPDC).nb;
+    nb1 = FILTERSQP_FUNC(bqpdc,BQPDC).nb1;
+    ka1 = FILTERSQP_FUNC(bqpdc,BQPDC).ka1;
+    kb1 = FILTERSQP_FUNC(bqpdc,BQPDC).kb1;
+    kc1 = FILTERSQP_FUNC(bqpdc,BQPDC).kc1;
+    irg1 = FILTERSQP_FUNC(bqpdc,BQPDC).irg1;
+    lu1 = FILTERSQP_FUNC(bqpdc,BQPDC).lu1;
+    lv = FILTERSQP_FUNC(bqpdc,BQPDC).lv;
+    lv1 = FILTERSQP_FUNC(bqpdc,BQPDC).lv1;
+    ll1 = FILTERSQP_FUNC(bqpdc,BQPDC).ll1;
+    eps = FILTERSQP_FUNC(epsc,EPSC).eps;
+    tol = FILTERSQP_FUNC(epsc,EPSC).tol;
+    emin = FILTERSQP_FUNC(epsc,EPSC).emin;
+    vstep = FILTERSQP_FUNC(vstepc,VSTEPC).vstep;
+    sgnf = FILTERSQP_FUNC(repc,REPC).sgnf;
+    nrep = FILTERSQP_FUNC(repc,REPC).nrep;
+    npiv = FILTERSQP_FUNC(repc,REPC).npiv;
+    nres = FILTERSQP_FUNC(repc,REPC).nres;
+    nup = FILTERSQP_FUNC(refactorc,REFACTORC).nup;
+    nfreq = FILTERSQP_FUNC(refactorc,REFACTORC).nfreq;
+    alpha = FILTERSQP_FUNC(alphac,ALPHAC).alpha;
 
-    ns = F77_FUNC(sparsec,SPARSEC).ns;
-    ns1 = F77_FUNC(sparsec,SPARSEC).ns1;
-    nt = F77_FUNC(sparsec,SPARSEC).nt;
-    nt1 = F77_FUNC(sparsec,SPARSEC).nt1;
-    nu = F77_FUNC(sparsec,SPARSEC).nu;
-    nu1 = F77_FUNC(sparsec,SPARSEC).nu1;
-    nx = F77_FUNC(sparsec,SPARSEC).nx;
-    nx1 = F77_FUNC(sparsec,SPARSEC).nx1;
-    np = F77_FUNC(sparsec,SPARSEC).np;
-    np1 = F77_FUNC(sparsec,SPARSEC).np1;
-    nprof = F77_FUNC(sparsec,SPARSEC).nprof;
-    lc = F77_FUNC(sparsec,SPARSEC).lc;
-    lc1 = F77_FUNC(sparsec,SPARSEC).lc1;
-    li = F77_FUNC(sparsec,SPARSEC).li;
-    li1 = F77_FUNC(sparsec,SPARSEC).li1;
-    lm = F77_FUNC(sparsec,SPARSEC).lm;
-    lm1 = F77_FUNC(sparsec,SPARSEC).lm1;
-    lp_ = F77_FUNC(sparsec,SPARSEC).lp_;
-    lp1 = F77_FUNC(sparsec,SPARSEC).lp1;
-    lq = F77_FUNC(sparsec,SPARSEC).lq;
-    lq1 = F77_FUNC(sparsec,SPARSEC).lq1;
-    lr = F77_FUNC(sparsec,SPARSEC).lr;
-    lr1 = F77_FUNC(sparsec,SPARSEC).lr1;
-    ls_ = F77_FUNC(sparsec,SPARSEC).ls_;
-    ls1 = F77_FUNC(sparsec,SPARSEC).ls1;
-    lt = F77_FUNC(sparsec,SPARSEC).lt;
-    lt1 = F77_FUNC(sparsec,SPARSEC).lt1;
+    ns = FILTERSQP_FUNC(sparsec,SPARSEC).ns;
+    ns1 = FILTERSQP_FUNC(sparsec,SPARSEC).ns1;
+    nt = FILTERSQP_FUNC(sparsec,SPARSEC).nt;
+    nt1 = FILTERSQP_FUNC(sparsec,SPARSEC).nt1;
+    nu = FILTERSQP_FUNC(sparsec,SPARSEC).nu;
+    nu1 = FILTERSQP_FUNC(sparsec,SPARSEC).nu1;
+    nx = FILTERSQP_FUNC(sparsec,SPARSEC).nx;
+    nx1 = FILTERSQP_FUNC(sparsec,SPARSEC).nx1;
+    np = FILTERSQP_FUNC(sparsec,SPARSEC).np;
+    np1 = FILTERSQP_FUNC(sparsec,SPARSEC).np1;
+    nprof = FILTERSQP_FUNC(sparsec,SPARSEC).nprof;
+    lc = FILTERSQP_FUNC(sparsec,SPARSEC).lc;
+    lc1 = FILTERSQP_FUNC(sparsec,SPARSEC).lc1;
+    li = FILTERSQP_FUNC(sparsec,SPARSEC).li;
+    li1 = FILTERSQP_FUNC(sparsec,SPARSEC).li1;
+    lm = FILTERSQP_FUNC(sparsec,SPARSEC).lm;
+    lm1 = FILTERSQP_FUNC(sparsec,SPARSEC).lm1;
+    lp_ = FILTERSQP_FUNC(sparsec,SPARSEC).lp_;
+    lp1 = FILTERSQP_FUNC(sparsec,SPARSEC).lp1;
+    lq = FILTERSQP_FUNC(sparsec,SPARSEC).lq;
+    lq1 = FILTERSQP_FUNC(sparsec,SPARSEC).lq1;
+    lr = FILTERSQP_FUNC(sparsec,SPARSEC).lr;
+    lr1 = FILTERSQP_FUNC(sparsec,SPARSEC).lr1;
+    ls_ = FILTERSQP_FUNC(sparsec,SPARSEC).ls_;
+    ls1 = FILTERSQP_FUNC(sparsec,SPARSEC).ls1;
+    lt = FILTERSQP_FUNC(sparsec,SPARSEC).lt;
+    lt1 = FILTERSQP_FUNC(sparsec,SPARSEC).lt1;
 
-    m1 = F77_FUNC(factorc,FACTORC).m1;
-    m2 = F77_FUNC(factorc,FACTORC).m2;
-    mp = F77_FUNC(factorc,FACTORC).mp;
-    mq = F77_FUNC(factorc,FACTORC).mq;
-    lastr = F77_FUNC(factorc,FACTORC).lastr;
-    irow = F77_FUNC(factorc,FACTORC).irow;
+    m1 = FILTERSQP_FUNC(factorc,FACTORC).m1;
+    m2 = FILTERSQP_FUNC(factorc,FACTORC).m2;
+    mp = FILTERSQP_FUNC(factorc,FACTORC).mp;
+    mq = FILTERSQP_FUNC(factorc,FACTORC).mq;
+    lastr = FILTERSQP_FUNC(factorc,FACTORC).lastr;
+    irow = FILTERSQP_FUNC(factorc,FACTORC).irow;
 
-    mxm1 = F77_FUNC(mxm1c,MXM1c).mxm1;
-    c = F77_FUNC(minorc,MINORC).c;
+    mxm1 = FILTERSQP_FUNC(mxm1c,MXM1c).mxm1;
+    c = FILTERSQP_FUNC(minorc,MINORC).c;
 
-    kkHot = F77_FUNC(wsc,WSC).kk;
-    kkkHot = F77_FUNC(wsc,WSC).kkk;
-    llHot = F77_FUNC(wsc,WSC).ll;
-    lllHot = F77_FUNC(wsc,WSC).lll;
+    kkHot = FILTERSQP_FUNC(wsc,WSC).kk;
+    kkkHot = FILTERSQP_FUNC(wsc,WSC).kkk;
+    llHot = FILTERSQP_FUNC(wsc,WSC).ll;
+    lllHot = FILTERSQP_FUNC(wsc,WSC).lll;
 
     kHot = k;
     xHot = CoinCopyOfArray(x,n);
@@ -595,73 +595,73 @@ namespace Bonmin
 #ifdef TIME_BQPD
     times_.warm_start -= CoinCpuTime();
 #endif
-    F77_FUNC(bqpdc,BQPDC).irh1 = irh1;
-    F77_FUNC(bqpdc,BQPDC).na = na;
-    F77_FUNC(bqpdc,BQPDC).na1 = na1;
-    F77_FUNC(bqpdc,BQPDC).nb = nb;
-    F77_FUNC(bqpdc,BQPDC).nb1 = nb1;
-    F77_FUNC(bqpdc,BQPDC).ka1 = ka1;
-    F77_FUNC(bqpdc,BQPDC).kb1 = kb1;
-    F77_FUNC(bqpdc,BQPDC).kc1 = kc1;
-    F77_FUNC(bqpdc,BQPDC).irg1 = irg1;
-    F77_FUNC(bqpdc,BQPDC).lu1 = lu1;
-    F77_FUNC(bqpdc,BQPDC).lv = lv;
-    F77_FUNC(bqpdc,BQPDC).lv1 = lv1;
-    F77_FUNC(bqpdc,BQPDC).ll1 = ll1;
-    F77_FUNC(epsc,EPSC).eps = eps;
-    F77_FUNC(epsc,EPSC).tol = tol;
-    F77_FUNC(epsc,EPSC).emin = emin;
-    F77_FUNC(vstepc,VSTEPC).vstep = vstep;
-    F77_FUNC(repc,REPC).sgnf = sgnf;
-    F77_FUNC(repc,REPC).nrep = nrep;
-    F77_FUNC(repc,REPC).npiv = npiv;
-    F77_FUNC(repc,REPC).nres = nres;
-    F77_FUNC(refactorc,REFACTORC).nup = nup;
-    F77_FUNC(refactorc,REFACTORC).nfreq = nfreq;
-    F77_FUNC(alphac,ALPHAC).alpha = alpha;
+    FILTERSQP_FUNC(bqpdc,BQPDC).irh1 = irh1;
+    FILTERSQP_FUNC(bqpdc,BQPDC).na = na;
+    FILTERSQP_FUNC(bqpdc,BQPDC).na1 = na1;
+    FILTERSQP_FUNC(bqpdc,BQPDC).nb = nb;
+    FILTERSQP_FUNC(bqpdc,BQPDC).nb1 = nb1;
+    FILTERSQP_FUNC(bqpdc,BQPDC).ka1 = ka1;
+    FILTERSQP_FUNC(bqpdc,BQPDC).kb1 = kb1;
+    FILTERSQP_FUNC(bqpdc,BQPDC).kc1 = kc1;
+    FILTERSQP_FUNC(bqpdc,BQPDC).irg1 = irg1;
+    FILTERSQP_FUNC(bqpdc,BQPDC).lu1 = lu1;
+    FILTERSQP_FUNC(bqpdc,BQPDC).lv = lv;
+    FILTERSQP_FUNC(bqpdc,BQPDC).lv1 = lv1;
+    FILTERSQP_FUNC(bqpdc,BQPDC).ll1 = ll1;
+    FILTERSQP_FUNC(epsc,EPSC).eps = eps;
+    FILTERSQP_FUNC(epsc,EPSC).tol = tol;
+    FILTERSQP_FUNC(epsc,EPSC).emin = emin;
+    FILTERSQP_FUNC(vstepc,VSTEPC).vstep = vstep;
+    FILTERSQP_FUNC(repc,REPC).sgnf = sgnf;
+    FILTERSQP_FUNC(repc,REPC).nrep = nrep;
+    FILTERSQP_FUNC(repc,REPC).npiv = npiv;
+    FILTERSQP_FUNC(repc,REPC).nres = nres;
+    FILTERSQP_FUNC(refactorc,REFACTORC).nup = nup;
+    FILTERSQP_FUNC(refactorc,REFACTORC).nfreq = nfreq;
+    FILTERSQP_FUNC(alphac,ALPHAC).alpha = alpha;
 
-    F77_FUNC(sparsec,SPARSEC).ns = ns;
-    F77_FUNC(sparsec,SPARSEC).ns1 = ns1;
-    F77_FUNC(sparsec,SPARSEC).nt = nt;
-    F77_FUNC(sparsec,SPARSEC).nt1 = nt1;
-    F77_FUNC(sparsec,SPARSEC).nu = nu;
-    F77_FUNC(sparsec,SPARSEC).nu1 = nu1;
-    F77_FUNC(sparsec,SPARSEC).nx = nx;
-    F77_FUNC(sparsec,SPARSEC).nx1 = nx1;
-    F77_FUNC(sparsec,SPARSEC).np = np;
-    F77_FUNC(sparsec,SPARSEC).np1 = np1;
-    F77_FUNC(sparsec,SPARSEC).nprof = nprof;
-    F77_FUNC(sparsec,SPARSEC).lc = lc;
-    F77_FUNC(sparsec,SPARSEC).lc1 = lc1;
-    F77_FUNC(sparsec,SPARSEC).li = li;
-    F77_FUNC(sparsec,SPARSEC).li1 = li1;
-    F77_FUNC(sparsec,SPARSEC).lm = lm;
-    F77_FUNC(sparsec,SPARSEC).lm1 = lm1;
-    F77_FUNC(sparsec,SPARSEC).lp_ = lp_;
-    F77_FUNC(sparsec,SPARSEC).lp1 = lp1;
-    F77_FUNC(sparsec,SPARSEC).lq = lq;
-    F77_FUNC(sparsec,SPARSEC).lq1 = lq1;
-    F77_FUNC(sparsec,SPARSEC).lr = lr;
-    F77_FUNC(sparsec,SPARSEC).lr1 = lr1;
-    F77_FUNC(sparsec,SPARSEC).ls_ = ls_;
-    F77_FUNC(sparsec,SPARSEC).ls1 = ls1;
-    F77_FUNC(sparsec,SPARSEC).lt = lt;
-    F77_FUNC(sparsec,SPARSEC).lt1 = lt1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).ns = ns;
+    FILTERSQP_FUNC(sparsec,SPARSEC).ns1 = ns1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).nt = nt;
+    FILTERSQP_FUNC(sparsec,SPARSEC).nt1 = nt1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).nu = nu;
+    FILTERSQP_FUNC(sparsec,SPARSEC).nu1 = nu1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).nx = nx;
+    FILTERSQP_FUNC(sparsec,SPARSEC).nx1 = nx1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).np = np;
+    FILTERSQP_FUNC(sparsec,SPARSEC).np1 = np1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).nprof = nprof;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lc = lc;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lc1 = lc1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).li = li;
+    FILTERSQP_FUNC(sparsec,SPARSEC).li1 = li1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lm = lm;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lm1 = lm1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lp_ = lp_;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lp1 = lp1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lq = lq;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lq1 = lq1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lr = lr;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lr1 = lr1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).ls_ = ls_;
+    FILTERSQP_FUNC(sparsec,SPARSEC).ls1 = ls1;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lt = lt;
+    FILTERSQP_FUNC(sparsec,SPARSEC).lt1 = lt1;
 
-    F77_FUNC(factorc,FACTORC).m1 = m1;
-    F77_FUNC(factorc,FACTORC).m2 = m2;
-    F77_FUNC(factorc,FACTORC).mp = mp;
-    F77_FUNC(factorc,FACTORC).mq = mq;
-    F77_FUNC(factorc,FACTORC).lastr = lastr;
-    F77_FUNC(factorc,FACTORC).irow = irow;
+    FILTERSQP_FUNC(factorc,FACTORC).m1 = m1;
+    FILTERSQP_FUNC(factorc,FACTORC).m2 = m2;
+    FILTERSQP_FUNC(factorc,FACTORC).mp = mp;
+    FILTERSQP_FUNC(factorc,FACTORC).mq = mq;
+    FILTERSQP_FUNC(factorc,FACTORC).lastr = lastr;
+    FILTERSQP_FUNC(factorc,FACTORC).irow = irow;
 
-    F77_FUNC(mxm1c,MXM1c).mxm1 = mxm1;
-    F77_FUNC(minorc,MINORC).c = c;
+    FILTERSQP_FUNC(mxm1c,MXM1c).mxm1 = mxm1;
+    FILTERSQP_FUNC(minorc,MINORC).c = c;
 
-    F77_FUNC(wsc,WSC).kk = kkHot;
-    F77_FUNC(wsc,WSC).kkk = kkkHot;
-    F77_FUNC(wsc,WSC).ll = llHot;
-    F77_FUNC(wsc,WSC).lll = lllHot;
+    FILTERSQP_FUNC(wsc,WSC).kk = kkHot;
+    FILTERSQP_FUNC(wsc,WSC).kkk = kkkHot;
+    FILTERSQP_FUNC(wsc,WSC).ll = llHot;
+    FILTERSQP_FUNC(wsc,WSC).lll = lllHot;
 
     k = kHot;
     CoinCopyN(xHot,n,x);
@@ -704,13 +704,13 @@ namespace Bonmin
   BqpdSolver::cachedInfo::optimize()
   {
     // Set up some common block stuff
-    F77_FUNC(scalec,SCALEC).scale_mode = 0;  // No scaling
-    F77_FUNC(scalec,SCALEC).phe = 0;  // No scaling
-    F77_FUNC(hessc,HESSC).phl = 1; // This is to tell gdotx to do the right thing
-    F77_FUNC(wsc,WSC).kk = kk;
-    F77_FUNC(wsc,WSC).ll = ll;
-    F77_FUNC(wsc,WSC).mxws = mxws;
-    F77_FUNC(wsc,WSC).mxlws = mxlws;
+    FILTERSQP_FUNC(scalec,SCALEC).scale_mode = 0;  // No scaling
+    FILTERSQP_FUNC(scalec,SCALEC).phe = 0;  // No scaling
+    FILTERSQP_FUNC(hessc,HESSC).phl = 1; // This is to tell gdotx to do the right thing
+    FILTERSQP_FUNC(wsc,WSC).kk = kk;
+    FILTERSQP_FUNC(wsc,WSC).ll = ll;
+    FILTERSQP_FUNC(wsc,WSC).mxws = mxws;
+    FILTERSQP_FUNC(wsc,WSC).mxlws = mxlws;
 
     if (use_warm_start_in_cache_ && !bad_warm_start_info_) {
       ifail = 0;
@@ -789,7 +789,7 @@ namespace Bonmin
       fclose(fp);
     }
 #endif
-    F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
+    FILTERSQP_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
         g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
         &m0de, &ifail, info, &iprint, &nout);
 #ifdef TIME_BQPD
@@ -800,7 +800,7 @@ namespace Bonmin
       fprintf(stdout, "Reinitialize hot start...\n");
       copyFromHotStart();
       ifail = 0;
-      F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
+      FILTERSQP_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
 			  g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
 			  &m0de, &ifail, info, &iprint, &nout);
       printf("new ifail = %d\n", ifail);
@@ -810,7 +810,7 @@ namespace Bonmin
       m0de = 0;
       tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
       ifail = 0;
-      F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
+      FILTERSQP_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
 			  g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
 			  &m0de, &ifail, info, &iprint, &nout);
       printf("new ifail = %d\n", ifail);
@@ -822,7 +822,7 @@ namespace Bonmin
       printf("Increasing fillin_factor from %e ", *fillin_factor_);
       *fillin_factor_ *= 2.;
       printf("to %e\n", *fillin_factor_);
-      int mxws_new = kk + F77_FUNC(wsc,WSC).kkk + (5*n + (int)(*fillin_factor_*(double)amax_));
+      int mxws_new = kk + FILTERSQP_FUNC(wsc,WSC).kkk + (5*n + (int)(*fillin_factor_*(double)amax_));
       real* ws_new = new real[mxws_new];
 #ifdef InitializeAll
       for (int i=0; i<mxws_new; i++) {
@@ -833,12 +833,12 @@ namespace Bonmin
       delete [] ws;
       ws = ws_new;
       mxws = mxws_new;
-      F77_FUNC(wsc,WSC).mxws = mxws;
+      FILTERSQP_FUNC(wsc,WSC).mxws = mxws;
 
       m0de = 0;
       tqp_->get_starting_point(n, 1, x, 0, NULL, NULL, m, 0, NULL);
       ifail = 0;
-      F77_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
+      FILTERSQP_FUNC(bqpd,BQPD)(&n, &m, &k, &kmax, a, la, x, bl, bu, &f, &fmin,
 			  g, r, w, e, ls, alp, lp, &mlp, &peq, ws, lws,
 			  &m0de, &ifail, info, &iprint, &nout);
     }
@@ -854,8 +854,8 @@ namespace Bonmin
     printf("final f + obj_val = %e\n", f+tqp_->ObjVal());
 #endif
 #if 0
-    int kkk = F77_FUNC(wsc,WSC).kkk;
-    int lll = F77_FUNC(wsc,WSC).lll;
+    int kkk = FILTERSQP_FUNC(wsc,WSC).kkk;
+    int lll = FILTERSQP_FUNC(wsc,WSC).lll;
     printf("========= 3333333333 =============\n");
     printf("kk = %d ll = %d kkk = %d lll = %d mxws = %d mxlws = %d\n", kk, ll, kkk, lll, mxws, mxlws);
     for (int i=0; i<kk+kkk; i++) {
