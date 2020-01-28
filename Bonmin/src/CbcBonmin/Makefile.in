@@ -147,18 +147,11 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libbonmin_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libbonmin_la_LDFLAGS) $(LDFLAGS) -o $@
 libbonminampl_la_DEPENDENCIES = ../Algorithms/Ampl/libbonamplsetup.la \
 	../Interfaces/Ampl/libbonamplinterface.la libbonmin.la \
 	$(am__DEPENDENCIES_1)
 am_libbonminampl_la_OBJECTS =
 libbonminampl_la_OBJECTS = $(am_libbonminampl_la_OBJECTS)
-libbonminampl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libbonminampl_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
 @COIN_HAS_ASL_TRUE@am_libbonminampl_la_rpath = -rpath $(libdir)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -293,7 +286,9 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
-LDFLAGS = @LDFLAGS@
+
+# add libtool flags
+LDFLAGS = @LDFLAGS@ $(LT_LDFLAGS)
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -414,9 +409,6 @@ libbonmin_la_LIBADD = \
 	$(BONMINLIB_LFLAGS)
 
 
-# This is for libtool
-libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
-
 ########################################################################
 #                         amplbonmin library                           #
 ########################################################################
@@ -434,9 +426,6 @@ libbonminampl_la_LIBADD = \
 	libbonmin.la \
 	$(BONMINAMPLINTERFACELIB_LFLAGS)
 
-
-# This is for libtool
-libbonminampl_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
@@ -555,10 +544,10 @@ clean-libLTLIBRARIES:
 	}
 
 libbonmin.la: $(libbonmin_la_OBJECTS) $(libbonmin_la_DEPENDENCIES) $(EXTRA_libbonmin_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libbonmin_la_LINK) -rpath $(libdir) $(libbonmin_la_OBJECTS) $(libbonmin_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK) -rpath $(libdir) $(libbonmin_la_OBJECTS) $(libbonmin_la_LIBADD) $(LIBS)
 
 libbonminampl.la: $(libbonminampl_la_OBJECTS) $(libbonminampl_la_DEPENDENCIES) $(EXTRA_libbonminampl_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libbonminampl_la_LINK) $(am_libbonminampl_la_rpath) $(libbonminampl_la_OBJECTS) $(libbonminampl_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK) $(am_libbonminampl_la_rpath) $(libbonminampl_la_OBJECTS) $(libbonminampl_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

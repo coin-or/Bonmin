@@ -17,7 +17,7 @@
 namespace Bonmin
 {
   /** A class to setup default strategy for Cbc specifying which cut generators to use.*/
-  class CbcStrategyChooseCuts : public CbcStrategyDefault {
+  class BONMINLIB_EXPORT CbcStrategyChooseCuts : public CbcStrategyDefault {
      public:
      /** Default constructor.*/
      CbcStrategyChooseCuts();

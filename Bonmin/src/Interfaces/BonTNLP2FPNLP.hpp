@@ -19,7 +19,7 @@ namespace Bonmin
    *  by changing the objective function to the (2-norm) distance to a point.
    * The extra function is set_dist_to_point_obj(size_t n, const double *, const int *)
    */
-  class TNLP2FPNLP : public Ipopt::TNLP
+  class BONMINLIB_EXPORT TNLP2FPNLP : public Ipopt::TNLP
   {
   public:
     /**@name Constructors/Destructors */

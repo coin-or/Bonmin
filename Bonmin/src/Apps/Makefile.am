@@ -15,6 +15,8 @@ if COIN_HAS_ASL
   noinst_PROGRAMS = BonNodeSolver
 endif
 
+LDFLAGS += $(LT_LDFLAGS)
+
 ########################################################################
 #                                bonmin                                #
 ########################################################################
@@ -22,8 +24,7 @@ endif
 bonmin_SOURCES = BonMin.cpp
 
 bonmin_LDADD = \
-	../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la
+	../CbcBonmin/libbonminampl.la
 
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
@@ -44,8 +45,7 @@ AM_CPPFLAGS = \
 BonNodeSolver_SOURCES = BonNodeSolver.cpp
 
 BonNodeSolver_LDADD = \
-	../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la
+	../CbcBonmin/libbonminampl.la
 
 ########################################################################
 #                            Astyle stuff                              #

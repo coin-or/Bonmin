@@ -43,7 +43,7 @@ namespace Bonmin
    *  This interface creates a AmplTNLP and also retrieves
    *  the information about the binary and integer variables
    */
-  class AmplTMINLP : public TMINLP
+  class BONMINAMPLINTERFACELIB_EXPORT AmplTMINLP : public TMINLP
   {
   public:
     /**@name Constructors/Destructors */

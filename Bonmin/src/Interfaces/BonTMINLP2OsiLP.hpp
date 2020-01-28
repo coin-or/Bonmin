@@ -13,6 +13,7 @@
 #include <cstdio>
 #include "IpSmartPtr.hpp"
 #include "IpTNLP.hpp"
+#include "BonminConfig.h"
 #include "BonTypes.hpp"
 
 class OsiSolverInterface;
@@ -23,7 +24,7 @@ namespace Bonmin {
   class BabSetupBase;
 
   /** A transformer class to build outer approximations i.e. transfomrs nonlinear programs into linear programs.*/
-  class TMINLP2OsiLP: public Ipopt::ReferencedObject {
+  class BONMINLIB_EXPORT TMINLP2OsiLP: public Ipopt::ReferencedObject {
 
   public:
 

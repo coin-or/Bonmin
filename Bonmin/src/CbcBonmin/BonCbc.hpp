@@ -11,12 +11,13 @@
 #define BonCbc_H
 
 //#include "BonBabSetupBase.hpp"
+#include "BonminConfig.h"
 #include "CbcModel.hpp"
 
 namespace Bonmin
 {
   class BabSetupBase;
-  class Bab
+  class BONMINLIB_EXPORT Bab
   {
   public:
     /** Integer optimization return codes.*/

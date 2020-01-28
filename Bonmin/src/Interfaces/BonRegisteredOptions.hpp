@@ -11,6 +11,7 @@
 #ifndef BonRegisteredOptions_H
 #define BonRegisteredOptions_H
 
+#include "BonminConfig.h"
 #include "IpRegOptions.hpp"
 #include "IpException.hpp"
 #include "CoinError.hpp"
@@ -27,7 +28,7 @@ namespace Bonmin {
     In particular, it allows to store code to indicate in which algorithm
     option is available. It also allows to table summing up all the options
     both in LaTex and html.*/
-class RegisteredOptions: public Ipopt::RegisteredOptions{
+class BONMINLIB_EXPORT RegisteredOptions: public Ipopt::RegisteredOptions{
   public:
     enum ExtraOptInfosBits{
     validInHybrid=0/** Say that option is valid in Hybrid method (1).*/,

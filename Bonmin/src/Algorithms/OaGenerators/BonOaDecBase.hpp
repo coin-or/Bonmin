@@ -24,7 +24,7 @@
 namespace Bonmin
 {
   /** Base class for OA algorithms.*/
-  class OaDecompositionBase : public CglCutGenerator
+  class BONMINLIB_EXPORT OaDecompositionBase : public CglCutGenerator
   {
   public:
 

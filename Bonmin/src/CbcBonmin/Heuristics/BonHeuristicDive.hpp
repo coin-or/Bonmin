@@ -15,7 +15,7 @@
 
 namespace Bonmin
 {
-  class HeuristicDive : public CbcHeuristic
+  class BONMINLIB_EXPORT HeuristicDive : public CbcHeuristic
   {
   public:
     /// Default constructor
@@ -80,9 +80,11 @@ namespace Bonmin
   };
 
   /// checks if the NLP relaxation of the problem is feasible
+  BONMINLIB_EXPORT
   bool isNlpFeasible(TMINLP2TNLP* minlp, const double primalTolerance);
   
   /// Adjusts the primalTolerance in case some of the constraints are violated
+  BONMINLIB_EXPORT 
   void adjustPrimalTolerance(TMINLP2TNLP* minlp, double & primalTolerance);
 }
 #endif

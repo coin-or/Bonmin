@@ -17,13 +17,13 @@
 //#define TIME_BQPD
 namespace Bonmin
 {
-  class BqpdSolver : public TNLPSolver
+  class BONMINLIB_EXPORT BqpdSolver : public TNLPSolver
   {
   public:
     friend class FilterSolver;
 
 
-  class UnsolvedBqpdError: public TNLPSolver::UnsolvedError
+  class BONMINLIB_EXPORT UnsolvedBqpdError: public TNLPSolver::UnsolvedError
     {
     public:
       UnsolvedBqpdError(int errorNum,

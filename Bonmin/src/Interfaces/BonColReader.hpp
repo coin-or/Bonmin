@@ -14,7 +14,8 @@
 #include <list>
 #include <fstream>
 #include <iostream>
-#include <CoinHelperFunctions.hpp>
+#include "BonminConfig.h"
+#include "CoinHelperFunctions.hpp"
 #include "OsiSolverInterface.hpp"
 //#include <tr1/unordered_map>
 #include <map>
@@ -22,7 +23,7 @@
 namespace Bonmin{
 /** A class for reading a .col or .row file containing name for variables and constraints (usually ampl generated file).
    */
-class NamesReader
+class BONMINLIB_EXPORT NamesReader
 {
 public:
   /** Constructor with a file name given by a const char * */

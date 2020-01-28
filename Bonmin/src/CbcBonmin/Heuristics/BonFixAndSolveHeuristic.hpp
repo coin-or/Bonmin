@@ -11,7 +11,7 @@
 #include "BonLocalSolverBasedHeuristic.hpp"
 
 namespace Bonmin {
-  class FixAndSolveHeuristic:public LocalSolverBasedHeuristic {
+  class BONMINLIB_EXPORT FixAndSolveHeuristic : public LocalSolverBasedHeuristic {
     public:
      /** Default constructor*/
      FixAndSolveHeuristic();

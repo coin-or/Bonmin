@@ -22,7 +22,7 @@ namespace Bonmin
     B_IFP=5/** Bonmin's implemantation of iterated feasibility pump for MINLP.*/
   };
   /* Bonmin algorithm setup. */
-  class BonminSetup : public BabSetupBase
+  class BONMINLIB_EXPORT BonminSetup : public BabSetupBase
   {
   public:
     /** Default constructor. */

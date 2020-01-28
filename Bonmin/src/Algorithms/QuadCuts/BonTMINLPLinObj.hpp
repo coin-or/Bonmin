@@ -36,7 +36,7 @@ namespace Bonmin {
     \f]
     The objective is put as first constraint of the problem and the extra variable is the last one.
  .*/
-class TMINLPLinObj: public Bonmin::TMINLP {
+class BONMINLIB_EXPORT TMINLPLinObj: public Bonmin::TMINLP {
   public:
    /** Default constructor*/
    TMINLPLinObj();

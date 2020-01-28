@@ -19,7 +19,7 @@ namespace Bonmin
 
   /** This is a derived class fro TMINLP2TNLP to handle adding quadratic cuts.
    */
-  class TMINLP2TNLPQuadCuts : public Bonmin::TMINLP2TNLP
+  class BONMINLIB_EXPORT TMINLP2TNLPQuadCuts : public Bonmin::TMINLP2TNLP
   {
   public:
     /**@name Constructors/Destructors */

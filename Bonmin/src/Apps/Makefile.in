@@ -111,16 +111,14 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_BonNodeSolver_OBJECTS = BonNodeSolver.$(OBJEXT)
 BonNodeSolver_OBJECTS = $(am_BonNodeSolver_OBJECTS)
-BonNodeSolver_DEPENDENCIES = ../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la
+BonNodeSolver_DEPENDENCIES = ../CbcBonmin/libbonminampl.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 am_bonmin_OBJECTS = BonMin.$(OBJEXT)
 bonmin_OBJECTS = $(am_bonmin_OBJECTS)
-bonmin_DEPENDENCIES = ../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la
+bonmin_DEPENDENCIES = ../CbcBonmin/libbonminampl.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -234,7 +232,7 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
-LDFLAGS = @LDFLAGS@
+LDFLAGS = @LDFLAGS@ $(LT_LDFLAGS)
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -336,8 +334,7 @@ AUTOMAKE_OPTIONS = foreign
 ########################################################################
 bonmin_SOURCES = BonMin.cpp
 bonmin_LDADD = \
-	../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la
+	../CbcBonmin/libbonminampl.la
 
 
 # Here list all include flags, relative to this "srcdir" directory.
@@ -358,8 +355,7 @@ AM_CPPFLAGS = \
 ########################################################################
 BonNodeSolver_SOURCES = BonNodeSolver.cpp
 BonNodeSolver_LDADD = \
-	../CbcBonmin/libbonminampl.la \
-	../CbcBonmin/libbonmin.la
+	../CbcBonmin/libbonminampl.la
 
 
 ########################################################################

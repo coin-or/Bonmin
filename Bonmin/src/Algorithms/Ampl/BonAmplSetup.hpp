@@ -14,7 +14,7 @@
 
 namespace Bonmin
 {
-  class BonminAmplSetup: public BonminSetup
+  class BONMINAMPLINTERFACELIB_EXPORT BonminAmplSetup: public BonminSetup
   {
   public:
     /** initialize bonmin with ampl model using the command line arguments.*/

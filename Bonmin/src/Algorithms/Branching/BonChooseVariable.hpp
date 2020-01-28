@@ -18,7 +18,7 @@ class CbcModel;
 namespace Bonmin
 {
 
-  class HotInfo : public OsiHotInfo {
+  class BONMINLIB_EXPORT HotInfo : public OsiHotInfo {
     public:
     /// Default constructor
     HotInfo();
@@ -78,7 +78,7 @@ namespace Bonmin
       value induced by branching on a specific object are estimated with the pure virtual function fill_changes.
   */
 
-  class BonChooseVariable : public OsiChooseVariable
+  class BONMINLIB_EXPORT BonChooseVariable : public OsiChooseVariable
   {
   protected:
   /**  This is a utility function which does strong branching on

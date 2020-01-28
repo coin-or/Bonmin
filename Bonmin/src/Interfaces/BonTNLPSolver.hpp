@@ -23,7 +23,7 @@ namespace Bonmin  {
     A TNLPSolver is able to solve and resolve a problem, it has some options (stored
     with Ipopt OptionList structure and registeredOptions) it produces some statistics (in SolveStatisctics and sometimes some errorCodes.
 */
-class TNLPSolver: public Ipopt::ReferencedObject{
+class BONMINLIB_EXPORT TNLPSolver: public Ipopt::ReferencedObject{
  public:
 
   enum ReturnStatus /** Standard return statuses for a solver*/{

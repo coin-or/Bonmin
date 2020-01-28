@@ -17,7 +17,7 @@
 namespace Bonmin {
 /** Reads a file containing change bounds for variables.
     Files follows pretty much the Bounds section in MPS standard.*/
-class BoundsReader
+class BONMINLIB_EXPORT BoundsReader
 {
 public:
   //Default constructor

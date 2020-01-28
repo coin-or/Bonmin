@@ -13,7 +13,7 @@
 #include "BonLocalSolverBasedHeuristic.hpp"
 
 namespace Bonmin {
-  class HeuristicRINS:public LocalSolverBasedHeuristic {
+  class BONMINLIB_EXPORT HeuristicRINS : public LocalSolverBasedHeuristic {
     public:
      /** Default constructor*/
      HeuristicRINS();

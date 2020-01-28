@@ -17,7 +17,7 @@
 
 namespace Bonmin
 {
-  class FilterSolver : public TNLPSolver
+  class BONMINLIB_EXPORT FilterSolver : public TNLPSolver
   {
   public:
 

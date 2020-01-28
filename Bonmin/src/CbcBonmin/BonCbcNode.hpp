@@ -25,7 +25,7 @@ namespace Bonmin
     augmenting the parent subproblem.
   */
 
-  class BonCbcFullNodeInfo : public CbcFullNodeInfo
+  class BONMINLIB_EXPORT BonCbcFullNodeInfo : public CbcFullNodeInfo
   {
 
   public:
@@ -82,7 +82,7 @@ namespace Bonmin
     augmenting the parent subproblem.
   */
 
-  class BonCbcPartialNodeInfo : public CbcPartialNodeInfo
+  class BONMINLIB_EXPORT BonCbcPartialNodeInfo : public CbcPartialNodeInfo
   {
 
   public:

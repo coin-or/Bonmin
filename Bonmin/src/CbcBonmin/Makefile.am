@@ -16,6 +16,9 @@ if COIN_HAS_ASL
   lib_LTLIBRARIES += libbonminampl.la
 endif
 
+# add libtool flags
+LDFLAGS += $(LT_LDFLAGS)
+
 ########################################################################
 #                          bonmin library                              #
 ########################################################################
@@ -35,9 +38,6 @@ libbonmin_la_LIBADD = \
 	Heuristics/libbonheuristics.la \
 	$(BONMINLIB_LFLAGS)
 
-# This is for libtool
-libbonmin_la_LDFLAGS = $(LT_LDFLAGS)
-
 ########################################################################
 #                         amplbonmin library                           #
 ########################################################################
@@ -54,9 +54,6 @@ libbonminampl_la_LIBADD = \
 	../Interfaces/Ampl/libbonamplinterface.la \
 	libbonmin.la \
 	$(BONMINAMPLINTERFACELIB_LFLAGS)
-
-# This is for libtool
-libbonminampl_la_LDFLAGS = $(LT_LDFLAGS)
 
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \

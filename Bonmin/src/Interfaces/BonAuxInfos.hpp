@@ -20,7 +20,7 @@ namespace Bonmin {
 
 
   /** Bonmin class for passing info between components of branch-and-cuts.*/
-class AuxInfo : public OsiBabSolver {
+class BONMINLIB_EXPORT AuxInfo : public OsiBabSolver {
 public:
   /** Default constructor.*/
   AuxInfo(int type);

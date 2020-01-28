@@ -13,6 +13,7 @@
 #include "CoinPackedMatrix.hpp"
 #include "OsiRowCut.hpp"
 #include "OsiCuts.hpp"
+#include "BonminConfig.h"
 #include "BonTypes.hpp"
 #include <list>
 
@@ -24,7 +25,7 @@ namespace Bonmin {
    Lower /** Stores the lower triangle of a symetric Q.*/,
    Full /** Stores the whole matrix of a non-symetric Q.*/};
 
-class QuadCut : public OsiRowCut {
+class BONMINLIB_EXPORT QuadCut : public OsiRowCut {
  public:
 
   /// Default constructor
@@ -98,7 +99,7 @@ class QuadCut : public OsiRowCut {
 };
 
 /** Generalizes OsiCuts to handle quadratic cuts.*/
-class Cuts : public OsiCuts {
+class BONMINLIB_EXPORT Cuts : public OsiCuts {
  public:
   typedef vector<QuadCut *> QuadCutPtrStorage;
   /** Default constructor.*/

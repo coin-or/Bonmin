@@ -14,7 +14,7 @@ namespace Bonmin {
  *  BonOsiSolverInterface to perform the strong branching solves.
 */
 
-class StrongBranchingSolver : public Ipopt::ReferencedObject  {
+class BONMINLIB_EXPORT StrongBranchingSolver : public Ipopt::ReferencedObject  {
  
 public:
 

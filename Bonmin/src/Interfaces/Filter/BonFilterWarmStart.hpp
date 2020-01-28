@@ -30,7 +30,7 @@ namespace Bonmin
    * For practical reason (integration in Cbc) this class also inherits from
    * CoinWarmStartBasis. <br>
   */
-  class FilterWarmStart :
+  class BONMINLIB_EXPORT FilterWarmStart :
     public virtual CoinWarmStartPrimalDual, public virtual CoinWarmStartBasis,
     public Coin::ReferencedObject
   {
@@ -106,7 +106,7 @@ namespace Bonmin
     bool empty_;
   };
 
-  class FilterWarmStartDiff : public CoinWarmStartPrimalDualDiff
+  class BONMINLIB_EXPORT FilterWarmStartDiff : public CoinWarmStartPrimalDualDiff
   {
     typedef FilterTypes::fint fint;
     typedef FilterTypes::real real;

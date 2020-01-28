@@ -12,7 +12,7 @@ namespace Bonmin
   /** Implementation of BonChooseVariable for curvature-based braching.
   */
 
-  class LpBranchingSolver : public StrongBranchingSolver
+  class BONMINLIB_EXPORT LpBranchingSolver : public StrongBranchingSolver
   {
 
   public:

@@ -14,6 +14,7 @@
 #ifndef __TMINLP_HPP__
 #define __TMINLP_HPP__
 
+#include "BonminConfig.h"
 #include "IpUtils.hpp"
 #include "IpReferenced.hpp"
 #include "IpException.hpp"
@@ -56,7 +57,7 @@ namespace Bonmin
    *  variable has no upper or lower bound, set the bound to
    *  -ipopt_inf or +ipopt_inf respectively
    */
-  class TMINLP : public Ipopt::ReferencedObject
+  class BONMINLIB_EXPORT TMINLP : public Ipopt::ReferencedObject
   {
   public:
     friend class TMINLP2TNLP;

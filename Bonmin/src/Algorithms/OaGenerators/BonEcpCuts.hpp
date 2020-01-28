@@ -14,7 +14,7 @@
 #include "CglCutGenerator.hpp"
 namespace Bonmin
 {
-  class EcpCuts: public OaDecompositionBase
+  class BONMINLIB_EXPORT EcpCuts: public OaDecompositionBase
   {
   public:
     EcpCuts(BabSetupBase & b);

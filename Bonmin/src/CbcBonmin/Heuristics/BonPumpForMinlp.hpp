@@ -11,7 +11,7 @@
 #include "BonLocalSolverBasedHeuristic.hpp"
 
 namespace Bonmin {
-  class PumpForMinlp:public LocalSolverBasedHeuristic {
+  class BONMINLIB_EXPORT PumpForMinlp : public LocalSolverBasedHeuristic {
     public:
      /** Default constructor*/
      PumpForMinlp();

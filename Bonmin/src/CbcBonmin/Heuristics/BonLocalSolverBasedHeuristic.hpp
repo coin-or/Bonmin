@@ -12,7 +12,7 @@
 #include "CbcHeuristic.hpp"
 
 namespace Bonmin {
-  class LocalSolverBasedHeuristic : public CbcHeuristic {
+  class BONMINLIB_EXPORT LocalSolverBasedHeuristic : public CbcHeuristic {
   public:
     /** Default constructor.*/
     LocalSolverBasedHeuristic();

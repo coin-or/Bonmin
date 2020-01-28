@@ -15,7 +15,7 @@
 
 namespace Bonmin
 {
-  class IpoptSolver: public TNLPSolver
+  class BONMINLIB_EXPORT IpoptSolver: public TNLPSolver
   {
   public:
   class UnsolvedIpoptError: public TNLPSolver::UnsolvedError

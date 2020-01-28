@@ -16,7 +16,7 @@
 namespace Bonmin
 {
   class SubMipSolver;
-  class HeuristicDiveMIP : public CbcHeuristic
+  class BONMINLIB_EXPORT HeuristicDiveMIP : public CbcHeuristic
   {
   public:
 #if 0
