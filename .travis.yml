@@ -67,3 +67,4 @@ script:
   - make
   - make test
   - make install
+  - cd examples/CppExample && make && ./CppExample
