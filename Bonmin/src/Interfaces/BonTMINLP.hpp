@@ -25,10 +25,23 @@
 #include "CoinError.hpp"
 #include "CoinHelperFunctions.hpp"
 
+#define DECLARE_STD_BONMIN_EXCEPTION(__except_type) \
+    class BONMINLIB_EXPORT  __except_type : public Ipopt::IpoptException \
+    { \
+    public: \
+      __except_type(std::string msg, std::string fname, Ipopt::Index line) \
+      : Ipopt::IpoptException(msg,fname,line, #__except_type) {} \
+      __except_type(const __except_type& copy) \
+      : Ipopt::IpoptException(copy) {} \
+    private: \
+       __except_type(); \
+       void operator=(const __except_type&); \
+    }
+
 namespace Bonmin
 {
-  DECLARE_STD_EXCEPTION(TMINLP_INVALID);
-  DECLARE_STD_EXCEPTION(TMINLP_INVALID_VARIABLE_BOUNDS);
+  DECLARE_STD_BONMIN_EXCEPTION(TMINLP_INVALID);
+  DECLARE_STD_BONMIN_EXCEPTION(TMINLP_INVALID_VARIABLE_BOUNDS);
 
   /** Base class for all MINLPs that use a standard triplet matrix form
    *  and dense vectors.
