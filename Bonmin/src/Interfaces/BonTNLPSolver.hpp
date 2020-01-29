@@ -49,7 +49,7 @@ class BONMINLIB_EXPORT TNLPSolver: public Ipopt::ReferencedObject{
 
   /** We will throw this error when a problem is not solved.
       Eventually store the error code from solver*/
-  class UnsolvedError
+  class BONMINLIB_EXPORT UnsolvedError
   {
   public:
     /** Constructor */
