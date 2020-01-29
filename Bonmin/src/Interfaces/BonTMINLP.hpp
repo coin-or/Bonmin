@@ -402,7 +402,7 @@ namespace Bonmin
   virtual const int * get_const_xtra_id() const{
     return NULL;
   }
-  protected:
+  private:
     /** Copy constructor */
     //@{
     /** Copy Constructor */
@@ -411,8 +411,6 @@ namespace Bonmin
     /** Overloaded Equals Operator */
     void operator=(const TMINLP&);
     //@}
-
-  private:
   };
 
 } // namespace Ipopt

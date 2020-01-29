@@ -152,6 +152,8 @@ namespace Bonmin
   protected:
     /** Add some cuts to the problem formulaiton (handles Quadratics).*/
     void addRowCuts(const OsiCuts &cuts, bool safe);
+
+  private:
     /**@name Default Compiler Generated Methods
      * (Hidden to avoid implicit creation/calling).
      * These methods are not implemented and
@@ -167,7 +169,6 @@ namespace Bonmin
     TMINLP2TNLPQuadCuts& operator=(const TMINLP2TNLP&);
     //@}
 
-  private:
   /** Some storage for quadratic cuts.*/
   vector<QuadRow *> quadRows_;
 
