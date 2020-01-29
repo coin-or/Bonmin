@@ -13,6 +13,7 @@
 #include <vector>
 #include "OsiAuxInfo.hpp"
 #include "CoinSmartPtr.hpp"
+#include "BonminConfig.h"
 #include "BonTypes.hpp"
 
 
