@@ -817,7 +817,7 @@ namespace Bonmin
     oaHeu->setNlp(nonlinearSolver_);
     HeuristicMethod h;
     h.heuristic = oaHeu;
-    h.id = "nonlinear programm";
+    h.id = "nonlinear program";
     heuristics_.push_back(h);
 
     Ipopt::Index doHeuristicRINS = false;
