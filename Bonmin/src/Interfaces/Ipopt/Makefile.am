@@ -21,9 +21,6 @@ libipoptinterface_la_SOURCES = \
 	BonIpoptSolver.cpp \
 	BonIpoptWarmStart.cpp
 
-# This is for libtool
-libipoptinterface_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = -I$(srcdir)/.. $(BONMINLIB_CFLAGS) -DBONMIN_BUILD
 

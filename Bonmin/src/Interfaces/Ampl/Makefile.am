@@ -22,9 +22,6 @@ libbonamplinterface_la_SOURCES = \
 	BonSolReader.cpp \
 	sos_kludge.cpp
 
-# This is for libtool
-libbonamplinterface_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
         -I$(srcdir)/.. \

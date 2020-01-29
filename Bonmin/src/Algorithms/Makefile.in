@@ -117,10 +117,6 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libbonalgorithms_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libbonalgorithms_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -397,9 +393,6 @@ libbonalgorithms_la_SOURCES = \
 libbonalgorithms_la_LIBADD = Branching/libbonbranching.la \
 	OaGenerators/libbonoagenerators.la QuadCuts/libbonquadcuts.la
 
-# This is for libtool
-libbonalgorithms_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
 	-I$(srcdir)/Branching \
@@ -487,7 +480,7 @@ clean-noinstLTLIBRARIES:
 	}
 
 libbonalgorithms.la: $(libbonalgorithms_la_OBJECTS) $(libbonalgorithms_la_DEPENDENCIES) $(EXTRA_libbonalgorithms_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libbonalgorithms_la_LINK)  $(libbonalgorithms_la_OBJECTS) $(libbonalgorithms_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK)  $(libbonalgorithms_la_OBJECTS) $(libbonalgorithms_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

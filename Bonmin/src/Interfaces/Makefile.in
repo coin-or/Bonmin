@@ -122,10 +122,6 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libbonmininterfaces_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libbonmininterfaces_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -429,9 +425,6 @@ libbonmininterfaces_la_SOURCES = \
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la \
 	$(am__append_3)
 
-# This is for libtool
-libbonmininterfaces_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
 	-I$(srcdir)/../Algorithms \
@@ -573,7 +566,7 @@ clean-noinstLTLIBRARIES:
 	}
 
 libbonmininterfaces.la: $(libbonmininterfaces_la_OBJECTS) $(libbonmininterfaces_la_DEPENDENCIES) $(EXTRA_libbonmininterfaces_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libbonmininterfaces_la_LINK)  $(libbonmininterfaces_la_OBJECTS) $(libbonmininterfaces_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK)  $(libbonmininterfaces_la_OBJECTS) $(libbonmininterfaces_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

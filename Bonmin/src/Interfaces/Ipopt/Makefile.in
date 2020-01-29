@@ -115,10 +115,6 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libipoptinterface_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libipoptinterface_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -373,9 +369,6 @@ libipoptinterface_la_SOURCES = \
 	BonIpoptWarmStart.cpp
 
 
-# This is for libtool
-libipoptinterface_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = -I$(srcdir)/.. $(BONMINLIB_CFLAGS) -DBONMIN_BUILD
 
@@ -453,7 +446,7 @@ clean-noinstLTLIBRARIES:
 	}
 
 libipoptinterface.la: $(libipoptinterface_la_OBJECTS) $(libipoptinterface_la_DEPENDENCIES) $(EXTRA_libipoptinterface_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libipoptinterface_la_LINK)  $(libipoptinterface_la_OBJECTS) $(libipoptinterface_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK)  $(libipoptinterface_la_OBJECTS) $(libipoptinterface_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

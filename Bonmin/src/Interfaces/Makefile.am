@@ -50,9 +50,6 @@ if COIN_HAS_FILTERSQP
   libbonmininterfaces_la_LIBADD += Filter/libfilterinterface.la
 endif
 
-# This is for libtool
-libbonmininterfaces_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
 	-I$(srcdir)/../Algorithms \

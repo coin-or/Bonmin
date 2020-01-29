@@ -26,9 +26,6 @@ libbonquadcuts_la_SOURCES = \
                   BonTMINLPLinObj.cpp \
                   BonTMINLP2Quad.cpp
 
-# This is for libtool
-libbonquadcuts_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
 	-I$(srcdir)/.. \

@@ -120,10 +120,6 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libbonheuristics_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libbonheuristics_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -400,9 +396,6 @@ libbonheuristics_la_SOURCES = \
        BonHeuristicDiveMIPVectorLength.cpp
 
 
-# This is for libtool
-libbonheuristics_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
 	-I$(srcdir)/.. \
@@ -504,7 +497,7 @@ clean-noinstLTLIBRARIES:
 	}
 
 libbonheuristics.la: $(libbonheuristics_la_OBJECTS) $(libbonheuristics_la_DEPENDENCIES) $(EXTRA_libbonheuristics_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libbonheuristics_la_LINK)  $(libbonheuristics_la_OBJECTS) $(libbonheuristics_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK)  $(libbonheuristics_la_OBJECTS) $(libbonheuristics_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

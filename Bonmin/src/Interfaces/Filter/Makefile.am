@@ -26,9 +26,6 @@ libfilterinterface_la_SOURCES = \
 	BonFilterSolver.cpp \
 	BonFilterWarmStart.cpp
 
-# This is for libtool
-libfilterinterface_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = -I$(srcdir)/.. $(BONMINLIB_CFLAGS) -DBONMIN_BUILD
 

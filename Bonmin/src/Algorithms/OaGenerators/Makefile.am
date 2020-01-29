@@ -26,9 +26,6 @@ libbonoagenerators_la_SOURCES = \
 	BonFpForMinlp.cpp \
 	BonOAMessages.cpp
 
-# This is for libtool
-libbonoagenerators_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
 	-I$(srcdir)/../../Interfaces \

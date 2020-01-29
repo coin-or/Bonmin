@@ -25,6 +25,9 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../../src/CbcBonmin/Heuristics \
 	$(BONMINLIB_CFLAGS) $(BONMINAMPLINTERFACELIB_CFLAGS)
 
+# add libtool flags
+LDFLAGS += $(LT_LDFLAGS)
+
 ########################################################################
 #                                sepa                                  #
 ########################################################################

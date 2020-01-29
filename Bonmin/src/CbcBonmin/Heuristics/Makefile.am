@@ -32,9 +32,6 @@ libbonheuristics_la_SOURCES = \
        BonMilpRounding.cpp \
        BonHeuristicDiveMIPVectorLength.cpp
 
-# This is for libtool
-libbonheuristics_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
 	-I$(srcdir)/.. \

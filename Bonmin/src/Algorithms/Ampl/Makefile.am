@@ -18,9 +18,6 @@ noinst_LTLIBRARIES = libbonamplsetup.la
 # List all source files, including headers
 libbonamplsetup_la_SOURCES = BonAmplSetup.cpp
 
-# This is for libtool
-libbonamplsetup_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
 	-I$(srcdir)/../OaGenerators \

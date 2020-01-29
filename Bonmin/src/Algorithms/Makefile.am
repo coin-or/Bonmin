@@ -37,9 +37,6 @@ libbonalgorithms_la_LIBADD = Branching/libbonbranching.la
 libbonalgorithms_la_LIBADD += OaGenerators/libbonoagenerators.la 
 libbonalgorithms_la_LIBADD += QuadCuts/libbonquadcuts.la 
 
-# This is for libtool
-libbonalgorithms_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
 	-I$(srcdir)/Branching \

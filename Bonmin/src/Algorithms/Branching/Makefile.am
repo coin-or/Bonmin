@@ -23,9 +23,6 @@ libbonbranching_la_SOURCES = \
         BonLpBranchingSolver.cpp \
         BonQpBranchingSolver.cpp
 
-# This is for libtool
-libbonbranching_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 # Currently, CbcBonmin has to be included for BonChooseVariable.hpp, but
 # we should try to unmangle the connection to Cbc.

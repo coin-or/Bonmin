@@ -117,10 +117,6 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libbonoagenerators_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libbonoagenerators_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -382,9 +378,6 @@ libbonoagenerators_la_SOURCES = \
 	BonOAMessages.cpp
 
 
-# This is for libtool
-libbonoagenerators_la_LDFLAGS = $(LT_LDFLAGS)
-
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
 	-I$(srcdir)/../../Interfaces \
@@ -472,7 +465,7 @@ clean-noinstLTLIBRARIES:
 	}
 
 libbonoagenerators.la: $(libbonoagenerators_la_OBJECTS) $(libbonoagenerators_la_DEPENDENCIES) $(EXTRA_libbonoagenerators_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libbonoagenerators_la_LINK)  $(libbonoagenerators_la_OBJECTS) $(libbonoagenerators_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK)  $(libbonoagenerators_la_OBJECTS) $(libbonoagenerators_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

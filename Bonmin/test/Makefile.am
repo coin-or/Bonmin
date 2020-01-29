@@ -36,7 +36,7 @@ endif
 CppExample_SOURCES = MyBonmin.cpp  MyTMINLP.cpp  MyTMINLP.hpp
 
 # list libraries that need to be linked in
-CppExample_LDADD        = ../src/CbcBonmin/libbonmin.la
+CppExample_LDADD = ../src/CbcBonmin/libbonmin.la
 
 #########################################################################
 ##                      Example C program                             #
