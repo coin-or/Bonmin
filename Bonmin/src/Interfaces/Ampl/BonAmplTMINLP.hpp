@@ -326,6 +326,9 @@ namespace Bonmin
     /** Flag to say if AMPL solution file should be written.*/
     int writeAmplSolFile_;
   };
+  
+  void fillAmplOptionList(RegisteredOptions& regopts, RegisteredOptions::ExtraCategoriesInfo which, Ipopt::AmplOptionsList * amplOptList);
+
 } // namespace Ipopt
 
 #endif

@@ -25,11 +25,10 @@
 using namespace Ipopt;
 
 namespace Bonmin{
-  void 
-  RegisteredOptions::fillAmplOptionList(ExtraCategoriesInfo which, Ipopt::AmplOptionsList * amplOptList){
+  void fillAmplOptionList(RegisteredOptions& regopts, RegisteredOptions::ExtraCategoriesInfo which, Ipopt::AmplOptionsList * amplOptList){
       std::list<int> test;
       std::list< Ipopt::RegisteredOption * > options;
-      chooseOptions(which, options);
+      regopts.chooseOptions(which, options);
       for(std::list< Ipopt::RegisteredOption * >::iterator i = options.begin();
            i != options.end() ; i++)
        {
@@ -169,9 +168,9 @@ namespace Bonmin
     suffix_handler->AddAvailableSuffix("perturb_radius",AmplSuffixHandler::Variable_Source, AmplSuffixHandler::Number_Type);
 
     SmartPtr<AmplOptionsList> ampl_options_list = new AmplOptionsList();
-    roptions->fillAmplOptionList(RegisteredOptions::BonminCategory, GetRawPtr(ampl_options_list));
-    roptions->fillAmplOptionList(RegisteredOptions::FilterCategory, GetRawPtr(ampl_options_list));
-    roptions->fillAmplOptionList(RegisteredOptions::BqpdCategory, GetRawPtr(ampl_options_list));
+    fillAmplOptionList(*roptions, RegisteredOptions::BonminCategory, GetRawPtr(ampl_options_list));
+    fillAmplOptionList(*roptions, RegisteredOptions::FilterCategory, GetRawPtr(ampl_options_list));
+    fillAmplOptionList(*roptions, RegisteredOptions::BqpdCategory, GetRawPtr(ampl_options_list));
     fillApplicationOptions(GetRawPtr(ampl_options_list) );
     std::string options_id = appName + "_options";
     ampl_tnlp_ = new AmplTNLP(jnlst, options, argv, suffix_handler, true,

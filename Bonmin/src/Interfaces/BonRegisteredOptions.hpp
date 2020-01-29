@@ -206,9 +206,6 @@ class BONMINLIB_EXPORT RegisteredOptions: public Ipopt::RegisteredOptions{
       return i->second;
    }
   
-   /* Forward declaration, the function will be defined in BonAmplTMINLP.cpp*/
-   void fillAmplOptionList(ExtraCategoriesInfo which, Ipopt::AmplOptionsList * amplOptList);
-
    private:
    /** Output Latex table of options.*/
    void chooseOptions(ExtraCategoriesInfo which, std::list<Ipopt::RegisteredOption *> &options);
@@ -219,6 +216,9 @@ class BONMINLIB_EXPORT RegisteredOptions: public Ipopt::RegisteredOptions{
    /** Store extra Informations on Registering categories
        (is bonmin, filterSqp...).*/
    std::map<std::string, ExtraCategoriesInfo> categoriesInfos_;
+
+  friend
+  void fillAmplOptionList(RegisteredOptions& regopts, RegisteredOptions::ExtraCategoriesInfo which, Ipopt::AmplOptionsList * amplOptList);
 };
 
 }/*Ends namespace Bonmin.*/
