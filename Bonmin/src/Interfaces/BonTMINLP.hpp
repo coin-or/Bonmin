@@ -70,7 +70,7 @@ namespace Bonmin
       USER_INTERRUPT,
       MINLP_ERROR};
     /** Class to store sos constraints for model */
-    struct SosInfo
+    struct BONMINLIB_EXPORT SosInfo
     {
       /** Number of SOS constraints.*/
       int num;
@@ -109,7 +109,7 @@ namespace Bonmin
     };
 
     /** Stores branching priorities information. */
-    struct BranchingInfo
+    struct BONMINLIB_EXPORT BranchingInfo
     {
       /**number of variables*/
       int size;
@@ -155,7 +155,7 @@ namespace Bonmin
     };
 
     /** Class to store perturbation radii for variables in the model */
-    class PerturbInfo
+    class BONMINLIB_EXPORT PerturbInfo
     {
     public:
       /** default constructor. */
