@@ -568,11 +568,11 @@ WARN_LOGFILE           = @coin_doxy_logname@
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                   = @abs_source_dir@/src 
-		       += @abs_source_dir@/examples/CppExample/MyBonmin.cpp
-		       += @abs_source_dir@/doc/BONMIN_ReferenceManual.hpp
-		       += @abs_source_dir@/examples/CppExample/MyTMINLP.hpp 
-		       += @abs_source_dir@/examples/CppExample/MyTMINLP.cpp
+INPUT                   = @abs_top_srcdir@/src 
+		       += @abs_top_srcdir@/examples/CppExample/MyBonmin.cpp
+		       += @abs_top_srcdir@/doc/BONMIN_ReferenceManual.hpp
+		       += @abs_top_srcdir@/examples/CppExample/MyTMINLP.hpp 
+		       += @abs_top_srcdir@/examples/CppExample/MyTMINLP.cpp
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
