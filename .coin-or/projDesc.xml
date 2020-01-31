@@ -18,10 +18,10 @@
 		  MINLP (Mixed Integer NonLinear Programming) problems.
 		</projectShortDescription>
 
-		<projectManager> Pierre Bonami, pierre.bonami at lif dot univ-mrs dot fr </projectManager>
-		<projectHomePage> http://www.coin-or.org/Bonmin</projectHomePage>
-		<projectLicense> Common Public License 1.0</projectLicense>
-		<projectLicenseURL>http://www.opensource.org/licenses/cpl1.0.php</projectLicenseURL>
+		<projectManager> Pierre Bonami </projectManager>
+		<projectHomePage> https://github.com/coin-or/Bonmin</projectHomePage>
+		<projectLicense> Eclipse Public License 1.0</projectLicense>
+		<projectLicenseURL>http://www.opensource.org/licenses/eclipse-1.0</projectLicenseURL>
 
 		<coinLinkedProjects>
 			<coinProject>
@@ -34,13 +34,13 @@
 				<repoName>Clp</repoName>
 			</coinProject>
 			<coinProject>
+				<repoName>Osi</repoName>
+			</coinProject>
+			<coinProject>
 				<repoName>CoinUtils</repoName>
 			</coinProject>
 			<coinProject>
 				<repoName>Ipopt</repoName>
-			</coinProject>
-			<coinProject>
-				<repoName>Osi</repoName>
 			</coinProject>
 		</coinLinkedProjects>
 
@@ -133,23 +133,18 @@
 		<testedPlatforms>
 
 		       <platform> 
-		          <operatingSystem>Microsoft Windows</operatingSystem>
-		          <compiler>CYGWIN/g++</compiler>                     
-		       </platform>
-
-		       <platform> 
-		          <operatingSystem>Microsoft Windows</operatingSystem>
-		          <compiler>MSys/g++</compiler>                       
-		       </platform>
-
-		       <platform> 
 		          <operatingSystem>Linux</operatingSystem>
 		          <compiler>g++</compiler>                
 		       </platform>
 
 		       <platform> 
-		          <operatingSystem>Mac OSX</operatingSystem>    
+		          <operatingSystem>Mac OS X</operatingSystem>    
 		          <compiler>g++</compiler>                      
+		       </platform>
+
+		       <platform> 
+		          <operatingSystem>Microsoft Windows with MSys2</operatingSystem>
+		          <compiler>g++, cl, icl</compiler>                       
 		       </platform>
 		</testedPlatforms>
 		<projectCategories>
@@ -164,8 +159,8 @@
 
 		 		 <documentation>http://www.coin-or.org/Bonmin/Intro.html</documentation>
 
-		 		 <sourceCodeDownload>https://projects.coin-or.org/Bonmin/wiki/GettingStarted</sourceCodeDownload>
-				 <binaryDownload>http://www.coin-or.org/download/binary/Bonmin</binaryDownload>
+		 		 <sourceCodeDownload>https://github.com/coin-or/Bonmin</sourceCodeDownload>
+				 <binaryDownload/>
 		 		 <mailingList>http://list.coin-or.org/mailman/listinfo/Bonmin</mailingList>
 
 		 </leftMenuLinks>
