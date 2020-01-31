@@ -9,7 +9,6 @@
 /LICENSE -text
 /README -text
 /appveyor.yml -text
-/bonmin-uninstalled.pc.in -text
 /bonmin.pc.in -text
 /compile -text
 /config.guess -text
