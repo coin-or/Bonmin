@@ -11,6 +11,7 @@
 #ifndef BonCbcNlpStrategy_H
 #define BonCbcNlpStrategy_H
 
+#include "BonminConfig.h"
 #include "CbcStrategy.hpp"
 class CglPreProcess;
 class CbcNodeInfo;
@@ -20,7 +21,7 @@ class CoinWarmStartDiff;
 
 namespace Bonmin
 {
-  class CbcNlpStrategy : public CbcStrategy
+  class BONMINLIB_EXPORT CbcNlpStrategy : public CbcStrategy
   {
   public:
 

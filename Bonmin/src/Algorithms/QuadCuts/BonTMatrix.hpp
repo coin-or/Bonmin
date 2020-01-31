@@ -19,7 +19,7 @@
 
 namespace Bonmin {
 
-struct TMat{
+struct BONMINLIB_EXPORT TMat{
   int * iRow_;
   int * jCol_;
   double * value_;

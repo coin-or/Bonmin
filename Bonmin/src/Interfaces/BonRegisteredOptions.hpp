@@ -11,6 +11,7 @@
 #ifndef BonRegisteredOptions_H
 #define BonRegisteredOptions_H
 
+#include "BonminConfig.h"
 #include "IpRegOptions.hpp"
 #include "IpException.hpp"
 #include "CoinError.hpp"
@@ -27,7 +28,7 @@ namespace Bonmin {
     In particular, it allows to store code to indicate in which algorithm
     option is available. It also allows to table summing up all the options
     both in LaTex and html.*/
-class RegisteredOptions: public Ipopt::RegisteredOptions{
+class BONMINLIB_EXPORT RegisteredOptions: public Ipopt::RegisteredOptions{
   public:
     enum ExtraOptInfosBits{
     validInHybrid=0/** Say that option is valid in Hybrid method (1).*/,
@@ -205,9 +206,6 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
       return i->second;
    }
   
-   /* Forward declaration, the function will be defined in BonAmplTMINLP.cpp*/
-   void fillAmplOptionList(ExtraCategoriesInfo which, Ipopt::AmplOptionsList * amplOptList);
-
    private:
    /** Output Latex table of options.*/
    void chooseOptions(ExtraCategoriesInfo which, std::list<Ipopt::RegisteredOption *> &options);
@@ -218,6 +216,9 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
    /** Store extra Informations on Registering categories
        (is bonmin, filterSqp...).*/
    std::map<std::string, ExtraCategoriesInfo> categoriesInfos_;
+
+  friend
+  void fillAmplOptionList(RegisteredOptions& regopts, RegisteredOptions::ExtraCategoriesInfo which, Ipopt::AmplOptionsList * amplOptList);
 };
 
 }/*Ends namespace Bonmin.*/

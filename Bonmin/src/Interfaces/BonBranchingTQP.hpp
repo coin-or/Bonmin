@@ -22,7 +22,7 @@ namespace Bonmin
    *  TNLP, not on the TNLP itself.  The variables of the QP are the
    *  displacement from the reference point.
    */
-  class BranchingTQP : public Ipopt::TNLP
+  class BONMINLIB_EXPORT BranchingTQP : public Ipopt::TNLP
   {
   public:
     /**@name Constructors/Destructors */

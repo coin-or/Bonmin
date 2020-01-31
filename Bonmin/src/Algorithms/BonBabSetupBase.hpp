@@ -22,7 +22,7 @@
 namespace Bonmin
 {
   /** A class to have all elements necessary to setup a branch-and-bound.*/
-  class BabSetupBase
+  class BONMINLIB_EXPORT BabSetupBase
   {
   public:
     /** Type for cut generation method with its frequency and string identification. */

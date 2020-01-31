@@ -723,7 +723,7 @@ namespace Bonmin
     }
     return bestPossibleObjective;
   }
-//#ifdef COIN_HAS_BONMIN
+
   ///Register the options of the method.
   void
   CbcDfsDiver::registerOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
@@ -752,7 +752,6 @@ namespace Bonmin
     b.options()->GetIntegerValue("max_dive_depth", maxDiveDepth_,b.prefix());
     b.options()->GetIntegerValue("max_backtracks_in_dive", maxDiveBacktracks_,b.prefix());
   }
-//#endif
 
   /** Changes the mode of comparison of the tree for "safety reasons" if the mode really changes we always
       finish the current dive and put all the node back onto the heap.*/

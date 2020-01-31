@@ -29,7 +29,7 @@ namespace Bonmin
 
   /** Class for strengthening OA cuts, and generating additional ones.
    */
-  class CutStrengthener: public Ipopt::ReferencedObject
+  class BONMINLIB_EXPORT CutStrengthener: public Ipopt::ReferencedObject
   {
     /** Class implementing the TNLP for strengthening one cut.  We
      *  assume that the cut has a lower bound. */

@@ -17,28 +17,20 @@ noinst_LTLIBRARIES = libipoptinterface.la
 
 # List all source files, including headers
 libipoptinterface_la_SOURCES = \
-	BonIpoptInteriorWarmStarter.cpp  BonIpoptSolver.cpp \
-        BonIpoptWarmStart.cpp \
-        BonIpoptInteriorWarmStarter.hpp  BonIpoptSolver.hpp \
-        BonIpoptWarmStart.hpp
+	BonIpoptInteriorWarmStarter.cpp \
+	BonIpoptSolver.cpp \
+	BonIpoptWarmStart.cpp
 
-# This is for libtool
-libipoptinterface_la_LDFLAGS = $(LT_LDFLAGS)
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
-AM_CPPFLAGS = -I`$(CYGPATH_W) $(srcdir)/..` $(BONMINLIB_CFLAGS)
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I..
+# Here list all include flags, relative to this "srcdir" directory.
+AM_CPPFLAGS = -I$(srcdir)/.. $(BONMINLIB_CFLAGS) -DBONMIN_BUILD
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+# and that therefore should be installed in 'include/coin-or'
+includecoindir = $(includedir)/coin-or
 includecoin_HEADERS = \
 	BonIpoptInteriorWarmStarter.hpp \
 	BonIpoptSolver.hpp \

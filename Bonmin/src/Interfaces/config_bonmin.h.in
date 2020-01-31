@@ -3,6 +3,12 @@
 #ifndef __CONFIG_BONMIN_H__
 #define __CONFIG_BONMIN_H__
 
+/* Library Visibility Attribute */
+#undef BONMINAMPLINTERFACELIB_EXPORT
+
+/* Library Visibility Attribute */
+#undef BONMINLIB_EXPORT
+
 /* Version number of project */
 #undef BONMIN_VERSION
 

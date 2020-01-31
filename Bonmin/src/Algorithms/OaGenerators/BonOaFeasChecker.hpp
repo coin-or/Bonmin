@@ -15,7 +15,7 @@
 namespace Bonmin
 {
   /** Class to perform OA in its classical form.*/
-  class OaFeasibilityChecker : public OaDecompositionBase
+  class BONMINLIB_EXPORT OaFeasibilityChecker : public OaDecompositionBase
   {
   public:
     /// New usefull constructor

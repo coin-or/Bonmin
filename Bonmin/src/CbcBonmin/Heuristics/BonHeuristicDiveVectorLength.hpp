@@ -18,7 +18,7 @@
 
 namespace Bonmin
 {
-  class HeuristicDiveVectorLength : public HeuristicDive {
+  class BONMINLIB_EXPORT HeuristicDiveVectorLength : public HeuristicDive {
   public:
     /// Default Constructor 
     HeuristicDiveVectorLength ();

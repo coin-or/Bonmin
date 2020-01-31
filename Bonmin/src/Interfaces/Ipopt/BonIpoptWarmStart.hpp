@@ -43,7 +43,7 @@ namespace Bonmin
           (constraints \f$ g(x) \leq 0 \f$) 
      </UL>
    */
-  class IpoptWarmStart :
+  class BONMINLIB_EXPORT IpoptWarmStart :
     public virtual CoinWarmStartPrimalDual, public virtual CoinWarmStartBasis
   {
   public:
@@ -106,7 +106,7 @@ namespace Bonmin
    whole vector of values.
    \todo Find a way to free unused values.
   */
-  class IpoptWarmStartDiff : public CoinWarmStartPrimalDualDiff
+  class BONMINLIB_EXPORT IpoptWarmStartDiff : public CoinWarmStartPrimalDualDiff
   {
   public:
     friend class IpoptWarmStart;

@@ -23,7 +23,7 @@ COINLIBS = \
 	$(CLPOBJDIR)/src/libClp.la \
 	$(COINUTILSOBJDIR)/src/libCoinUtils.la
 
-if COIN_HAS_CPX
+if COIN_HAS_OSICPX
   COINLIBS += \
 	$(OSIOBJDIR)/src/OsiCpx/libOsiCpx.la \
 	$(CPXLIB)

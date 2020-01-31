@@ -10,6 +10,7 @@
 #define BonminOuterApprox_H
 
 #include <cmath>
+#include "BonminConfig.h"
 
 namespace Bonmin{
    class OsiTMINLPInterface;
@@ -18,7 +19,7 @@ namespace Bonmin{
 class OsiSolverInterface;
 namespace Bonmin {
   /** A class to build outer approximations.*/
-  class OuterApprox{
+  class BONMINLIB_EXPORT OuterApprox{
 
   public:
 

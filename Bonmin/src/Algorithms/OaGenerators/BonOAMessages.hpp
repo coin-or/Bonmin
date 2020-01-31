@@ -9,6 +9,7 @@
 
 #ifndef OaMessages_H
 #define OaMessages_H
+#include "BonminConfig.h"
 #include "CoinMessage.hpp"
 
 namespace Bonmin
@@ -34,7 +35,7 @@ namespace Bonmin
   };
 
   /** Output messages for Outer approximation cutting planes */
-  class OaMessages : public CoinMessages
+  class BONMINLIB_EXPORT OaMessages : public CoinMessages
   {
   public:
     OaMessages();

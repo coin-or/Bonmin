@@ -17,7 +17,7 @@
 #include <list>
 
 namespace Bonmin {
-class LinearCutsGenerator : public CglCutGenerator {
+class BONMINLIB_EXPORT LinearCutsGenerator : public CglCutGenerator {
    public:
     /** Type for cut generation method with its frequency and string identification. */
     struct CuttingMethod : public Coin::ReferencedObject 

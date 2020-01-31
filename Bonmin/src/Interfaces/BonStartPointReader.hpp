@@ -20,7 +20,7 @@
 namespace Bonmin {
 /** This class reads a file with a starting point for Ipopt initalization. File format is number of primals number of duals then values one after another
  * Numbering of variables is first variables, then duals on lower bounds duals on upper bounds and to finish duals on constraints */
-class StartPointReader
+class BONMINLIB_EXPORT StartPointReader
 {
 public:
   /** Constructor with fileName_ given by a string (and default) */

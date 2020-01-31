@@ -16,33 +16,26 @@ noinst_LTLIBRARIES = libbonamplsetup.la
 ########################################################################
 
 # List all source files, including headers
-libbonamplsetup_la_SOURCES = BonAmplSetup.cpp BonAmplSetup.hpp 
+libbonamplsetup_la_SOURCES = BonAmplSetup.cpp
 
-# This is for libtool
-libbonamplsetup_la_LDFLAGS = $(LT_LDFLAGS)
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
+# Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../Branching` \
-	-I`$(CYGPATH_W) $(srcdir)/..` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Filter` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Ampl` \
-	$(BONMINLIB_CFLAGS)
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
+	-I$(srcdir)/../OaGenerators \
+	-I$(srcdir)/../Branching \
+	-I$(srcdir)/.. \
+	-I$(srcdir)/../../Interfaces \
+	-I$(srcdir)/../../Interfaces/Ipopt \
+	-I$(srcdir)/../../Interfaces/Filter \
+	-I$(srcdir)/../../Interfaces/Ampl \
+	$(BONMINLIB_CFLAGS) $(BONMINAMPLINTERFACELIB_CFLAGS) -DBONMINAMPL_BUILD
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+# and that therefore should be installed in 'include/coin-or'
+includecoindir = $(includedir)/coin-or
 includecoin_HEADERS = BonAmplSetup.hpp
 
 ########################################################################

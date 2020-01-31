@@ -18,7 +18,7 @@
 
 namespace Bonmin
 {
-  class HeuristicDiveFractional : public HeuristicDive {
+  class BONMINLIB_EXPORT HeuristicDiveFractional : public HeuristicDive {
   public:
     /// Default Constructor 
     HeuristicDiveFractional ();

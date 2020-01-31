@@ -45,7 +45,7 @@ namespace Bonmin {
    (so that we can use it for example as the continuous solver in Cbc).
 */
 
-class OsiTMINLPInterface : public OsiSolverInterface
+class BONMINLIB_EXPORT OsiTMINLPInterface : public OsiSolverInterface
 {
   friend class BonminParam;
 

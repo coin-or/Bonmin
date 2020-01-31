@@ -11,6 +11,7 @@
 // Code separated from BonOaDecBase to try to clarify OAs
 #ifndef BonSubMipSolver_HPP
 #define BonSubMipSolver_HPP
+#include "BonminConfig.h"
 #include "IpSmartPtr.hpp"
 #include <string>
 /* forward declarations.*/
@@ -26,7 +27,7 @@ namespace Bonmin {
     class RegisteredOptions;
     class BabSetupBase; 
     /** A very simple class to provide a common interface for solving MIPs with Cplex and Cbc.*/
-    class SubMipSolver
+    class BONMINLIB_EXPORT SubMipSolver
     {
     public:
       enum MILP_solve_strategy{

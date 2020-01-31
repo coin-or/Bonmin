@@ -17,50 +17,37 @@ noinst_LTLIBRARIES = libbonheuristics.la
 
 # List all source files, including headers
 libbonheuristics_la_SOURCES = \
-       BonLocalSolverBasedHeuristic.cpp  BonLocalSolverBasedHeuristic.hpp \
-       BonFixAndSolveHeuristic.cpp  BonFixAndSolveHeuristic.hpp \
-       BonDummyPump.cpp BonDummyPump.hpp \
-       BonPumpForMinlp.cpp BonPumpForMinlp.hpp \
-       BonHeuristicRINS.cpp BonHeuristicRINS.hpp \
-       BonHeuristicLocalBranching.cpp BonHeuristicLocalBranching.hpp \
-       BonHeuristicFPump.cpp BonHeuristicFPump.hpp \
-       BonHeuristicDive.cpp BonHeuristicDive.hpp \
-       BonHeuristicDiveFractional.cpp BonHeuristicDiveFractional.hpp \
-       BonHeuristicDiveVectorLength.cpp BonHeuristicDiveVectorLength.hpp \
-       BonHeuristicDiveMIP.cpp BonHeuristicDiveMIP.hpp \
-       BonHeuristicDiveMIPFractional.cpp BonHeuristicDiveMIPFractional.hpp \
-       BonMilpRounding.cpp BonMilpRounding.hpp \
-       BonHeuristicDiveMIPVectorLength.cpp BonHeuristicDiveMIPVectorLength.hpp
+       BonLocalSolverBasedHeuristic.cpp \
+       BonFixAndSolveHeuristic.cpp \
+       BonDummyPump.cpp \
+       BonPumpForMinlp.cpp \
+       BonHeuristicRINS.cpp \
+       BonHeuristicLocalBranching.cpp \
+       BonHeuristicFPump.cpp \
+       BonHeuristicDive.cpp \
+       BonHeuristicDiveFractional.cpp \
+       BonHeuristicDiveVectorLength.cpp \
+       BonHeuristicDiveMIP.cpp \
+       BonHeuristicDiveMIPFractional.cpp \
+       BonMilpRounding.cpp \
+       BonHeuristicDiveMIPVectorLength.cpp
 
-# This is for libtool
-libbonheuristics_la_LDFLAGS = $(LT_LDFLAGS)
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
+# Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/..` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Algorithms` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Filter` \
-	$(BONMINLIB_CFLAGS)
-
-# Currently, the following has to be included for BonChooseVariable.hpp, but
-# we should try to unmangle the connection to Cbc
-
-#AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../../CbcBonmin`
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
-
+	-I$(srcdir)/.. \
+	-I$(srcdir)/../../Algorithms \
+	-I$(srcdir)/../../Interfaces \
+	-I$(srcdir)/../../Interfaces/Ipopt \
+	-I$(srcdir)/../../Interfaces/Filter \
+	$(BONMINLIB_CFLAGS) -DBONMIN_BUILD
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+# and that therefore should be installed in 'include/coin-or'
+includecoindir = $(includedir)/coin-or
 includecoin_HEADERS = \
                      BonLocalSolverBasedHeuristic.hpp \
                      BonFixAndSolveHeuristic.hpp \

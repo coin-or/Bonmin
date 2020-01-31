@@ -13,7 +13,7 @@
 
 namespace Bonmin
 {
-  class  GuessHeuristic : public CbcHeuristic
+  class BONMINLIB_EXPORT GuessHeuristic : public CbcHeuristic
   {
   public:
     /// Usefull constructor

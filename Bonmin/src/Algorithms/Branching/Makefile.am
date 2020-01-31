@@ -17,47 +17,36 @@ noinst_LTLIBRARIES = libbonbranching.la
 
 # List all source files, including headers
 libbonbranching_la_SOURCES = \
-	BonChooseVariable.cpp BonChooseVariable.hpp \
-        BonRandomChoice.cpp BonRandomChoice.hpp \
-        BonPseudoCosts.cpp BonPseudoCosts.hpp \
-        BonLpBranchingSolver.cpp BonLpBranchingSolver.hpp \
-	BonQpBranchingSolver.cpp BonQpBranchingSolver.hpp
+        BonChooseVariable.cpp \
+        BonRandomChoice.cpp \
+        BonPseudoCosts.cpp \
+        BonLpBranchingSolver.cpp \
+        BonQpBranchingSolver.cpp
 
-# This is for libtool
-libbonbranching_la_LDFLAGS = $(LT_LDFLAGS)
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
+# Here list all include flags, relative to this "srcdir" directory.
+# Currently, CbcBonmin has to be included for BonChooseVariable.hpp, but
+# we should try to unmangle the connection to Cbc.
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/..` \
-	-I`$(CYGPATH_W) $(srcdir)/../../CbcBonmin` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Ipopt` \
-	-I`$(CYGPATH_W) $(srcdir)/../../Interfaces/Filter` \
-	$(BONMINLIB_CFLAGS)
-
-# Currently, the following has to be included for BonChooseVariable.hpp, but
-# we should try to unmangle the connection to Cbc
-
-#AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../../CbcBonmin`
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces
-
+	-I$(srcdir)/.. \
+	-I$(srcdir)/../OaGenerators \
+	-I$(srcdir)/../../CbcBonmin \
+	-I$(srcdir)/../../Interfaces \
+	-I$(srcdir)/../../Interfaces/Ipopt \
+	-I$(srcdir)/../../Interfaces/Filter \
+	$(BONMINLIB_CFLAGS) -DBONMIN_BUILD
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+# and that therefore should be installed in 'include/coin-or'
+includecoindir = $(includedir)/coin-or
 includecoin_HEADERS = \
 	BonChooseVariable.hpp \
 	BonPseudoCosts.hpp \
 	BonCurvBranchingSolver.hpp \
-        BonLpBranchingSolver.hpp
+	BonLpBranchingSolver.hpp
 
 ########################################################################
 #                            Astyle stuff                              #
@@ -66,10 +55,10 @@ includecoin_HEADERS = \
 # Here repeat all source files, with "bak" appended
 ASTYLE_FILES = \
 	BonChooseVariable.cppbak BonChooseVariable.hppbak \
-        BonPseudoCosts.cppbak BonPseudoCosts.hppbak \
+	BonPseudoCosts.cppbak BonPseudoCosts.hppbak \
 	BonQpBranchingSolver.cppbak BonQpBranchingSolver.hppbak \
 	BonCurvBranchingSolver.cppbak BonCurvBranchingSolver.hppbak \
-        BonLpBranchingSolver.hppbak BonLpBranchingSolver.cppbak
+	BonLpBranchingSolver.hppbak BonLpBranchingSolver.cppbak
 
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@

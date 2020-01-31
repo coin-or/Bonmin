@@ -4,11 +4,13 @@
 .coin-or/projDesc.xml -text
 /.travis.yml -text
 Bonmin/AUTHORS -text
+Bonmin/Dependencies -text
 Bonmin/INSTALL -text
 Bonmin/LICENSE -text
 Bonmin/README -text
 Bonmin/bonmin-uninstalled.pc.in -text
 Bonmin/bonmin.pc.in -text
+Bonmin/compile -text
 Bonmin/config.guess -text
 Bonmin/config.sub -text
 Bonmin/configure -text
@@ -171,7 +173,6 @@ Bonmin/src/CbcBonmin/Heuristics/BonPumpForMinlp.cpp -text
 Bonmin/src/CbcBonmin/Heuristics/BonPumpForMinlp.hpp -text
 Bonmin/src/CbcBonmin/Heuristics/Makefile.am -text
 Bonmin/src/CbcBonmin/Heuristics/Makefile.in -text
-Bonmin/src/CbcBonmin/bonminamplinterface-uninstalled.pc.in -text
 Bonmin/src/CbcBonmin/bonminamplinterface.pc.in -text
 Bonmin/src/Interfaces/Ampl/BonSolReader.cpp -text
 Bonmin/src/Interfaces/Ampl/BonSolReader.hpp -text
@@ -214,16 +215,6 @@ Bonmin/src/Interfaces/config_default.h -text
 Bonmin/test/bonmin.opt -text
 Bonmin/test/mytoy.nl -text
 Bonmin/test/toy.mps.gz -text svneol=unset#application/x-gzip
-/Dependencies -text
-/INSTALL -text
-/LICENSE -text
-/README -text
 /appveyor.yml -text
-/config.guess -text
-/config.sub -text
-/configure -text
-/depcomp -text
 doxydoc/doxygen.conf -text
 doxydoc/doxygen.conf.in -text
-/install-sh -text
-/missing -text

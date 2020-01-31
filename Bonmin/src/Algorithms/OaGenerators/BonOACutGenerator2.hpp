@@ -15,7 +15,7 @@
 namespace Bonmin
 {
   /** Class to perform OA in its classical form.*/
-  class OACutGenerator2 : public OaDecompositionBase
+  class BONMINLIB_EXPORT OACutGenerator2 : public OaDecompositionBase
   {
   public:
     /// Constructor with basic setup

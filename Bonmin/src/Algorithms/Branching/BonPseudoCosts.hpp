@@ -10,11 +10,12 @@
 #ifndef BonPseudoCosts_H
 #define BonPseudoCosts_H
 
+#include "BonminConfig.h"
 #include "OsiChooseVariable.hpp"
 namespace Bonmin
 {
 
-  class PseudoCosts: public OsiPseudoCosts
+  class BONMINLIB_EXPORT PseudoCosts: public OsiPseudoCosts
   {
   public:
     /** Default constructor.*/

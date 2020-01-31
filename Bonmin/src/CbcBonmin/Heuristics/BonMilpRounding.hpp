@@ -18,7 +18,7 @@
 namespace Bonmin
 {
   class SubMipSolver;
-  class MilpRounding : public CbcHeuristic
+  class BONMINLIB_EXPORT MilpRounding : public CbcHeuristic
   {
   public:
 

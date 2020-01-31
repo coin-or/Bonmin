@@ -1,12 +1,15 @@
-prefix=@prefix@
+@COIN_RELOCATABLE_FALSE@prefix=@prefix@
+@COIN_RELOCATABLE_TRUE@prefix=${pcfiledir}/../..
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@/coin
 
 Name: Bonmin
 Description: Basic Open-source Nonlinear Mixed Integer programming
-URL: https://projects.coin-or.org/Bonmin
+URL: https://github.com/coin-or/Bonmin
 Version: @PACKAGE_VERSION@
-Libs: -L${libdir} -lbonmin @BONMINLIB_PCLIBS@
+Libs: -L${libdir} -lbonmin
+Libs.private: @BONMINLIB_LFLAGS_NOPC@
 Cflags: -I${includedir}
-Requires: @BONMINLIB_PCREQUIRES@
+Requires:
+Requires.private: @BONMINLIB_PCFILES@

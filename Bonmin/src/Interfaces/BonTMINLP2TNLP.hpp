@@ -29,7 +29,7 @@ namespace Bonmin
    *  the treatment of binary and integer variables as
    *  relaxed, or fixed
    */
-  class TMINLP2TNLP : public Ipopt::TNLP
+  class BONMINLIB_EXPORT TMINLP2TNLP : public Ipopt::TNLP
   {
   public:
     /**@name Constructors/Destructors */

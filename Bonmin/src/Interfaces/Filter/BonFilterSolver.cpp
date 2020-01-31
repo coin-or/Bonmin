@@ -25,7 +25,7 @@ typedef Bonmin::FilterSolver::real real;
 typedef long ftnlen;
 extern "C"
 {
-  void F77_FUNC(filtersqp,FILTERSQP)(
+  void FILTERSQP_FUNC(filtersqp,FILTERSQP)(
     fint *n, fint *m, fint *kmax, fint *maxa,
     fint *maxf, fint *mlp, fint *mxwk, fint *mxiwk,
     fint *iprint, fint *nout, fint *ifail, real *rho,
@@ -56,56 +56,56 @@ extern "C"
       fint  char_l;
       char pname[10];
     }
-  F77_FUNC(cpname,CPNAME);
+  FILTERSQP_FUNC(cpname,CPNAME);
 
   /* common block for Hessian storage set to 0, i.e. NO Hessian */
   extern struct {
       fint phl, phr, phc;
     }
-  F77_FUNC(hessc,HESSC);
+  FILTERSQP_FUNC(hessc,HESSC);
 
   /* common block for upper bound on filter */
   extern struct {
       real ubd, tt;
     }
-  F77_FUNC(ubdc,UBDC);
+  FILTERSQP_FUNC(ubdc,UBDC);
 
   /* common block for infinity & epslon */
   extern struct {
       real infty, eps;
     }
-  F77_FUNC_(nlp_eps_inf,NLP_EPS_INF);
+  FILTERSQP_FUNC_(nlp_eps_inf,NLP_EPS_INF);
 
   /* common block for prfinting from QP solver */
   extern struct {
       fint n_bqpd_calls, n_bqpd_prfint;
     }
-  F77_FUNC_(bqpd_count,BQPD_COUNT);
+  FILTERSQP_FUNC_(bqpd_count,BQPD_COUNT);
 
   /* common for scaling: scale_mode = 0 (none), 1 (variables), 2 (vars+cons) */
   extern struct {
       fint scale_mode, phe;
     }
-  F77_FUNC(scalec,SCALEC);
+  FILTERSQP_FUNC(scalec,SCALEC);
 }
 
 extern "C"
 {
 
 /// Objective function evaluation
-  void F77_FUNC(objfun,OBJFUN)(real *x, fint *n, real * f, real *user, fint * iuser, fint * errflag) {
+  void FILTERSQP_FUNC(objfun,OBJFUN)(real *x, fint *n, real * f, real *user, fint * iuser, fint * errflag) {
     (*errflag) = !tnlpSolved->eval_f(*n, x, 1, *f);
   }
 
   /** Constraint functions evaluation. */
   void
-  F77_FUNC(confun,CONFUN)(real * x, fint * n , fint *m, real *c, real *a, fint * la, real * user, fint * iuser,
+  FILTERSQP_FUNC(confun,CONFUN)(real * x, fint * n , fint *m, real *c, real *a, fint * la, real * user, fint * iuser,
       fint * errflag) {
     (*errflag) = !tnlpSolved->eval_g(*n, x, 1, *m, c);
   }
 
   void
-  F77_FUNC(gradient,GRADIENT)(fint *n, fint *m, fint * mxa, real * x, real *a, fint * la,
+  FILTERSQP_FUNC(gradient,GRADIENT)(fint *n, fint *m, fint * mxa, real * x, real *a, fint * la,
       fint * maxa, real * user, fint * iuser, fint * errflag) {
     (*errflag) = !tnlpSolved->eval_grad_f(*n, x, 1, a);
     /// ATTENTION: Filter expect the jacobian to be ordered by row
@@ -128,7 +128,7 @@ extern "C"
 
   /* evaluation of the Hessian of the Lagrangian */
   void
-  F77_FUNC(hessian,HESSIAN)(real *x, fint *n, fint *m, fint *phase, real *lam,
+  FILTERSQP_FUNC(hessian,HESSIAN)(real *x, fint *n, fint *m, fint *phase, real *lam,
       real *ws, fint *lws, real *user, fint *iuser,
       fint *l_hess, fint *li_hess, fint *errflag) {
     Ipopt::Number obj_factor = (*phase == 1)? 0. : 1.;
@@ -464,7 +464,7 @@ namespace Bonmin
     tnlp->get_bounds_info(n, bounds, bounds + nplusm, m, bounds + n, bounds + n + nplusm);
 
 #if 0
-    double infty = F77_FUNC_(nlp_eps_inf,NLP_EPS_INF).infty;
+    double infty = FILTERSQP_FUNC_(nlp_eps_inf,NLP_EPS_INF).infty;
     // AW: I don't think we need this, it isn't done for ReOptimize either
     for (int i = 0 ; i < nplusm ; i++) {
       if (bounds[i] < -infty) bounds[i] = - infty;
@@ -500,7 +500,7 @@ namespace Bonmin
     permutationHess = permutationHess_ = new int[nnz_h];
     hStruct_ = new fint[nnz_h + n + 3];
     int * cache = new int[2*nnz_h + 1];
-    F77_FUNC(hessc,HESSC).phl = 1;
+    FILTERSQP_FUNC(hessc,HESSC).phl = 1;
     tnlp->eval_h((Ipopt::Index&) n, NULL, 0, 1., (Ipopt::Index&) m, NULL, 0, (Ipopt::Index&) nnz_h, cache + nnz_h, cache  , NULL);
 
     TMat2RowPMat(true, n, n, nnz_h, cache, cache + nnz_h, permutationHess,
@@ -523,10 +523,10 @@ namespace Bonmin
     hStruct = hStruct_;
     tnlpSolved = static_cast<Ipopt::TNLP *>(Ipopt::GetRawPtr(tnlp));
 
-    options->GetNumericValue("ubd",F77_FUNC(ubdc,UBDC).ubd, "filter.");
-    options->GetNumericValue("tt", F77_FUNC(ubdc,UBDC).tt, "filter.");
-    options->GetNumericValue("eps", F77_FUNC_(nlp_eps_inf,NLP_EPS_INF).eps, "filter.");
-    options->GetNumericValue("infty", F77_FUNC_(nlp_eps_inf,NLP_EPS_INF).infty, "filter.");
+    options->GetNumericValue("ubd",FILTERSQP_FUNC(ubdc,UBDC).ubd, "filter.");
+    options->GetNumericValue("tt", FILTERSQP_FUNC(ubdc,UBDC).tt, "filter.");
+    options->GetNumericValue("eps", FILTERSQP_FUNC_(nlp_eps_inf,NLP_EPS_INF).eps, "filter.");
+    options->GetNumericValue("infty", FILTERSQP_FUNC_(nlp_eps_inf,NLP_EPS_INF).infty, "filter.");
     rho = 10.;
     maxiter = 1000;
     options->GetIntegerValue("maxiter", (Ipopt::Index &) maxiter, "filter.");
@@ -534,7 +534,7 @@ namespace Bonmin
 
 
     // Set up scaling
-    F77_FUNC(scalec,SCALEC).scale_mode = 0;
+    FILTERSQP_FUNC(scalec,SCALEC).scale_mode = 0;
     s = new real [n+m];
 
     istat = new fint[14];
@@ -689,7 +689,7 @@ namespace Bonmin
       printf("fxstart[%2d] = %23.16e\n", i, x[i]);
     }
 #endif
-    F77_FUNC(filtersqp,FILTERSQP)(&n, &m, &kmax, & maxa, &maxf, &mlp, &maxWk,
+    FILTERSQP_FUNC(filtersqp,FILTERSQP)(&n, &m, &kmax, & maxa, &maxf, &mlp, &maxWk,
         &maxiWk, &iprint, &nout, &ifail, &rho, x,
         c, &f, &fmin, bounds,
         bounds + n + m,

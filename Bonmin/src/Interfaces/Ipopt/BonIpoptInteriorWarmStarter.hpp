@@ -9,13 +9,14 @@
 #ifndef __IPOPTINTERIORWARMSTARTER_HPP__
 #define __IPOPTINTERIORWARMSTARTER_HPP__
 
+#include "BonminConfig.h"
 #include "IpSmartPtr.hpp"
 #include "IpNLP.hpp"
 #include <vector>
 
 namespace Bonmin
 {
-  class IpoptInteriorWarmStarter : public Ipopt::ReferencedObject
+  class BONMINLIB_EXPORT IpoptInteriorWarmStarter : public Ipopt::ReferencedObject
   {
   public:
     /**@name Constructors/Destructors */

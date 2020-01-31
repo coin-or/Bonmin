@@ -272,7 +272,7 @@ QuadRow::add_to_hessian(AdjustableMat &H, bool offset){
      }
      else {
         std::pair<AdjustableMat::iterator, bool> res = 
-            H.insert(std::make_pair(e, std::make_pair(H.size(), 1)));
+            H.insert(std::make_pair(e, std::make_pair((int)H.size(), 1)));
         assert(res.second == true);
         Q_hessian_idx_.push_back(res.first);
      }

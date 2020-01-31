@@ -16,7 +16,7 @@
 namespace Bonmin
 {
   /** Generate cuts for the nlp corresponding to continuous relaxation at a node.*/
-  class OaNlpOptim : public CglCutGenerator
+  class BONMINLIB_EXPORT OaNlpOptim : public CglCutGenerator
   {
   public:
     /// Default constructor

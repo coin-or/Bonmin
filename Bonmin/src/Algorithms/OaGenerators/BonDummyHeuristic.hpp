@@ -14,7 +14,7 @@
 #include "CbcHeuristic.hpp"
 namespace Bonmin
 {
-  class  DummyHeuristic : public CbcHeuristic
+  class BONMINLIB_EXPORT DummyHeuristic : public CbcHeuristic
   {
   public:
     /// Default constructor

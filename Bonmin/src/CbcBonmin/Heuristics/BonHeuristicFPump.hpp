@@ -15,7 +15,7 @@
 
 namespace Bonmin
 {
-  class  HeuristicFPump : public CbcHeuristic
+  class BONMINLIB_EXPORT HeuristicFPump : public CbcHeuristic
   {
   public:
     /// Default constructor

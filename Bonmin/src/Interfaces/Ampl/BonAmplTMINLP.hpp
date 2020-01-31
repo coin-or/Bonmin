@@ -43,7 +43,7 @@ namespace Bonmin
    *  This interface creates a AmplTNLP and also retrieves
    *  the information about the binary and integer variables
    */
-  class AmplTMINLP : public TMINLP
+  class BONMINAMPLINTERFACELIB_EXPORT AmplTMINLP : public TMINLP
   {
   public:
     /**@name Constructors/Destructors */
@@ -326,6 +326,9 @@ namespace Bonmin
     /** Flag to say if AMPL solution file should be written.*/
     int writeAmplSolFile_;
   };
+  
+  void fillAmplOptionList(RegisteredOptions& regopts, RegisteredOptions::ExtraCategoriesInfo which, Ipopt::AmplOptionsList * amplOptList);
+
 } // namespace Ipopt
 
 #endif

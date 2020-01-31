@@ -14,6 +14,7 @@
 #ifndef __TMINLP_HPP__
 #define __TMINLP_HPP__
 
+#include "BonminConfig.h"
 #include "IpUtils.hpp"
 #include "IpReferenced.hpp"
 #include "IpException.hpp"
@@ -24,10 +25,23 @@
 #include "CoinError.hpp"
 #include "CoinHelperFunctions.hpp"
 
+#define DECLARE_STD_BONMIN_EXCEPTION(__except_type) \
+    class BONMINLIB_EXPORT  __except_type : public Ipopt::IpoptException \
+    { \
+    public: \
+      __except_type(std::string msg, std::string fname, Ipopt::Index line) \
+      : Ipopt::IpoptException(msg,fname,line, #__except_type) {} \
+      __except_type(const __except_type& copy) \
+      : Ipopt::IpoptException(copy) {} \
+    private: \
+       __except_type(); \
+       void operator=(const __except_type&); \
+    }
+
 namespace Bonmin
 {
-  DECLARE_STD_EXCEPTION(TMINLP_INVALID);
-  DECLARE_STD_EXCEPTION(TMINLP_INVALID_VARIABLE_BOUNDS);
+  DECLARE_STD_BONMIN_EXCEPTION(TMINLP_INVALID);
+  DECLARE_STD_BONMIN_EXCEPTION(TMINLP_INVALID_VARIABLE_BOUNDS);
 
   /** Base class for all MINLPs that use a standard triplet matrix form
    *  and dense vectors.
@@ -56,7 +70,7 @@ namespace Bonmin
    *  variable has no upper or lower bound, set the bound to
    *  -ipopt_inf or +ipopt_inf respectively
    */
-  class TMINLP : public Ipopt::ReferencedObject
+  class BONMINLIB_EXPORT TMINLP : public Ipopt::ReferencedObject
   {
   public:
     friend class TMINLP2TNLP;
@@ -69,7 +83,7 @@ namespace Bonmin
       USER_INTERRUPT,
       MINLP_ERROR};
     /** Class to store sos constraints for model */
-    struct SosInfo
+    struct BONMINLIB_EXPORT SosInfo
     {
       /** Number of SOS constraints.*/
       int num;
@@ -108,7 +122,7 @@ namespace Bonmin
     };
 
     /** Stores branching priorities information. */
-    struct BranchingInfo
+    struct BONMINLIB_EXPORT BranchingInfo
     {
       /**number of variables*/
       int size;
@@ -154,7 +168,7 @@ namespace Bonmin
     };
 
     /** Class to store perturbation radii for variables in the model */
-    class PerturbInfo
+    class BONMINLIB_EXPORT PerturbInfo
     {
     public:
       /** default constructor. */
@@ -401,7 +415,7 @@ namespace Bonmin
   virtual const int * get_const_xtra_id() const{
     return NULL;
   }
-  protected:
+  private:
     /** Copy constructor */
     //@{
     /** Copy Constructor */
@@ -410,8 +424,6 @@ namespace Bonmin
     /** Overloaded Equals Operator */
     void operator=(const TMINLP&);
     //@}
-
-  private:
   };
 
 } // namespace Ipopt

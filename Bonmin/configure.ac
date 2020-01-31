@@ -24,45 +24,47 @@ under the Eclipse Public License.])
 # whether the package is actually there
 AC_CONFIG_SRCDIR(src/CbcBonmin/BonCbc.hpp)
 
-# Where should everything be installed by default?  Here, we want it
-# to be installed directly in 'bin', 'lib', 'include' subdirectories
-# of the directory where configure is run.  The default would be
-# /usr/local.
-AC_PREFIX_DEFAULT([`pwd`])
+# Do some initialization work (version numbers, change prefix default, ...)
+
+AC_COIN_INITIALIZE(Bonmin)
 
 #############################################################################
 #                         Standard build tool stuff                         #
 #############################################################################
 
-# Get the system type
-AC_CANONICAL_BUILD
-
-# If this project depends on external projects, the Externals file in
-# the source root directory contains definition of where to find those
-# externals.  The following macro ensures that those externals are
-# retrieved by svn if they are not there yet.
-AC_COIN_PROJECTDIR_INIT(Bonmin)
-
-# Check if user wants to produce debugging code
-AC_COIN_DEBUG_COMPILE(Bonmin)
-
 # Get the name of the C++ compiler and appropriate compiler options
+
 AC_COIN_PROG_CXX
 
+# Initialize libtool
 
-# Initialize automake and libtool
-AC_COIN_INIT_AUTO_TOOLS
+AC_COIN_PROG_LIBTOOL
+
+# set RPATH_FLAGS to the compiler link flags required to hardcode location
+# of the shared objects (expanded_libdir is set somewhere in configure before)
+# (use in examples Makefile)
+AC_COIN_RPATH_FLAGS([$expanded_libdir])
 
 #############################################################################
 #                           COIN-OR components                              #
 #############################################################################
 
-AC_COIN_CHECK_PACKAGE(CoinDepend, [cbc osi-clp ipopt], [BonminLib])
-if test $coin_has_coindepend != yes ; then
-  AC_MSG_ERROR([Required package Cbc or Ipopt not available.])
+AC_COIN_CHK_PKG(Cbc,[BonminLib])
+if test $coin_has_cbc != yes ; then
+  AC_MSG_ERROR([Required package Cbc is not available.])
 fi
 
-AC_COIN_CHECK_PACKAGE(ASL, [ipoptamplinterface], [BonminAmplInterfaceLib])
+AC_COIN_CHK_PKG(Ipopt,[BonminLib])
+if test $coin_has_ipopt != yes ; then
+  AC_MSG_ERROR([Required package Ipopt is not available.])
+fi
+
+AC_COIN_CHK_PKG(OsiClp,[BonminLib],[osi-clp])
+if test $coin_has_osiclp != yes ; then
+  AC_MSG_ERROR([Required package OsiClp is not available.])
+fi
+
+AC_COIN_CHK_PKG(ASL,[BonminAmplInterfaceLib],[ipoptamplinterface])
 
 #AC_COIN_CHECK_PACKAGE(Bcp, [bcp])
 #
@@ -82,55 +84,83 @@ AC_COIN_CHECK_PACKAGE(ASL, [ipoptamplinterface], [BonminAmplInterfaceLib])
 #############################################################################
 
 # Check whether OsiCplex is available
-AC_COIN_CHECK_PACKAGE(OsiCpx, [osi-cplex], [BonminLib])
+AC_COIN_CHK_PKG(OsiCpx,[BonminLib],[osi-cplex])
 
 # To get also the directory where cplex.h can be found, we also check for cplex directly.
-AC_COIN_CHECK_USER_LIBRARY([Cplex], [CPX],[cplex.h],[CPXgetstat])
+AC_COIN_CHK_LIB(Cplex,[BonminLib],[-lcplex -lpthread -lm -ldl],[],[],[CPXgetstat])
 
 #############################################################################
 #                                FilterSQP                                  #
 #############################################################################
 
-# for backward compatibility, map --with-filtersqp to --with-filtersqp-libs
 AC_ARG_WITH([filtersqp],
             AC_HELP_STRING([--with-filtersqp],
-                           [specify library for FilterSQP (or BUILD for compilation)]),
+                           [Linker flags for FilterSQP]),
             [filtersqp_libs="$withval"])
 
-AC_COIN_CHECK_PACKAGE(FilterSQP, [coinfiltersqp], [BonminLib])
+if test -n "$filtersqp_libs" ; then
+  AC_LANG_PUSH(C)
+  ac_save_LIBS="$LIBS"
+  LIBS="$filtersqp_libs $LIBS"
+  for ac_extra in "no extra underscore" ; do
+    for ac_case in "lower case" "upper case" ; do
+      for ac_trail in "underscore" "no underscore" ; do
+        case $ac_case in
+          "lower case")
+            ac_name=filtersqp
+            ac_confun_name=confun
+            ac_objfun_name=objfun
+            ac_gradient_name=gradient
+            #ac_objgrad_name=objgrad
+            ac_hessian_name=hessian
+            ;;
+          "upper case")
+            ac_name=FILTERSQP
+            ac_confun_name=CONFUN
+            ac_objfun_name=OBJFUN
+            ac_gradient_name=GRADIENT
+            #ac_objgrad_name=OBJGRAD
+            ac_hessian_name=HESSIAN
+            ;;
+        esac
+        if test "$ac_trail" = underscore ; then
+          ac_underscore=_
+        else
+          ac_underscore=
+        fi
+        AC_MSG_CHECKING([for function $ac_name in $LIBS])
+        AC_LINK_IFELSE(
+          [AC_LANG_PROGRAM(
+            [void $ac_confun_name$ac_underscore(void) {}
+             void $ac_objfun_name$ac_underscore(void) {}
+             void $ac_gradient_name$ac_underscore(void) {}
+             /* void $ac_objgrad_name$ac_underscore(void) {} */
+             void $ac_hessian_name$ac_underscore(void) {}
+             void $ac_name$ac_underscore();],
+            [$ac_name$ac_underscore()])],
+          [filtersqp_namemangling="${ac_case}, ${ac_trail}, ${ac_extra}"
+           ac_success=yes],
+          [ac_success=no])
+        AC_MSG_RESULT([$ac_success])
+        if test $ac_success = yes ; then
+          break 3
+        fi
+      done
+    done
+  done
+  LIBS=$ac_save_LIBS
+  AC_LANG_POP(C)
 
-if test $coin_has_filtersqp = yes
-then
-  # Get the name of the Fortran compiler and appropriate compiler options
-  AC_COIN_PROG_F77
-
-  # Find out how to call Fortran from C and determine Fortran runtime libraries
-  AC_COIN_F77_WRAPPERS
+  if test $ac_success = yes ; then
+    AC_COIN_DEFINENAMEMANGLING([FILTERSQP],[$filtersqp_namemangling])
+    BONMINLIB_LFLAGS="$filtersqp_libs $BONMINLIB_LFLAGS"
+    AC_DEFINE(COIN_HAS_FILTERSQP,1,[Define to 1 if FilterSQP is available])
+  else
+    AC_MSG_ERROR([Symbol filterSQP not found with FilterSQP flags $filtersqp_libs.])
+  fi
 fi
 
-# we want to keep the linking check for FilterSQP, but cannot do this if FilterSQP will be build later (in ThirdParty)
-#if test $coin_has_filtersqp = yes ; then
-#  AC_MSG_CHECKING([whether FilterSQP library $FILTERSQP_LIBS works])
-#  SAVE_LIBS="$LIBS"
-#  LIBS="$FILTERSQP_LIBS $FLIBS $LIBS"
-#  AC_LANG_PUSH([Fortran 77])
-#  AC_TRY_LINK([],
-#[      call filterSQP
-#      end
-#      subroutine confun
-#      end
-#      subroutine objfun
-#      end
-#      subroutine gradient
-#      end
-#      subroutine hessian],
-#              [AC_MSG_RESULT([yes])
-#               FILTERSQP_LIBS="$FILTERSQP_LIBS $FLIBS"],
-#              [AC_MSG_RESULT([no])
-#               AC_MSG_ERROR([user supplied FilterSQP library $FILTERSQP_LIBS does not work])])
-#  AC_LANG_POP([Fortran 77])
-#  LIBS="$SAVE_LIBS"
-#fi
+AM_CONDITIONAL(COIN_HAS_FILTERSQP, test -n "$filtersqp_libs")
 
 #############################################################################
 #                           Feasibility Pump                                #
@@ -168,11 +198,14 @@ AC_CONFIG_LINKS([test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp
 #                  Check for doxygen                                        #
 #############################################################################
 
-AC_COIN_DOXYGEN(CoinUtils Osi Clp Cgl Cbc Ipopt)
+#AC_COIN_DOXYGEN(CoinUtils Osi Clp Cgl Cbc Ipopt)
+AC_COIN_DOXYGEN
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
 ##############################################################################
+
+AC_COIN_FINALIZE_FLAGS([BonminLib BonminAmplInterfaceLib])
 
 AC_CONFIG_FILES([Makefile
                  src/Apps/Makefile
@@ -193,13 +226,11 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
                  examples/CppExample/Makefile
                  examples/CExample/Makefile
-                 bonmin.pc bonmin-uninstalled.pc
+                 bonmin.pc
                  doxydoc/doxygen.conf])
 
 if test $coin_has_asl = yes ; then
-  AC_CONFIG_FILES([bonminamplinterface.pc:src/CbcBonmin/bonminamplinterface.pc.in
-                   bonminamplinterface-uninstalled.pc:src/CbcBonmin/bonminamplinterface-uninstalled.pc.in
-                  ])
+  AC_CONFIG_FILES([bonminamplinterface.pc:src/CbcBonmin/bonminamplinterface.pc.in])
 fi
 
 AC_CONFIG_HEADER([src/Interfaces/config.h src/Interfaces/config_bonmin.h])

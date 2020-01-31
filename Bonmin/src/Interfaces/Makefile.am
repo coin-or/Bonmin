@@ -8,13 +8,13 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-#We need to do autothings in the subdirectories for the different interfaces
+# We need to do autothings in the subdirectories for the different interfaces
 SUBDIRS = Ipopt
 if COIN_HAS_ASL
-SUBDIRS += Ampl
+  SUBDIRS += Ampl
 endif
 if COIN_HAS_FILTERSQP
-SUBDIRS += Filter
+  SUBDIRS += Filter
 endif
 
 ########################################################################
@@ -23,57 +23,48 @@ endif
 
 # Name of the library in this directory
 noinst_LTLIBRARIES = libbonmininterfaces.la 
+
 # List all source files, including headers
 libbonmininterfaces_la_SOURCES = \
-        BonAuxInfos.cpp BonAuxInfos.hpp \
-	BonBoundsReader.cpp BonBoundsReader.hpp \
-	BonColReader.cpp BonColReader.hpp \
-	BonCutStrengthener.cpp BonCutStrengthener.hpp \
-	BonStartPointReader.cpp BonStartPointReader.hpp \
-	BonOsiTMINLPInterface.cpp BonOsiTMINLPInterface.hpp \
-	BonTMINLP2TNLP.cpp BonTMINLP2TNLP.hpp \
-	BonTMINLP2OsiLP.cpp BonTMINLP2OsiLP.hpp \
-	BonTMINLP.cpp BonTMINLP.hpp \
-	BonTNLPSolver.hpp BonTNLPSolver.cpp \
-	BonTNLP2FPNLP.cpp BonTNLP2FPNLP.hpp \
-	BonBranchingTQP.cpp BonBranchingTQP.hpp \
-	BonStrongBranchingSolver.cpp BonStrongBranchingSolver.hpp \
-        BonRegisteredOption.hpp BonRegisteredOptions.cpp
-
-#BonStdCInterface.h BonStdCInterface.cpp
-#BonStdInterfaceTMINLP.cpp BonStdInterfaceTMINLP.hpp
+	BonAuxInfos.cpp \
+	BonBoundsReader.cpp \
+	BonColReader.cpp \
+	BonCutStrengthener.cpp \
+	BonStartPointReader.cpp \
+	BonOsiTMINLPInterface.cpp \
+	BonTMINLP2TNLP.cpp \
+	BonTMINLP2OsiLP.cpp \
+	BonTMINLP.cpp \
+	BonTNLPSolver.cpp \
+	BonTNLP2FPNLP.cpp \
+	BonBranchingTQP.cpp \
+	BonStrongBranchingSolver.cpp \
+	BonRegisteredOptions.cpp
+#BonStdCInterface.cpp
+#BonStdInterfaceTMINLP.cpp
 
 #sublibraries for various installed solvers
 libbonmininterfaces_la_LIBADD = Ipopt/libipoptinterface.la 
 
 if COIN_HAS_FILTERSQP
-libbonmininterfaces_la_LIBADD += Filter/libfilterinterface.la
+  libbonmininterfaces_la_LIBADD += Filter/libfilterinterface.la
 endif
 
-libbonmininterfaces_la_DEPENDENCIES = $(libbonmininterfaces_la_LIBADD)
-
-# This is for libtool (on Windows)
-libbonmininterfaces_la_LDFLAGS = $(LT_LDFLAGS)
-
-# Here list all include flags, relative to this "srcdir" directory.  This
-# "cygpath" stuff is necessary to compile with native compilers on Windows
+# Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms` \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/OaGenerators` \
-	-I`$(CYGPATH_W) $(srcdir)/../Algorithms/Branching` \
-	-I`$(CYGPATH_W) $(srcdir)/../CbcBonmin` \
-	$(BONMINLIB_CFLAGS)
-
-# This line is necessary to allow VPATH compilation
-DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)`
+	-I$(srcdir)/../Algorithms \
+	-I$(srcdir)/../Algorithms/OaGenerators \
+	-I$(srcdir)/../Algorithms/Branching \
+	-I$(srcdir)/../CbcBonmin \
+	$(BONMINLIB_CFLAGS) -DBONMIN_BUILD
 
 ########################################################################
 #                Headers that need to be installed                     #
 ########################################################################
 
 # Here list all the header files that are required by a user of the library,
-# and that therefore should be installed in 'include/coin'
-includecoindir = $(includedir)/coin
+# and that therefore should be installed in 'include/coin-or'
+includecoindir = $(includedir)/coin-or
 includecoin_HEADERS = \
      BonOsiTMINLPInterface.hpp \
      BonTMINLP2TNLP.hpp \

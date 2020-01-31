@@ -73,7 +73,7 @@ namespace Bonmin {
            bool inserted = 
 #endif
                     H_.insert(std::make_pair( std::make_pair(jCol[i], iRow[i]), 
-                              std::make_pair(i, -1))).second;
+                              std::make_pair((int)i, -1))).second;
            assert(inserted == true);
          }
          delete [] jCol;

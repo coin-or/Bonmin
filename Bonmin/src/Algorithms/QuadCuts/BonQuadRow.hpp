@@ -29,7 +29,7 @@ namespace Bonmin{
 /** Stores a quadratic row of the form l < c + ax + x^T Q x < u. 
     Does computation usefull for nlp-solver.
     It can only be initialized from a QuadCut.*/
-class QuadRow {
+class BONMINLIB_EXPORT QuadRow {
  public:
  /** Default constructor.*/
  QuadRow();

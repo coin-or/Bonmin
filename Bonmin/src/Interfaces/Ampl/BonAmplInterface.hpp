@@ -19,7 +19,7 @@ class BM_lp;
 namespace Bonmin
 {
   /** Class for providing an Osi interface to Ipopt with an ampl nl file as input. */
-  class AmplInterface: public OsiTMINLPInterface
+  class BONMINAMPLINTERFACELIB_EXPORT AmplInterface: public OsiTMINLPInterface
   {
   public:
     /** Default constructor */

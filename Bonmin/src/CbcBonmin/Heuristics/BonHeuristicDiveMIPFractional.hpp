@@ -18,7 +18,7 @@
 
 namespace Bonmin
 {
-  class HeuristicDiveMIPFractional : public HeuristicDiveMIP {
+  class BONMINLIB_EXPORT HeuristicDiveMIPFractional : public HeuristicDiveMIP {
   public:
     /// Default Constructor 
     HeuristicDiveMIPFractional ();
