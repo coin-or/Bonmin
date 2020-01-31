@@ -12,7 +12,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([Bonmin],[trunk],[bonmin@list.coin-or.org])
+AC_INIT([Bonmin],[trunk],[https://github.com/coin-or/Bonmin/issues/new],[coin-or-bonmin],[https://github.com/coin-or/Bonmin])
 
 AC_COPYRIGHT([
 Copyright 2006, 2008 International Business Machines and others.
