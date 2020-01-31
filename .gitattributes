@@ -1,10 +1,10 @@
 * text=auto !eol
 .ci/.travis.pre -text
 .ci/appveyor.pre -text
+.coin-or/Dependencies -text
 .coin-or/projDesc.xml -text
 /.travis.yml -text
 /AUTHORS -text
-/Dependencies -text
 /INSTALL -text
 /LICENSE -text
 /README -text
