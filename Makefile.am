@@ -89,12 +89,4 @@ endif
 #                         Maintainer Stuff                             #
 ########################################################################
 
-# Files that are generated and should be cleaned with make distclean
-DISTCLEANFILES = \
-	Test/*.$(OBJEXT) \
-	Test/unitTest$(EXEEXT) \
-	Test/CppExample/*.$(OBJEXT) \
-	Test/CppExample/CppExample$(EXEEXT) \
-	Test/testtoy.nl
-
 include BuildTools/Makemain.inc
