@@ -7,7 +7,7 @@
 /AUTHORS -text
 /INSTALL -text
 /LICENSE -text
-/README -text
+/README.md -text
 /appveyor.yml -text
 /bonmin.pc.in -text
 /compile -text
