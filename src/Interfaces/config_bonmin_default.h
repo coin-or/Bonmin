@@ -17,8 +17,7 @@
 #define BONMIN_VERSION_RELEASE 9999
 
 #ifndef BONMINLIB_EXPORT
-#ifdef _WIN32
-/* assuming we link against a Bonmin DLL */
+#if defined(_WIN32) || defined(DLL_EXPORT)
 #define BONMINLIB_EXPORT __declspec(dllimport)
 #else
 #define BONMINLIB_EXPORT
