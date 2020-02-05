@@ -4,7 +4,7 @@
 
 /* this needs to come before the include of config_ipopt_default.h */
 #ifndef BONMINLIB_EXPORT
-#if defined(_WIN32) || defined(DLL_EXPORT)
+#if defined(_WIN32) && defined(DLL_EXPORT)
 #define BONMINLIB_EXPORT __declspec(dllexport)
 #else
 #define BONMINLIB_EXPORT
