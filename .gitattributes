@@ -1,0 +1,574 @@
+* text=auto !eol
+Doxygen/html/_b_o_n_m_i_n___reference_manual_8hpp.html -text
+Doxygen/html/_b_o_n_m_i_n___reference_manual_8hpp_source.html -text
+Doxygen/html/_bon_ampl_interface_8hpp.html -text
+Doxygen/html/_bon_ampl_interface_8hpp_source.html -text
+Doxygen/html/_bon_ampl_setup_8hpp.html -text
+Doxygen/html/_bon_ampl_setup_8hpp_source.html -text
+Doxygen/html/_bon_ampl_t_m_i_n_l_p_8hpp.html -text
+Doxygen/html/_bon_ampl_t_m_i_n_l_p_8hpp_source.html -text
+Doxygen/html/_bon_arrays_helpers_8hpp.html -text
+Doxygen/html/_bon_arrays_helpers_8hpp_source.html -text
+Doxygen/html/_bon_aux_infos_8hpp.html -text
+Doxygen/html/_bon_aux_infos_8hpp_source.html -text
+Doxygen/html/_bon_bab_infos_8hpp.html -text
+Doxygen/html/_bon_bab_infos_8hpp_source.html -text
+Doxygen/html/_bon_bab_setup_base_8hpp.html -text
+Doxygen/html/_bon_bab_setup_base_8hpp_source.html -text
+Doxygen/html/_bon_bonmin_setup_8hpp.html -text
+Doxygen/html/_bon_bonmin_setup_8hpp_source.html -text
+Doxygen/html/_bon_bounds_reader_8hpp.html -text
+Doxygen/html/_bon_bounds_reader_8hpp_source.html -text
+Doxygen/html/_bon_bqpd_solver_8hpp.html -text
+Doxygen/html/_bon_bqpd_solver_8hpp_source.html -text
+Doxygen/html/_bon_bqpd_warm_start_8hpp.html -text
+Doxygen/html/_bon_bqpd_warm_start_8hpp_source.html -text
+Doxygen/html/_bon_branching_t_q_p_8hpp.html -text
+Doxygen/html/_bon_branching_t_q_p_8hpp_source.html -text
+Doxygen/html/_bon_cbc_8hpp.html -text
+Doxygen/html/_bon_cbc_8hpp_source.html -text
+Doxygen/html/_bon_cbc_lp_strategy_8hpp.html -text
+Doxygen/html/_bon_cbc_lp_strategy_8hpp_source.html -text
+Doxygen/html/_bon_cbc_nlp_strategy_8hpp.html -text
+Doxygen/html/_bon_cbc_nlp_strategy_8hpp_source.html -text
+Doxygen/html/_bon_cbc_node_8hpp.html -text
+Doxygen/html/_bon_cbc_node_8hpp_source.html -text
+Doxygen/html/_bon_choose_variable_8hpp.html -text
+Doxygen/html/_bon_choose_variable_8hpp_source.html -text
+Doxygen/html/_bon_col_reader_8hpp.html -text
+Doxygen/html/_bon_col_reader_8hpp_source.html -text
+Doxygen/html/_bon_curv_branching_solver_8hpp.html -text
+Doxygen/html/_bon_curv_branching_solver_8hpp_source.html -text
+Doxygen/html/_bon_curvature_estimator_8hpp.html -text
+Doxygen/html/_bon_curvature_estimator_8hpp_source.html -text
+Doxygen/html/_bon_cut_strengthener_8hpp.html -text
+Doxygen/html/_bon_cut_strengthener_8hpp_source.html -text
+Doxygen/html/_bon_diver_8hpp.html -text
+Doxygen/html/_bon_diver_8hpp_source.html -text
+Doxygen/html/_bon_dummy_heuristic_8hpp.html -text
+Doxygen/html/_bon_dummy_heuristic_8hpp_source.html -text
+Doxygen/html/_bon_dummy_pump_8hpp.html -text
+Doxygen/html/_bon_dummy_pump_8hpp_source.html -text
+Doxygen/html/_bon_ecp_cuts_8hpp.html -text
+Doxygen/html/_bon_ecp_cuts_8hpp_source.html -text
+Doxygen/html/_bon_exit_codes_8hpp.html -text
+Doxygen/html/_bon_exit_codes_8hpp_source.html -text
+Doxygen/html/_bon_filter_solver_8hpp.html -text
+Doxygen/html/_bon_filter_solver_8hpp_source.html -text
+Doxygen/html/_bon_filter_types_8hpp.html -text
+Doxygen/html/_bon_filter_types_8hpp_source.html -text
+Doxygen/html/_bon_filter_warm_start_8hpp.html -text
+Doxygen/html/_bon_filter_warm_start_8hpp_source.html -text
+Doxygen/html/_bon_fix_and_solve_heuristic_8hpp.html -text
+Doxygen/html/_bon_fix_and_solve_heuristic_8hpp_source.html -text
+Doxygen/html/_bon_fp_for_minlp_8hpp.html -text
+Doxygen/html/_bon_fp_for_minlp_8hpp_source.html -text
+Doxygen/html/_bon_guess_heuristic_8hpp.html -text
+Doxygen/html/_bon_guess_heuristic_8hpp_source.html -text
+Doxygen/html/_bon_heuristic_dive_8hpp.html -text
+Doxygen/html/_bon_heuristic_dive_8hpp_source.html -text
+Doxygen/html/_bon_heuristic_dive_fractional_8hpp.html -text
+Doxygen/html/_bon_heuristic_dive_fractional_8hpp_source.html -text
+Doxygen/html/_bon_heuristic_dive_m_i_p_8hpp.html -text
+Doxygen/html/_bon_heuristic_dive_m_i_p_8hpp_source.html -text
+Doxygen/html/_bon_heuristic_dive_m_i_p_fractional_8hpp.html -text
+Doxygen/html/_bon_heuristic_dive_m_i_p_fractional_8hpp_source.html -text
+Doxygen/html/_bon_heuristic_dive_m_i_p_vector_length_8hpp.html -text
+Doxygen/html/_bon_heuristic_dive_m_i_p_vector_length_8hpp_source.html -text
+Doxygen/html/_bon_heuristic_dive_vector_length_8hpp.html -text
+Doxygen/html/_bon_heuristic_dive_vector_length_8hpp_source.html -text
+Doxygen/html/_bon_heuristic_f_pump_8hpp.html -text
+Doxygen/html/_bon_heuristic_f_pump_8hpp_source.html -text
+Doxygen/html/_bon_heuristic_local_branching_8hpp.html -text
+Doxygen/html/_bon_heuristic_local_branching_8hpp_source.html -text
+Doxygen/html/_bon_heuristic_r_i_n_s_8hpp.html -text
+Doxygen/html/_bon_heuristic_r_i_n_s_8hpp_source.html -text
+Doxygen/html/_bon_ipopt_interior_warm_starter_8hpp.html -text
+Doxygen/html/_bon_ipopt_interior_warm_starter_8hpp_source.html -text
+Doxygen/html/_bon_ipopt_solver_8hpp.html -text
+Doxygen/html/_bon_ipopt_solver_8hpp_source.html -text
+Doxygen/html/_bon_ipopt_warm_start_8hpp.html -text
+Doxygen/html/_bon_ipopt_warm_start_8hpp_source.html -text
+Doxygen/html/_bon_linear_cuts_generator_8hpp.html -text
+Doxygen/html/_bon_linear_cuts_generator_8hpp_source.html -text
+Doxygen/html/_bon_local_solver_based_heuristic_8hpp.html -text
+Doxygen/html/_bon_local_solver_based_heuristic_8hpp_source.html -text
+Doxygen/html/_bon_lp_branching_solver_8hpp.html -text
+Doxygen/html/_bon_lp_branching_solver_8hpp_source.html -text
+Doxygen/html/_bon_milp_rounding_8hpp.html -text
+Doxygen/html/_bon_milp_rounding_8hpp_source.html -text
+Doxygen/html/_bon_msg_utils_8hpp.html -text
+Doxygen/html/_bon_msg_utils_8hpp_source.html -text
+Doxygen/html/_bon_o_a_cut_generator2_8hpp.html -text
+Doxygen/html/_bon_o_a_cut_generator2_8hpp_source.html -text
+Doxygen/html/_bon_o_a_messages_8hpp.html -text
+Doxygen/html/_bon_o_a_messages_8hpp_source.html -text
+Doxygen/html/_bon_oa_dec_base_8hpp.html -text
+Doxygen/html/_bon_oa_dec_base_8hpp_source.html -text
+Doxygen/html/_bon_oa_feas_checker_8hpp.html -text
+Doxygen/html/_bon_oa_feas_checker_8hpp_source.html -text
+Doxygen/html/_bon_oa_nlp_optim_8hpp.html -text
+Doxygen/html/_bon_oa_nlp_optim_8hpp_source.html -text
+Doxygen/html/_bon_osi_t_m_i_n_l_p_interface_8hpp.html -text
+Doxygen/html/_bon_osi_t_m_i_n_l_p_interface_8hpp_source.html -text
+Doxygen/html/_bon_outer_approx_8hpp.html -text
+Doxygen/html/_bon_outer_approx_8hpp_source.html -text
+Doxygen/html/_bon_pseudo_costs_8hpp.html -text
+Doxygen/html/_bon_pseudo_costs_8hpp_source.html -text
+Doxygen/html/_bon_pump_for_minlp_8hpp.html -text
+Doxygen/html/_bon_pump_for_minlp_8hpp_source.html -text
+Doxygen/html/_bon_qp_branching_solver_8hpp.html -text
+Doxygen/html/_bon_qp_branching_solver_8hpp_source.html -text
+Doxygen/html/_bon_quad_cut_8hpp.html -text
+Doxygen/html/_bon_quad_cut_8hpp_source.html -text
+Doxygen/html/_bon_quad_row_8hpp.html -text
+Doxygen/html/_bon_quad_row_8hpp_source.html -text
+Doxygen/html/_bon_random_choice_8hpp.html -text
+Doxygen/html/_bon_random_choice_8hpp_source.html -text
+Doxygen/html/_bon_registered_options_8hpp.html -text
+Doxygen/html/_bon_registered_options_8hpp_source.html -text
+Doxygen/html/_bon_sol_reader_8hpp.html -text
+Doxygen/html/_bon_sol_reader_8hpp_source.html -text
+Doxygen/html/_bon_solver_help_8hpp.html -text
+Doxygen/html/_bon_solver_help_8hpp_source.html -text
+Doxygen/html/_bon_start_point_reader_8hpp.html -text
+Doxygen/html/_bon_start_point_reader_8hpp_source.html -text
+Doxygen/html/_bon_strong_branching_solver_8hpp.html -text
+Doxygen/html/_bon_strong_branching_solver_8hpp_source.html -text
+Doxygen/html/_bon_sub_mip_solver_8hpp.html -text
+Doxygen/html/_bon_sub_mip_solver_8hpp_source.html -text
+Doxygen/html/_bon_t_m_i_n_l_p2_osi_l_p_8hpp.html -text
+Doxygen/html/_bon_t_m_i_n_l_p2_osi_l_p_8hpp_source.html -text
+Doxygen/html/_bon_t_m_i_n_l_p2_quad_8hpp.html -text
+Doxygen/html/_bon_t_m_i_n_l_p2_quad_8hpp_source.html -text
+Doxygen/html/_bon_t_m_i_n_l_p2_t_n_l_p_8hpp.html -text
+Doxygen/html/_bon_t_m_i_n_l_p2_t_n_l_p_8hpp_source.html -text
+Doxygen/html/_bon_t_m_i_n_l_p_8hpp.html -text
+Doxygen/html/_bon_t_m_i_n_l_p_8hpp_source.html -text
+Doxygen/html/_bon_t_m_i_n_l_p_lin_obj_8hpp.html -text
+Doxygen/html/_bon_t_m_i_n_l_p_lin_obj_8hpp_source.html -text
+Doxygen/html/_bon_t_matrix_8hpp.html -text
+Doxygen/html/_bon_t_matrix_8hpp_source.html -text
+Doxygen/html/_bon_t_n_l_p2_f_p_n_l_p_8hpp.html -text
+Doxygen/html/_bon_t_n_l_p2_f_p_n_l_p_8hpp_source.html -text
+Doxygen/html/_bon_t_n_l_p_solver_8hpp.html -text
+Doxygen/html/_bon_t_n_l_p_solver_8hpp_source.html -text
+Doxygen/html/_bon_types_8hpp.html -text
+Doxygen/html/_bon_types_8hpp_source.html -text
+Doxygen/html/_bonmin_config_8h.html -text
+Doxygen/html/_bonmin_config_8h_source.html -text
+Doxygen/html/_my_bonmin_8cpp.html -text
+Doxygen/html/_my_bonmin_8cpp_source.html -text
+Doxygen/html/_my_t_m_i_n_l_p_8cpp.html -text
+Doxygen/html/_my_t_m_i_n_l_p_8cpp_source.html -text
+Doxygen/html/_my_t_m_i_n_l_p_8hpp.html -text
+Doxygen/html/_my_t_m_i_n_l_p_8hpp_source.html -text
+Doxygen/html/annotated.html -text
+Doxygen/html/bc_s.png -text svneol=unset#image/png
+Doxygen/html/bug.html -text
+Doxygen/html/class_bon_random_choice-members.html -text
+Doxygen/html/class_bon_random_choice.html -text
+Doxygen/html/class_bonmin_1_1_ampl_interface-members.html -text
+Doxygen/html/class_bonmin_1_1_ampl_interface.html -text
+Doxygen/html/class_bonmin_1_1_ampl_interface.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_ampl_t_m_i_n_l_p-members.html -text
+Doxygen/html/class_bonmin_1_1_ampl_t_m_i_n_l_p.html -text
+Doxygen/html/class_bonmin_1_1_ampl_t_m_i_n_l_p.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_aux_info-members.html -text
+Doxygen/html/class_bonmin_1_1_aux_info.html -text
+Doxygen/html/class_bonmin_1_1_aux_info.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_bab-members.html -text
+Doxygen/html/class_bonmin_1_1_bab.html -text
+Doxygen/html/class_bonmin_1_1_bab_info-members.html -text
+Doxygen/html/class_bonmin_1_1_bab_info.html -text
+Doxygen/html/class_bonmin_1_1_bab_info.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_bab_setup_base-members.html -text
+Doxygen/html/class_bonmin_1_1_bab_setup_base.html -text
+Doxygen/html/class_bonmin_1_1_bab_setup_base.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_bon_cbc_full_node_info-members.html -text
+Doxygen/html/class_bonmin_1_1_bon_cbc_full_node_info.html -text
+Doxygen/html/class_bonmin_1_1_bon_cbc_partial_node_info-members.html -text
+Doxygen/html/class_bonmin_1_1_bon_cbc_partial_node_info.html -text
+Doxygen/html/class_bonmin_1_1_bon_choose_variable-members.html -text
+Doxygen/html/class_bonmin_1_1_bon_choose_variable.html -text
+Doxygen/html/class_bonmin_1_1_bon_choose_variable_1_1_messages-members.html -text
+Doxygen/html/class_bonmin_1_1_bon_choose_variable_1_1_messages.html -text
+Doxygen/html/class_bonmin_1_1_bonmin_ampl_setup-members.html -text
+Doxygen/html/class_bonmin_1_1_bonmin_ampl_setup.html -text
+Doxygen/html/class_bonmin_1_1_bonmin_ampl_setup.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_bonmin_setup-members.html -text
+Doxygen/html/class_bonmin_1_1_bonmin_setup.html -text
+Doxygen/html/class_bonmin_1_1_bonmin_setup.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_bounds_reader-members.html -text
+Doxygen/html/class_bonmin_1_1_bounds_reader.html -text
+Doxygen/html/class_bonmin_1_1_bqpd_solver-members.html -text
+Doxygen/html/class_bonmin_1_1_bqpd_solver.html -text
+Doxygen/html/class_bonmin_1_1_bqpd_solver.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_bqpd_solver_1_1_unsolved_bqpd_error-members.html -text
+Doxygen/html/class_bonmin_1_1_bqpd_solver_1_1_unsolved_bqpd_error.html -text
+Doxygen/html/class_bonmin_1_1_bqpd_solver_1_1_unsolved_bqpd_error.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_bqpd_warm_start-members.html -text
+Doxygen/html/class_bonmin_1_1_bqpd_warm_start.html -text
+Doxygen/html/class_bonmin_1_1_branching_t_q_p-members.html -text
+Doxygen/html/class_bonmin_1_1_branching_t_q_p.html -text
+Doxygen/html/class_bonmin_1_1_cbc_dfs_diver-members.html -text
+Doxygen/html/class_bonmin_1_1_cbc_dfs_diver.html -text
+Doxygen/html/class_bonmin_1_1_cbc_diver-members.html -text
+Doxygen/html/class_bonmin_1_1_cbc_diver.html -text
+Doxygen/html/class_bonmin_1_1_cbc_nlp_strategy-members.html -text
+Doxygen/html/class_bonmin_1_1_cbc_nlp_strategy.html -text
+Doxygen/html/class_bonmin_1_1_cbc_probed_diver-members.html -text
+Doxygen/html/class_bonmin_1_1_cbc_probed_diver.html -text
+Doxygen/html/class_bonmin_1_1_cbc_strategy_choose_cuts-members.html -text
+Doxygen/html/class_bonmin_1_1_cbc_strategy_choose_cuts.html -text
+Doxygen/html/class_bonmin_1_1_curv_branching_solver-members.html -text
+Doxygen/html/class_bonmin_1_1_curv_branching_solver.html -text
+Doxygen/html/class_bonmin_1_1_curv_branching_solver.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_curvature_estimator-members.html -text
+Doxygen/html/class_bonmin_1_1_curvature_estimator.html -text
+Doxygen/html/class_bonmin_1_1_cut_strengthener-members.html -text
+Doxygen/html/class_bonmin_1_1_cut_strengthener.html -text
+Doxygen/html/class_bonmin_1_1_cut_strengthener_1_1_strengthening_t_n_l_p-members.html -text
+Doxygen/html/class_bonmin_1_1_cut_strengthener_1_1_strengthening_t_n_l_p.html -text
+Doxygen/html/class_bonmin_1_1_cuts-members.html -text
+Doxygen/html/class_bonmin_1_1_cuts.html -text
+Doxygen/html/class_bonmin_1_1_diver_compare-members.html -text
+Doxygen/html/class_bonmin_1_1_diver_compare.html -text
+Doxygen/html/class_bonmin_1_1_dummy_heuristic-members.html -text
+Doxygen/html/class_bonmin_1_1_dummy_heuristic.html -text
+Doxygen/html/class_bonmin_1_1_dummy_pump-members.html -text
+Doxygen/html/class_bonmin_1_1_dummy_pump.html -text
+Doxygen/html/class_bonmin_1_1_dummy_pump.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_ecp_cuts-members.html -text
+Doxygen/html/class_bonmin_1_1_ecp_cuts.html -text
+Doxygen/html/class_bonmin_1_1_ecp_cuts.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_filter_solver-members.html -text
+Doxygen/html/class_bonmin_1_1_filter_solver.html -text
+Doxygen/html/class_bonmin_1_1_filter_solver.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_filter_solver_1_1_unsolved_filter_error-members.html -text
+Doxygen/html/class_bonmin_1_1_filter_solver_1_1_unsolved_filter_error.html -text
+Doxygen/html/class_bonmin_1_1_filter_solver_1_1_unsolved_filter_error.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_filter_warm_start-members.html -text
+Doxygen/html/class_bonmin_1_1_filter_warm_start.html -text
+Doxygen/html/class_bonmin_1_1_filter_warm_start_diff-members.html -text
+Doxygen/html/class_bonmin_1_1_filter_warm_start_diff.html -text
+Doxygen/html/class_bonmin_1_1_fix_and_solve_heuristic-members.html -text
+Doxygen/html/class_bonmin_1_1_fix_and_solve_heuristic.html -text
+Doxygen/html/class_bonmin_1_1_fix_and_solve_heuristic.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_guess_heuristic-members.html -text
+Doxygen/html/class_bonmin_1_1_guess_heuristic.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive-members.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_heuristic_dive_fractional-members.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive_fractional.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive_fractional.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_heuristic_dive_m_i_p-members.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive_m_i_p.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive_m_i_p.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_heuristic_dive_m_i_p_fractional-members.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive_m_i_p_fractional.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive_m_i_p_fractional.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_heuristic_dive_m_i_p_vector_length-members.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive_m_i_p_vector_length.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive_m_i_p_vector_length.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_heuristic_dive_vector_length-members.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive_vector_length.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_dive_vector_length.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_heuristic_f_pump-members.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_f_pump.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_local_branching-members.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_local_branching.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_local_branching.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_heuristic_r_i_n_s-members.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_r_i_n_s.html -text
+Doxygen/html/class_bonmin_1_1_heuristic_r_i_n_s.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_hot_info-members.html -text
+Doxygen/html/class_bonmin_1_1_hot_info.html -text
+Doxygen/html/class_bonmin_1_1_ipopt_interior_warm_starter-members.html -text
+Doxygen/html/class_bonmin_1_1_ipopt_interior_warm_starter.html -text
+Doxygen/html/class_bonmin_1_1_ipopt_solver-members.html -text
+Doxygen/html/class_bonmin_1_1_ipopt_solver.html -text
+Doxygen/html/class_bonmin_1_1_ipopt_solver.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_ipopt_solver_1_1_unsolved_ipopt_error-members.html -text
+Doxygen/html/class_bonmin_1_1_ipopt_solver_1_1_unsolved_ipopt_error.html -text
+Doxygen/html/class_bonmin_1_1_ipopt_solver_1_1_unsolved_ipopt_error.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_ipopt_warm_start-members.html -text
+Doxygen/html/class_bonmin_1_1_ipopt_warm_start.html -text
+Doxygen/html/class_bonmin_1_1_ipopt_warm_start_diff-members.html -text
+Doxygen/html/class_bonmin_1_1_ipopt_warm_start_diff.html -text
+Doxygen/html/class_bonmin_1_1_linear_cuts_generator-members.html -text
+Doxygen/html/class_bonmin_1_1_linear_cuts_generator.html -text
+Doxygen/html/class_bonmin_1_1_local_solver_based_heuristic-members.html -text
+Doxygen/html/class_bonmin_1_1_local_solver_based_heuristic.html -text
+Doxygen/html/class_bonmin_1_1_local_solver_based_heuristic.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_lp_branching_solver-members.html -text
+Doxygen/html/class_bonmin_1_1_lp_branching_solver.html -text
+Doxygen/html/class_bonmin_1_1_lp_branching_solver.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_milp_rounding-members.html -text
+Doxygen/html/class_bonmin_1_1_milp_rounding.html -text
+Doxygen/html/class_bonmin_1_1_minlp_feas_pump-members.html -text
+Doxygen/html/class_bonmin_1_1_minlp_feas_pump.html -text
+Doxygen/html/class_bonmin_1_1_minlp_feas_pump.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_names_reader-members.html -text
+Doxygen/html/class_bonmin_1_1_names_reader.html -text
+Doxygen/html/class_bonmin_1_1_o_a_cut_generator2-members.html -text
+Doxygen/html/class_bonmin_1_1_o_a_cut_generator2.html -text
+Doxygen/html/class_bonmin_1_1_o_a_cut_generator2.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_oa_decomposition_base-members.html -text
+Doxygen/html/class_bonmin_1_1_oa_decomposition_base.html -text
+Doxygen/html/class_bonmin_1_1_oa_decomposition_base.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_oa_decomposition_base_1_1solver_manip-members.html -text
+Doxygen/html/class_bonmin_1_1_oa_decomposition_base_1_1solver_manip.html -text
+Doxygen/html/class_bonmin_1_1_oa_feasibility_checker-members.html -text
+Doxygen/html/class_bonmin_1_1_oa_feasibility_checker.html -text
+Doxygen/html/class_bonmin_1_1_oa_feasibility_checker.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_oa_messages-members.html -text
+Doxygen/html/class_bonmin_1_1_oa_messages.html -text
+Doxygen/html/class_bonmin_1_1_oa_nlp_optim-members.html -text
+Doxygen/html/class_bonmin_1_1_oa_nlp_optim.html -text
+Doxygen/html/class_bonmin_1_1_osi_t_m_i_n_l_p_interface-members.html -text
+Doxygen/html/class_bonmin_1_1_osi_t_m_i_n_l_p_interface.html -text
+Doxygen/html/class_bonmin_1_1_osi_t_m_i_n_l_p_interface.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_osi_t_m_i_n_l_p_interface_1_1_messages-members.html -text
+Doxygen/html/class_bonmin_1_1_osi_t_m_i_n_l_p_interface_1_1_messages.html -text
+Doxygen/html/class_bonmin_1_1_osi_t_m_i_n_l_p_interface_1_1_simple_error-members.html -text
+Doxygen/html/class_bonmin_1_1_osi_t_m_i_n_l_p_interface_1_1_simple_error.html -text
+Doxygen/html/class_bonmin_1_1_outer_approx-members.html -text
+Doxygen/html/class_bonmin_1_1_outer_approx.html -text
+Doxygen/html/class_bonmin_1_1_pseudo_costs-members.html -text
+Doxygen/html/class_bonmin_1_1_pseudo_costs.html -text
+Doxygen/html/class_bonmin_1_1_pump_for_minlp-members.html -text
+Doxygen/html/class_bonmin_1_1_pump_for_minlp.html -text
+Doxygen/html/class_bonmin_1_1_pump_for_minlp.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_qp_branching_solver-members.html -text
+Doxygen/html/class_bonmin_1_1_qp_branching_solver.html -text
+Doxygen/html/class_bonmin_1_1_qp_branching_solver.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_quad_cut-members.html -text
+Doxygen/html/class_bonmin_1_1_quad_cut.html -text
+Doxygen/html/class_bonmin_1_1_quad_row-members.html -text
+Doxygen/html/class_bonmin_1_1_quad_row.html -text
+Doxygen/html/class_bonmin_1_1_registered_options-members.html -text
+Doxygen/html/class_bonmin_1_1_registered_options.html -text
+Doxygen/html/class_bonmin_1_1_rounding_f_pump-members.html -text
+Doxygen/html/class_bonmin_1_1_rounding_f_pump.html -text
+Doxygen/html/class_bonmin_1_1_sol_reader-members.html -text
+Doxygen/html/class_bonmin_1_1_sol_reader.html -text
+Doxygen/html/class_bonmin_1_1_start_point_reader-members.html -text
+Doxygen/html/class_bonmin_1_1_start_point_reader.html -text
+Doxygen/html/class_bonmin_1_1_strong_branching_solver-members.html -text
+Doxygen/html/class_bonmin_1_1_strong_branching_solver.html -text
+Doxygen/html/class_bonmin_1_1_strong_branching_solver.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_sub_mip_solver-members.html -text
+Doxygen/html/class_bonmin_1_1_sub_mip_solver.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p-members.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p2_osi_l_p-members.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p2_osi_l_p.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p2_t_n_l_p-members.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p2_t_n_l_p.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p2_t_n_l_p.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p2_t_n_l_p_quad_cuts-members.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p2_t_n_l_p_quad_cuts.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p2_t_n_l_p_quad_cuts.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p_1_1_perturb_info-members.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p_1_1_perturb_info.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p_lin_obj-members.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p_lin_obj.html -text
+Doxygen/html/class_bonmin_1_1_t_m_i_n_l_p_lin_obj.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_t_n_l_p2_f_p_n_l_p-members.html -text
+Doxygen/html/class_bonmin_1_1_t_n_l_p2_f_p_n_l_p.html -text
+Doxygen/html/class_bonmin_1_1_t_n_l_p_solver-members.html -text
+Doxygen/html/class_bonmin_1_1_t_n_l_p_solver.html -text
+Doxygen/html/class_bonmin_1_1_t_n_l_p_solver.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1_t_n_l_p_solver_1_1_unsolved_error-members.html -text
+Doxygen/html/class_bonmin_1_1_t_n_l_p_solver_1_1_unsolved_error.html -text
+Doxygen/html/class_bonmin_1_1_t_n_l_p_solver_1_1_unsolved_error.png -text svneol=unset#image/png
+Doxygen/html/class_bonmin_1_1vector-members.html -text
+Doxygen/html/class_bonmin_1_1vector.html -text
+Doxygen/html/class_bonmin_1_1vector.png -text svneol=unset#image/png
+Doxygen/html/class_my_t_m_i_n_l_p-members.html -text
+Doxygen/html/class_my_t_m_i_n_l_p.html -text
+Doxygen/html/class_my_t_m_i_n_l_p.png -text svneol=unset#image/png
+Doxygen/html/classes.html -text
+Doxygen/html/classstd_1_1vector.html -text
+Doxygen/html/classstd_1_1vector.png -text svneol=unset#image/png
+Doxygen/html/closed.png -text svneol=unset#image/png
+Doxygen/html/config__bonmin__default_8h.html -text
+Doxygen/html/config__bonmin__default_8h_source.html -text
+Doxygen/html/config__default_8h.html -text
+Doxygen/html/config__default_8h_source.html -text
+Doxygen/html/doxygen.css -text
+Doxygen/html/doxygen.png -text svneol=unset#image/png
+Doxygen/html/files.html -text
+Doxygen/html/form_0.png -text svneol=unset#image/png
+Doxygen/html/form_1.png -text svneol=unset#image/png
+Doxygen/html/form_2.png -text svneol=unset#image/png
+Doxygen/html/form_3.png -text svneol=unset#image/png
+Doxygen/html/form_4.png -text svneol=unset#image/png
+Doxygen/html/form_5.png -text svneol=unset#image/png
+Doxygen/html/form_6.png -text svneol=unset#image/png
+Doxygen/html/form_7.png -text svneol=unset#image/png
+Doxygen/html/formula.repository -text
+Doxygen/html/functions.html -text
+Doxygen/html/functions_0x62.html -text
+Doxygen/html/functions_0x63.html -text
+Doxygen/html/functions_0x64.html -text
+Doxygen/html/functions_0x65.html -text
+Doxygen/html/functions_0x66.html -text
+Doxygen/html/functions_0x67.html -text
+Doxygen/html/functions_0x68.html -text
+Doxygen/html/functions_0x69.html -text
+Doxygen/html/functions_0x6a.html -text
+Doxygen/html/functions_0x6b.html -text
+Doxygen/html/functions_0x6c.html -text
+Doxygen/html/functions_0x6d.html -text
+Doxygen/html/functions_0x6e.html -text
+Doxygen/html/functions_0x6f.html -text
+Doxygen/html/functions_0x70.html -text
+Doxygen/html/functions_0x71.html -text
+Doxygen/html/functions_0x72.html -text
+Doxygen/html/functions_0x73.html -text
+Doxygen/html/functions_0x74.html -text
+Doxygen/html/functions_0x75.html -text
+Doxygen/html/functions_0x76.html -text
+Doxygen/html/functions_0x77.html -text
+Doxygen/html/functions_0x78.html -text
+Doxygen/html/functions_0x79.html -text
+Doxygen/html/functions_0x7a.html -text
+Doxygen/html/functions_0x7e.html -text
+Doxygen/html/functions_enum.html -text
+Doxygen/html/functions_eval.html -text
+Doxygen/html/functions_func.html -text
+Doxygen/html/functions_func_0x62.html -text
+Doxygen/html/functions_func_0x63.html -text
+Doxygen/html/functions_func_0x64.html -text
+Doxygen/html/functions_func_0x65.html -text
+Doxygen/html/functions_func_0x66.html -text
+Doxygen/html/functions_func_0x67.html -text
+Doxygen/html/functions_func_0x68.html -text
+Doxygen/html/functions_func_0x69.html -text
+Doxygen/html/functions_func_0x6a.html -text
+Doxygen/html/functions_func_0x6c.html -text
+Doxygen/html/functions_func_0x6d.html -text
+Doxygen/html/functions_func_0x6e.html -text
+Doxygen/html/functions_func_0x6f.html -text
+Doxygen/html/functions_func_0x70.html -text
+Doxygen/html/functions_func_0x71.html -text
+Doxygen/html/functions_func_0x72.html -text
+Doxygen/html/functions_func_0x73.html -text
+Doxygen/html/functions_func_0x74.html -text
+Doxygen/html/functions_func_0x75.html -text
+Doxygen/html/functions_func_0x76.html -text
+Doxygen/html/functions_func_0x77.html -text
+Doxygen/html/functions_func_0x78.html -text
+Doxygen/html/functions_func_0x7a.html -text
+Doxygen/html/functions_func_0x7e.html -text
+Doxygen/html/functions_rela.html -text
+Doxygen/html/functions_type.html -text
+Doxygen/html/functions_vars.html -text
+Doxygen/html/functions_vars_0x62.html -text
+Doxygen/html/functions_vars_0x63.html -text
+Doxygen/html/functions_vars_0x64.html -text
+Doxygen/html/functions_vars_0x65.html -text
+Doxygen/html/functions_vars_0x66.html -text
+Doxygen/html/functions_vars_0x67.html -text
+Doxygen/html/functions_vars_0x68.html -text
+Doxygen/html/functions_vars_0x69.html -text
+Doxygen/html/functions_vars_0x6a.html -text
+Doxygen/html/functions_vars_0x6b.html -text
+Doxygen/html/functions_vars_0x6c.html -text
+Doxygen/html/functions_vars_0x6d.html -text
+Doxygen/html/functions_vars_0x6e.html -text
+Doxygen/html/functions_vars_0x6f.html -text
+Doxygen/html/functions_vars_0x70.html -text
+Doxygen/html/functions_vars_0x71.html -text
+Doxygen/html/functions_vars_0x72.html -text
+Doxygen/html/functions_vars_0x73.html -text
+Doxygen/html/functions_vars_0x74.html -text
+Doxygen/html/functions_vars_0x75.html -text
+Doxygen/html/functions_vars_0x76.html -text
+Doxygen/html/functions_vars_0x77.html -text
+Doxygen/html/functions_vars_0x78.html -text
+Doxygen/html/functions_vars_0x79.html -text
+Doxygen/html/globals.html -text
+Doxygen/html/globals_defs.html -text
+Doxygen/html/globals_func.html -text
+Doxygen/html/globals_vars.html -text
+Doxygen/html/hierarchy.html -text
+Doxygen/html/index.html -text
+Doxygen/html/jquery.js -text
+Doxygen/html/namespace_bonmin.html -text
+Doxygen/html/namespace_filter_types.html -text
+Doxygen/html/namespace_ipopt.html -text
+Doxygen/html/namespacemembers.html -text
+Doxygen/html/namespacemembers_enum.html -text
+Doxygen/html/namespacemembers_eval.html -text
+Doxygen/html/namespacemembers_func.html -text
+Doxygen/html/namespacemembers_type.html -text
+Doxygen/html/namespaces.html -text
+Doxygen/html/nav_f.png -text svneol=unset#image/png
+Doxygen/html/nav_h.png -text svneol=unset#image/png
+Doxygen/html/open.png -text svneol=unset#image/png
+Doxygen/html/pages.html -text
+Doxygen/html/struct_bonmin_1_1_bab_setup_base_1_1_cutting_method-members.html -text
+Doxygen/html/struct_bonmin_1_1_bab_setup_base_1_1_cutting_method.html -text
+Doxygen/html/struct_bonmin_1_1_bab_setup_base_1_1_heuristic_method-members.html -text
+Doxygen/html/struct_bonmin_1_1_bab_setup_base_1_1_heuristic_method.html -text
+Doxygen/html/struct_bonmin_1_1_bqpd_solver_1_1cached_info-members.html -text
+Doxygen/html/struct_bonmin_1_1_bqpd_solver_1_1cached_info.html -text
+Doxygen/html/struct_bonmin_1_1_filter_solver_1_1cached_info-members.html -text
+Doxygen/html/struct_bonmin_1_1_filter_solver_1_1cached_info.html -text
+Doxygen/html/struct_bonmin_1_1_linear_cuts_generator_1_1_cutting_method-members.html -text
+Doxygen/html/struct_bonmin_1_1_linear_cuts_generator_1_1_cutting_method.html -text
+Doxygen/html/struct_bonmin_1_1_names_reader_1_1ltstr-members.html -text
+Doxygen/html/struct_bonmin_1_1_names_reader_1_1ltstr.html -text
+Doxygen/html/struct_bonmin_1_1_oa_decomposition_base_1_1_parameters-members.html -text
+Doxygen/html/struct_bonmin_1_1_oa_decomposition_base_1_1_parameters.html -text
+Doxygen/html/struct_bonmin_1_1_simple_referenced-members.html -text
+Doxygen/html/struct_bonmin_1_1_simple_referenced.html -text
+Doxygen/html/struct_bonmin_1_1_simple_referenced_ptr-members.html -text
+Doxygen/html/struct_bonmin_1_1_simple_referenced_ptr.html -text
+Doxygen/html/struct_bonmin_1_1_t_m_i_n_l_p_1_1_branching_info-members.html -text
+Doxygen/html/struct_bonmin_1_1_t_m_i_n_l_p_1_1_branching_info.html -text
+Doxygen/html/struct_bonmin_1_1_t_m_i_n_l_p_1_1_marked_non_convex-members.html -text
+Doxygen/html/struct_bonmin_1_1_t_m_i_n_l_p_1_1_marked_non_convex.html -text
+Doxygen/html/struct_bonmin_1_1_t_m_i_n_l_p_1_1_simple_concave_constraint-members.html -text
+Doxygen/html/struct_bonmin_1_1_t_m_i_n_l_p_1_1_simple_concave_constraint.html -text
+Doxygen/html/struct_bonmin_1_1_t_m_i_n_l_p_1_1_sos_info-members.html -text
+Doxygen/html/struct_bonmin_1_1_t_m_i_n_l_p_1_1_sos_info.html -text
+Doxygen/html/struct_bonmin_1_1_t_mat-members.html -text
+Doxygen/html/struct_bonmin_1_1_t_mat.html -text
+Doxygen/html/struct_bonmin_1_1_t_mat_1_1_column_order-members.html -text
+Doxygen/html/struct_bonmin_1_1_t_mat_1_1_column_order.html -text
+Doxygen/html/struct_bonmin_1_1_t_mat_1_1_column_order.png -text svneol=unset#image/png
+Doxygen/html/struct_bonmin_1_1_t_mat_1_1_row_order-members.html -text
+Doxygen/html/struct_bonmin_1_1_t_mat_1_1_row_order.html -text
+Doxygen/html/struct_bonmin_1_1_t_mat_1_1_row_order.png -text svneol=unset#image/png
+Doxygen/html/struct_bonmin_1_1_t_mat_1_1_t_mat_ordering-members.html -text
+Doxygen/html/struct_bonmin_1_1_t_mat_1_1_t_mat_ordering.html -text
+Doxygen/html/struct_bonmin_1_1_t_mat_1_1_t_mat_ordering.png -text svneol=unset#image/png
+Doxygen/html/tab_a.png -text svneol=unset#image/png
+Doxygen/html/tab_b.png -text svneol=unset#image/png
+Doxygen/html/tab_h.png -text svneol=unset#image/png
+Doxygen/html/tab_s.png -text svneol=unset#image/png
+Doxygen/html/tabs.css -text
+Doxygen/html/todo.html -text
+/Install.html -text
+/Intro.html -text
+/Obtain.html -text
+/bib.html -text
+/bonmin.css -text
+/cmr10-10.png -text
+/cmsy10-32.png -text
+/index.html -text
+/msbm10-52.png -text
+option_pages/bonmin.css -text
+option_pages/options_list_bonmin.html -text
+option_pages/options_list_filter.html -text
+option_pages/options_list_ipopt.html -text
+/options_list.html -text
+/options_set.html -text
+/trunk-B-Hyb.xhtml -text
+/use.html -text

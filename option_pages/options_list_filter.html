@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title></title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- html --> 
+<meta name="src" content="tmp.tex"> 
+<meta name="date" content="2013-06-14 18:51:00"> 
+<link rel="stylesheet" type="text/css" href="bonmin.css"> 
+</head><body 
+>
+<!--l. 7--><p class="noindent" ><div id="header">   <h1 id="siteName"><TT> <big> BONMIN </big> </tt> Users' Manual</h1>   <div id="globalNav">   <a href="Intro.html">Introduction</a> |   <a href="Obtain.html">Download</a> |  <a href="Install.html">Install</a> |   <a href="use.html">Use</a> |   <a href="options_set.html">Setting Options</a> |   <a href="options_list.html">Options List</a> |   <a href="bib.html">Bibliography</a> |  </div>   </div>  <div id="leftPanel"> <div id="side-bar">  <ul> <li class="main"><a href="/Bonmin/index.html">Bonmin</a></li>  <li><a href="https://projects.coin-or.org/Bonmin">Wiki</a></li>   <li><a href="http://neos.mcs.anl.gov/neos/solvers/minco:Bonmin/AMPL.html"> NEOS </a> </li>  <li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU OCR </a></li>  <li><a href="http://domino.research.ibm.com/comm/research_projects.nsf/pages/minlp.index.html">  IBM MINLP </a></li>  <br>  <br>  <li class="main"><a href="/index.html">COIN-OR Home</a></li>  <li><a href="/projects.html">Projects</a></li>  <li><a href="/faqs.html">FAQs</a></li>   <li><a href="/download.html">Download</a></li>  <li><a href="/mail.html">Mailing Lists</a></li>  <li><a href="/how-to-help.html">Get Involved</a></li>  <li><a href="/resources.html">Related Resources</a></li>  <li class="main"><a href="/foundation.html">  <br>  <br>  COIN-OR Foundation  </a></li>   <li><a href="/events.html">Events</a></li>  <li><a href="/members.html">Members</a></li>  </ul>  </div> </div> <!--end navBar div -->  <br>   <h2 id="pageName"> List of filter options  </h2>    </div> 
+<!--l. 113--><p class="noindent" > <table border="1"> <tr> <td>Option </td> <td> type </td> <td> B-BB</td> <td> B-OA</td> <td> B-QG</td> <td> B-Hyb</td> </tr> <tr> <th colspan=9> <a href="#sec:FilterSQPoptions">FilterSQP options</a> </th> </tr> <tr> <td> <a href="#opt:eps">eps</a> </td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td> <a href="#opt:infty">infty</a> </td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td> <a href="#opt:iprint">iprint</a> </td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td> <a href="#opt:kmax">kmax</a> </td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td> <a href="#opt:maxf">maxf</a> </td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td> <a href="#opt:maxiter">maxiter</a> </td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td> <a href="#opt:mlp">mlp</a> </td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td> <a href="#opt:mxlws">mxlws</a> </td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td> <a href="#opt:mxws">mxws</a> </td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td> <a href="#opt:rho_init">rho_init</a> </td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td> <a href="#opt:tt">tt</a> </td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td> <a href="#opt:ubd">ubd</a> </td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> </tr> </table> 
+   <h4 class="subsectionHead"><span class="titlemark">0.1   </span> <a 
+ id="x1-10000.1"></a>FilterSQP options</h4>
+<!--l. 116--><p class="noindent" ><a id="sec:FilterSQPoptions"></a>
+<!--l. 117--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-20000.1"></a><span 
+class="cmbx-10">eps:</span></span>
+   Tolerance for SQP solver <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">eps</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmsy-7">-</span><span 
+class="cmr-7">08</span></sup>.
+<!--l. 123--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-30000.1"></a><span 
+class="cmbx-10">infty:</span></span>
+   A large number <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">infty</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+20</span></sup>.
+<!--l. 129--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-40000.1"></a><span 
+class="cmbx-10">iprint:</span></span>
+   Print level (0=silent, 3=verbose) <br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">iprint</span> <span 
+class="cmsy-10">&#x2264; </span>6 and its default value is
+0.
+<!--l. 135--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-50000.1"></a><span 
+class="cmbx-10">kmax:</span></span>
+   Dimension of null-space <br 
+class="newline" />The valid range for this integer option is <span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">kmax</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+<span 
+class="cmsy-10">-</span>1.
+<!--l. 141--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-60000.1"></a><span 
+class="cmbx-10">maxf:</span></span>
+   Maximum filter length <br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">maxf</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+100.
+<!--l. 147--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-70000.1"></a><span 
+class="cmbx-10">maxiter:</span></span>
+   Maximum number of iterations <br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">maxiter</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+1000.
+                                                                  
+
+                                                                  
+<!--l. 153--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-80000.1"></a><span 
+class="cmbx-10">mlp:</span></span>
+   Maximum level for degeneracy (bqpd) <br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">mlp</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+1000.
+<!--l. 159--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-90000.1"></a><span 
+class="cmbx-10">mxlws:</span></span>
+   FINTEGER workspace increment <br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">mxlws</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+500000.
+<!--l. 165--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-100000.1"></a><span 
+class="cmbx-10">mxws:</span></span>
+   REAL workspace increment <br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">mxws</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+2000000.
+<!--l. 171--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-110000.1"></a><span 
+class="cmbx-10">rho</span><span 
+class="cmbx-10">_init:</span></span>
+   Initial trust region size <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">rho</span>_<span 
+class="cmmi-10">init</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+10.
+<!--l. 177--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-120000.1"></a><span 
+class="cmbx-10">tt:</span></span>
+   Parameter for upper bound on filter <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">tt</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+1<span 
+class="cmmi-10">.</span>25.
+<!--l. 183--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-130000.1"></a><span 
+class="cmbx-10">ubd:</span></span>
+   Parameter for upper bound on filter <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">ubd</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+100.
+    
+</body></html> 
+
+                                                                  
+
+

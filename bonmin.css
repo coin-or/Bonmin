@@ -1,0 +1,282 @@
+/***********************************************/
+/* Bonmin.css                                  */
+/* coin.css modified.                          */
+/* want a top navigation panel                 */
+/* And links on the left-hand-side             */
+/***********************************************/
+
+/***********************************************/
+/* HTML tag styles                             */
+/***********************************************/ 
+
+body{
+      background-color: white;
+      font-family: Arial, Helvetica, Univers, Zurich BT, sans-serif; 
+}
+
+
+
+
+h4 {
+	margin-left: 5%;
+}
+
+ul.indented {
+	margin-left: 5%;
+}
+
+/* For corporate logo display */
+img.logo {
+	border-style: none;
+	vertical-align: middle;
+	text-align: center;
+}
+
+li.logo {
+	font-size: x-large;
+}
+
+table.logo {
+	vertical-align: middle;
+	text-align: center;
+	border-spacing: 20px;
+}
+
+
+/* ##### Header ##### */
+/* This part adapted from Tierra Verde Dos by haran from OSWD.org */
+
+#header {
+/*  color: rgb(0,0,153);*/
+  color: black;
+  background-image: url(blue_gradient.jpg);
+  background-repeat: repeat-y;
+  vertical-align: center; 
+  text-align: right;
+/*  padding: 0 2.5mm 1ex 4mm; */
+  padding: 0 0 0 0;
+  border-bottom: 2px solid white;
+}
+
+#header h1 {
+  margin-right: 30px;
+}
+
+#leftPanel
+{
+	float:left;
+width:3cm;
+padding-left:10px;
+padding-right:10px;
+}
+
+#rightPanel
+{
+	float:right;
+width:30%;
+padding-right: 10px;
+padding-left: 10px;
+padding-bottom: 50px;
+margin-right:10px;
+position: relative;
+top:4em;
+left:10px;
+bottom:50px;
+}
+
+
+#headlines{
+position:relative;
+    border-top: 1px solid #cccccc;
+	border-left: 1px solid #cccccc;
+	border-bottom: 1px solid #cccccc;
+	border-right: 1px solid #cccccc;
+	padding-right: 10px;
+	padding-top:100px;
+	padding-bottom:500px;
+}
+
+#refer{
+width:97%;
+position:relative;
+float:justify;
+border:2px soldid #999999;
+background-color:#cccccc;
+  text-align:justify;
+}
+
+
+#content{
+	float: justify;
+	margin-left:10%;
+  width: 85%;
+   text-align:justify;
+}
+
+#verbatim{
+	width: 65%;
+	border:2px solid #cccccc;
+	background-color:#ccccff;
+}
+
+/***********************************************/
+/* Components                                  */
+/***********************************************/
+
+#siteName{
+	margin: 0;
+	padding: 0 0 0 10px;
+}
+
+
+/************* #globalNav styles **************/
+
+#globalNav{
+padding: 0px 0px 5px 10px;
+border-bottom: 1px solid #CCC;
+color: black;
+}
+
+#globalNav img{
+ display: block;
+}
+
+#globalNav a {
+	font-size: 120%;
+	padding: 0 4px 0 0;
+}
+
+/*************** #pageName styles **************/
+
+#pageName{
+	margin: 0px;
+	padding: 0px 0px 0px 10px;
+}
+
+
+/************** .feature styles ***************/
+
+.feature{
+	padding: 0px 0px 10px 10px;
+	font-size: 100%;
+}
+
+.feature h3{
+	padding: 30px 0px 5px 0px;
+	text-align: center;
+}
+
+.feature img{
+	float: left;
+	padding: 10px 10px 0px 0px;
+}
+
+
+/************** .story styles *****************/
+
+.story{
+	padding: 10px 0px 0px 10px;
+	font-size: 100%;
+}
+
+.story p{
+	padding: 0px 0px 10px 0px;
+}
+
+
+/************* #siteInfo styles ***************/
+
+#siteInfo{
+	clear: both;
+	border: 1px solid #cccccc;
+	font-size: 100%;
+	color: #cccccc;
+	padding: 10px 10px 10px 10px;
+}
+
+#siteInfo img{
+	padding: 4px 4px 4px 10px;
+	vertical-align: middle;
+}
+
+
+
+/* ##### Side Bar ##### */
+/* This part adapted from Tierra Verde Dos by haran from OSWD.org */
+
+#side-bar {
+  font-size: 95%;
+  text-align: left;
+/*  width: 11em; */
+/*  float: left; */
+  clear: left;
+}
+
+#side-bar ul {
+  list-style-type: none;
+  list-style-position: outside;
+  margin: 0;
+  padding: 0;
+}
+
+#side-bar li {
+  margin-left: 1em;
+  padding: 1ex 1em 1ex 0.5ex;
+  border-bottom: 1px solid black;
+}
+
+#side-bar li.main {
+  margin-left: 0;
+}
+
+#side-bar a {
+  color: rgb(0,0,153);
+  background-color: transparent;
+  text-decoration: none;
+}
+
+#side-bar a:hover {
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+
+
+/*********** #sectionLinks styles ***********/
+
+#sectionLinks{
+	position: relative;
+	margin: 0px;
+	padding: 0px;
+	border-bottom: 1px solid #cccccc;
+	font-size: 100%;
+}
+
+#sectionLinks h4{
+	padding: 10px 0px 2px 10px;
+}
+
+#sectionLinks a {
+	display: block;
+	border-top: 1px solid #cccccc;
+	padding: 2px 0px 2px 10px;
+}
+
+#sectionLinks a:hover{
+	background-color: #dddddd;
+}
+
+
+/************** #headlines styles **************/
+
+#headlines{
+	margin: 0px;
+	padding: 10px 0px 20px 10px;
+	font-size: 80%;
+}
+
+#headlines p{
+	padding: 5px 0px 5px 0px;
+}
+
+

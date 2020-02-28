@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title></title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html --> 
+<meta name="src" content="tmp.tex"> 
+<meta name="date" content="2015-04-04 14:24:00"> 
+<link rel="stylesheet" type="text/css" href="bonmin.css"> 
+</head><body 
+>
+<!--l. 26--><p class="noindent" ><div id="header">   <h1 id="siteName"><TT> <big> BONMIN </big> </tt> Users' Manual</h1>   <div id="globalNav">   <a href="Intro.html">Introduction</a> |   <a href="Obtain.html">Download</a> |  <a href="Install.html">Install</a> |   <a href="use.html">Use</a> |   <a href="options_set.html">Setting Options</a> |   <a href="options_list.html">Options List</a> |   <a href="bib.html">Bibliography</a> |  </div>   </div>  <div id="leftPanel"> <div id="side-bar">  <ul> <li class="main"><a href="/Bonmin/index.html">Bonmin</a></li>  <li><a href="https://projects.coin-or.org/Bonmin">Wiki</a></li>   <li><a href="http://neos.mcs.anl.gov/neos/solvers/minco:Bonmin/AMPL.html"> NEOS </a> </li>  <li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU OCR </a></li>  <li><a href="http://domino.research.ibm.com/comm/research_projects.nsf/pages/minlp.index.html">  IBM MINLP </a></li>  <br>  <br>  <li class="main"><a href="/index.html">COIN-OR Home</a></li>  <li><a href="/projects.html">Projects</a></li>  <li><a href="/faqs.html">FAQs</a></li>   <li><a href="/download.html">Download</a></li>  <li><a href="/mail.html">Mailing Lists</a></li>  <li><a href="/how-to-help.html">Get Involved</a></li>  <li><a href="/resources.html">Related Resources</a></li>  <li class="main"><a href="/foundation.html">  <br>  <br>  COIN-OR Foundation  </a></li>   <li><a href="/events.html">Events</a></li>  <li><a href="/members.html">Members</a></li>  </ul>  </div> </div> <!--end navBar div -->  <br>   <h2 id="pageName"> Introduction  </h2>  <a href="#MathBack " > Types of problems
+solved  </a> / <a href="#Algos " > Algorithms  </a> / <a href="#ThirdP " > Required third party code  </a> / <a href="#Support " >
+Supported platforms  </a> /   </div> 
+<!--l. 26--><p class="noindent" > <div id="rightPanel"> <div id="headlines"> <h4>References </h4>    <div id="refer"> <p>  1 <a 
+href="http://domino.research.ibm.com/library/cyberdig.nsf/1e4115aea78b6e7c85256b360066f0d4/fdb4630e33bd2876852570b20062af37?OpenDocument" >An algorithmic framework for convex MINLP. Bonami et.al.</a>  </p> </div>       <div id="refer"> <p>  2 <a 
+href="http://hal.archives-ouvertes.fr/hal-00423416/en/" >Algorithms
+and Software for Convex Mixed Integer Nonlinear Programs. Bonami, Kilinc,
+Linderoth</a>  </p> </div>       <div id="refer"> <p>  3 <a 
+href="bib.html#DG" >An outer-approximation algorithm for a class of MINLP.
+M. Duran and I.E. Grossmann. Mathematical Programming</a>  </p> </div>       <div id="refer"> <p>  4 <a 
+href="bib.html#Gupta80Nonlinear" >Branch
+and bound experiments in convex nonlinear integer programming. O.K.
+Gupta and V. Ravindran.</a>  </p> </div>       <div id="refer"> <p>  5 <a 
+href="http://dx.doi.org/10.1007/BF01581153" >Solving MINLP by outer approximation. R.
+Fletcher and S. Leyffer. Mathematical Programming.</a>  </p> </div>       <div id="refer"> <p>  6 <a 
+href="http://dx.doi.org/10.1016/0098-1354(92)80028-8" >An LP/NLP based
+branched and bound algorithm for convex MINLP optimization problems. I.
+Quesada and I.E. Grossmann. Computers and Chemical Engineering.</a>  </p> </div>    </div> </div> 
+<!--l. 28--><p class="noindent" > </div> <div id="content"> <div class="feature"> <h3> <a id="sec:Intro"><span 
+class="cmtt-10">BONMIN</span></a> </h3>  <span 
+class="cmtt-10">BONMIN</span>&#x00A0;(Basic Open-source Nonlinear Mixed INteger
+programming) is an open-source code for solving general MINLP (Mixed Integer
+NonLinear Programming) problems. It is distributed on <a 
+href="http://www.coin-or.org" >COIN-OR</a>&#x00A0; under
+the EPL (Eclipse Public License). The EPL is a license approved by the
+<a 
+href="http://www.opensource.org" >OSI</a>, (Open Source Initiative), thus <span 
+class="cmtt-10">BONMIN</span>&#x00A0;is OSI Certified Open Source
+Software.
+<!--l. 42--><p class="indent" >   There are several algorithmic choices that can be selected with <span 
+class="cmtt-10">BONMIN</span>. <span 
+class="cmtt-10">B-BB </span>is a
+NLP-based branch-and-bound algorithm, <span 
+class="cmtt-10">B-OA </span>is an outer-approximation
+decomposition algorithm, <span 
+class="cmtt-10">B-iFP </span>is an iterated feasibility pump algorithm,
+<span 
+class="cmtt-10">B-QG </span>is an implementation of Quesada and Grossmann&#8217;s branch-and-cut
+algorithm, <span 
+class="cmtt-10">B-Hyb </span>is a hybrid outer-approximation based branch-and-cut
+algorithm and <span 
+class="cmtt-10">B-Ecp </span>is a variant of <span 
+class="cmtt-10">B-QG </span>based on adding additional ECP
+cuts.
+<!--l. 53--><p class="indent" >   Some of the algorithmic choices require the ability to solve MILP (Mixed Integer
+Linear Programming) problems and NLP (NonLinear Programming) problems. The
+default solvers for these are, respectively, the COIN-OR codes <a 
+href="https://projects.coin-or.org/Cbc" ><span 
+class="cmtt-10">Cbc</span></a>&#x00A0;and <a 
+href="https://projects.coin-or.org/Ipopt" ><span 
+class="cmtt-10">Ipopt</span></a>. In
+turn, <span 
+class="cmtt-10">Cbc </span>uses further COIN-OR modules: <a 
+href="https://projects.coin-or.org/Clp" ><span 
+class="cmtt-10">Clp</span></a>&#x00A0;(for LP (Linear Programming)
+problems), <a 
+href="https://projects.coin-or.org/Cgl" ><span 
+class="cmtt-10">Cgl</span></a>&#x00A0;(for generating MILP cutting planes), as well as various other
+utilities. It is also possible to step outside the open-source realm and use <a 
+href="http://www.cplex.com" ><span 
+class="cmtt-10">Cplex</span></a>&#x00A0;as
+the MILP solver and FilterSQP as the NLP solver.
+<!--l. 63--><p class="indent" >   Additional documentation can be found on the <span 
+class="cmtt-10">Bonmin</span>
+<!--l. 76--><p class="indent" >   <a 
+href="http://www.coin-or.org/Bonmin" >homepage</a> and <a 
+href="https://projects.coin-or.org/Bonmin" >wiki</a>.
+<!--l. 78--><p class="indent" >    </div> <div class="story"><h3><a id="MathBack">Types of problems solved</a></h3>   <span 
+class="cmtt-10">BONMIN</span>&#x00A0;solves MINLPs of the form
+<!--l. 82--><p class="indent" >
+                                                                  
+
+                                                                  
+<table 
+class="align-star">
+                        <tr><td 
+class="align-odd"></td>                        <td 
+class="align-even">min<span 
+class="cmmi-10">f</span>(<span 
+class="cmmi-10">x</span>)</td>                                  <td 
+class="align-label"></td>                        <td 
+class="align-label">
+                        </td></tr><tr><td 
+class="align-odd"></td>                        <td 
+class="align-even"><span 
+class="cmmi-10">s.t.</span></td>                                       <td 
+class="align-label"></td>                        <td 
+class="align-label">
+                        </td></tr><tr><td 
+class="align-odd"></td>                        <td 
+class="align-even"><span 
+class="cmmi-10">g</span><sup><span 
+class="cmmi-7">L</span></sup> <span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">g</span>(<span 
+class="cmmi-10">x</span>) <span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">g</span><sup><span 
+class="cmmi-7">U</span></sup><span 
+class="cmmi-10">,</span></td>                            <td 
+class="align-label"></td>                        <td 
+class="align-label">
+                        </td></tr><tr><td 
+class="align-odd"></td>                        <td 
+class="align-even"><span 
+class="cmmi-10">x</span><sup><span 
+class="cmmi-7">L</span></sup> <span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">x </span><span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">x</span><sup><span 
+class="cmmi-7">U</span></sup><span 
+class="cmmi-10">,</span></td>                              <td 
+class="align-label"></td>                        <td 
+class="align-label">
+                        </td></tr><tr><td 
+class="align-odd"></td>                        <td 
+class="align-even"><span 
+class="cmmi-10">x </span><span 
+class="cmsy-10">&#x2208; </span><span 
+class="msbm-10">&#x211D;</span><sup><span 
+class="cmmi-7">n</span></sup><span 
+class="cmmi-10">,</span><span style="margin-left:2.77695pt" class="tmspace"></span><span 
+class="cmmi-10">x</span><sub>
+<span 
+class="cmmi-7">i</span></sub> <span 
+class="cmsy-10">&#x2208; </span><span 
+class="msbm-10">&#x2124;</span><span style="margin-left:2.77695pt" class="tmspace"></span><span 
+class="cmsy-10">&#x2200;</span><span 
+class="cmmi-10">i </span><span 
+class="cmsy-10">&#x2208; </span><span 
+class="cmmi-10">I,</span></td>                        <td 
+class="align-label"></td>                        <td 
+class="align-label"></td></tr></table>
+where the functions <span 
+class="cmmi-10">f </span>: <span 
+class="cmmi-10">&#x00A0;</span><span 
+class="cmsy-10">{</span><span 
+class="cmmi-10">x </span><span 
+class="cmsy-10">&#x2208; </span><span 
+class="msbm-10">&#x211D;</span><sup><span 
+class="cmmi-7">n</span></sup> : <span 
+class="cmmi-10">x</span><sup><span 
+class="cmmi-7">L</span></sup> <span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">x </span><span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">x</span><sup><span 
+class="cmmi-7">U</span></sup><span 
+class="cmsy-10">}</span><span 
+class="cmmi-10">&#x00A0; </span><span 
+class="cmsy-10">&#x2192;</span> <span 
+class="cmmi-10">&#x00A0;</span><span 
+class="msbm-10">&#x211D; </span>and
+<span 
+class="cmmi-10">g </span>: <span 
+class="cmmi-10">&#x00A0;</span><span 
+class="cmsy-10">{</span><span 
+class="cmmi-10">x </span><span 
+class="cmsy-10">&#x2208; </span><span 
+class="msbm-10">&#x211D;</span><sup><span 
+class="cmmi-7">n</span></sup> : <span 
+class="cmmi-10">x</span><sup><span 
+class="cmmi-7">L</span></sup> <span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">x </span><span 
+class="cmsy-10">&#x2264; </span><span 
+class="cmmi-10">x</span><sup><span 
+class="cmmi-7">U</span></sup><span 
+class="cmsy-10">}</span><span 
+class="cmmi-10">&#x00A0; </span><span 
+class="cmsy-10">&#x2192;</span> <span 
+class="cmmi-10">&#x00A0;</span><span 
+class="msbm-10">&#x211D;</span><sup><span 
+class="cmmi-7">m</span></sup> are assumed to be twice continuously
+differentiable, and <span 
+class="cmmi-10">I </span><span 
+class="cmsy-10">&#x2286;{</span>1<span 
+class="cmmi-10">,</span><span 
+class="cmmi-10">&#x2026;</span><span 
+class="cmmi-10">,n</span><span 
+class="cmsy-10">}</span>. We emphasize that <span 
+class="cmtt-10">BONMIN</span>&#x00A0;treats problems that are
+cast in <span 
+class="cmti-10">minimization </span>form.
+<!--l. 99--><p class="indent" >   The different methods that <span 
+class="cmtt-10">BONMIN</span>&#x00A0;implements are exact algorithms when the
+functions <span 
+class="cmmi-10">f </span>and <span 
+class="cmmi-10">g </span>are convex but are only heuristics when this is not the case (i.e.,
+<span 
+class="cmtt-10">BONMIN</span>&#x00A0;is not a <span 
+class="cmti-10">global </span>optimizer).
+<!--l. 102--><p class="indent" >    </div> <div class="story"><h3><a id="Algos">Algorithms</a></h3>   <span 
+class="cmtt-10">BONMIN</span>&#x00A0;implements six different algorithms for solving
+MINLPs:
+     <ul class="itemize1">
+     <li class="itemize"><span 
+class="cmtt-10">B-BB</span>: a simple branch-and-bound algorithm based on solving a continuous
+     nonlinear  program  at  each  node  of  the  search  tree  and  branching  on
+     variables  <a 
+href="bib.html#Gupta80Nonlinear" >[Gupta 1980]</a>  ; we also allow the possibility of SOS (Type 1)
+     branching
+     </li>
+     <li class="itemize"><span 
+class="cmtt-10">B-OA</span>:  an  outer-approximation  based  decomposition  algorithm  [<a 
+href="bib.html#DG" >Duran
+     Grossmann 1986</a>,<a 
+href="http://dx.doi.org/10.1007/BF01581153" >Fletcher Leyffer 1994</a>]
+     </li>
+     <li class="itemize"><span 
+class="cmtt-10">B-QG</span>: an outer-approximation based branch-and-cut algorithm  <a 
+href="http://dx.doi.org/10.1016/0098-1354(92)80028-8" >[Quesada
+     Grossmann 1994]</a>
+     </li>
+     <li class="itemize"><span 
+class="cmtt-10">B-Hyb</span>:  a  hybrid  outer-approximation  /  nonlinear  programming  based
+     branch-and-cut algorithm  <a 
+href="http://domino.research.ibm.com/library/cyberdig.nsf/1e4115aea78b6e7c85256b360066f0d4/fdb4630e33bd2876852570b20062af37?OpenDocument" >[Bonami et al. 2008]</a>
+     </li>
+     <li class="itemize"><span 
+class="cmtt-10">B-Ecp</span>: another outer-approximation based branch-and-cut inspired by the
+     settings described in  <a 
+href="http://wiki.mcs.anl.gov/leyffer/index.php/Sven_Leyffer's_Publications" >[Abhishek Leyffer Linderoth 2006]</a>
+                                                                  
+
+                                                                  
+     </li>
+     <li class="itemize"><span 
+class="cmtt-10">B-iFP</span>: an iterated feasibility pump algorithm   <a 
+href="http://dx.doi.org/10.1007/s10107-008-0212-2" >[Bonami Cornu&eacute;jols Lodi
+     Margot 2009]</a>  .</li></ul>
+<!--l. 125--><p class="indent" >   In this manual, we will not go into a further description of these algorithms.
+Mathematical details of these algorithms and some details of their implementations
+can be found in  <a 
+href="http://domino.research.ibm.com/library/cyberdig.nsf/1e4115aea78b6e7c85256b360066f0d4/fdb4630e33bd2876852570b20062af37?OpenDocument" >[Bonami et al. 2008]</a>   and  <a 
+href="http://hal.archives-ouvertes.fr/hal-00423416/en/" >[Bonami K<img 
+src="cmr10-10.png" alt="i" class="10x-x-10" />ln<img 
+src="cmr10-10.png" alt="i" class="10x-x-10" />c Linderoth 2009]</a>
+.
+<!--l. 129--><p class="indent" >   Whether or not you are interested in the details of the algorithms, you certainly
+want to know which one of these six algorithms you should choose to solve your
+particular problem. For convex MINLPs, experiments we have made on a reasonably
+large test set of problems point in favor of using <span 
+class="cmtt-10">B-Hyb </span>(it solved the most of the
+problems in our test set in 3 hours of computing time). Nevertheless, there are cases
+where <span 
+class="cmtt-10">B-OA </span>is much faster than <span 
+class="cmtt-10">B-Hyb </span>and others where <span 
+class="cmtt-10">B-BB </span>is interesting. <span 
+class="cmtt-10">B-QG </span>and
+<span 
+class="cmtt-10">B-ECP </span>correspond mainly to a specific parameter setting of <span 
+class="cmtt-10">B-Hyb </span>but they
+can be faster in some case. <span 
+class="cmtt-10">B-iFP </span>is more tailored at finding quickly good
+solutions to very hard convex MINLP. For nonconvex MINLPs, we strongly
+recommend using <span 
+class="cmtt-10">B-BB </span>(the outer-approximation algorithms have not been tailored
+to treat nonconvex problems at this point). Although even <span 
+class="cmtt-10">B-BB </span>is only a
+heuristic for such problems, we have added several options to try and improve
+the quality of the solutions it provides (see <a 
+href="options_set.html#sec:non_convex" >non convex options</a>). Because
+it is applicable to more classes problem <span 
+class="cmtt-10">B-BB </span>is the default algorithm in
+<span 
+class="cmtt-10">BONMIN</span>.
+<!--l. 142--><p class="indent" >    </div> <div class="story"><h3><a id="ThirdP">Required third party code</a></h3>   In order to run <span 
+class="cmtt-10">BONMIN</span>, you have to download
+other external libraries (and pay attention to their licenses!):
+     <ul class="itemize1">
+     <li class="itemize"><a 
+href="http://www.netlib.org/lapack/" >Lapack</a> (Linear Algebra PACKage)
+     </li>
+     <li class="itemize"><a 
+href="http://www.netlib.org/blas/" >Blas</a> (Basic Linear Algebra Subroutines)
+     </li>
+     <li class="itemize">a sparse linear solver that is supported by Ipopt, e.g., MA27 from the <a 
+href="http://www.cse.clrc.ac.uk/nag/hsl/contents.shtml" >HSL</a>
+     (Harwell Subroutine Library), MUMPS, or Pardiso.</li></ul>
+<!--l. 155--><p class="indent" >   Note that Lapack and the Blas are free for commercial use from the <a 
+href="http://www.netlib.org" >Netlib
+Repository</a>, but they are not OSI Certified Open Source Software. The linear solver
+MA27 is freely available for noncommercial use.
+<!--l. 160--><p class="indent" >   The above software is sufficient to run <span 
+class="cmtt-10">BONMIN</span>&#x00A0;as a stand-alone C++ code, but it
+does not provide a modeling language. For functionality from a modeling language,
+<span 
+class="cmtt-10">BONMIN</span>&#x00A0;can be invoked from <a 
+href="http://www.ampl.com" ><span 
+class="cmtt-10">AMPL</span></a> (no extra installation is required provided that you
+have a licensed copy of <span 
+class="cmtt-10">AMPL </span>installed), though you need the <span 
+class="cmtt-10">ASL </span>(AMPL Solver
+Library) which is obtainable from the Netlib.
+<!--l. 167--><p class="indent" >   <span 
+class="cmtt-10">BONMIN</span>&#x00A0;can use FilterSQP  <a 
+href="http://www.mcs.anl.gov/~leyffer/solvers.html" >[FletcherLeyffer1998]</a>   as an alternative to <a 
+href="https://projects.coin-or.org/Ipopt" ><span 
+class="cmtt-10">Ipopt</span></a>&#x00A0;for
+solving NLPs.
+<!--l. 169--><p class="indent" >   Also, in the outer approximation methods <span 
+class="cmtt-10">B-OA </span>and <span 
+class="cmtt-10">B-iFP</span>, some MILP problems
+                                                                  
+
+                                                                  
+are solved. By default <span 
+class="cmtt-10">BONMIN</span>&#x00A0;uses <a 
+href="https://projects.coin-or.org/Cbc" ><span 
+class="cmtt-10">Cbc</span></a>&#x00A0;to solve them, but it can also be set up to
+use the commercial solver <a 
+href="http://www.cplex.com" ><a 
+href="http://www.cplex.com" ><span 
+class="cmtt-10">Cplex</span></a></a>.
+    
+</body></html> 
+
+                                                                  
+
+

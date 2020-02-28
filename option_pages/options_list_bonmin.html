@@ -1,0 +1,1855 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title></title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- html --> 
+<meta name="src" content="tmp.tex"> 
+<meta name="date" content="2013-06-14 18:51:00"> 
+<link rel="stylesheet" type="text/css" href="bonmin.css"> 
+</head><body 
+>
+<!--l. 7--><p class="noindent" ><div id="header">   <h1 id="siteName"><TT> <big> BONMIN </big> </tt> Users' Manual</h1>   <div id="globalNav">   <a href="Intro.html">Introduction</a> |   <a href="Obtain.html">Download</a> |  <a href="Install.html">Install</a> |   <a href="use.html">Use</a> |   <a href="options_set.html">Setting Options</a> |   <a href="options_list.html">Options List</a> |   <a href="bib.html">Bibliography</a> |  </div>   </div>  <div id="leftPanel"> <div id="side-bar">  <ul> <li class="main"><a href="/Bonmin/index.html">Bonmin</a></li>  <li><a href="https://projects.coin-or.org/Bonmin">Wiki</a></li>   <li><a href="http://neos.mcs.anl.gov/neos/solvers/minco:Bonmin/AMPL.html"> NEOS </a> </li>  <li><a href="http://egon.cheme.cmu.edu/ibm/page.htm">IBM-CMU OCR </a></li>  <li><a href="http://domino.research.ibm.com/comm/research_projects.nsf/pages/minlp.index.html">  IBM MINLP </a></li>  <br>  <br>  <li class="main"><a href="/index.html">COIN-OR Home</a></li>  <li><a href="/projects.html">Projects</a></li>  <li><a href="/faqs.html">FAQs</a></li>   <li><a href="/download.html">Download</a></li>  <li><a href="/mail.html">Mailing Lists</a></li>  <li><a href="/how-to-help.html">Get Involved</a></li>  <li><a href="/resources.html">Related Resources</a></li>  <li class="main"><a href="/foundation.html">  <br>  <br>  COIN-OR Foundation  </a></li>   <li><a href="/events.html">Events</a></li>  <li><a href="/members.html">Members</a></li>  </ul>  </div> </div> <!--end navBar div -->  <br>   <h2 id="pageName"> List of bonmin options  </h2>    </div> 
+<!--l. 829--><p class="noindent" > <table border="1"> <tr> <td>Option </td> <td> type </td> <td> B-BB</td> <td> B-OA</td> <td> B-QG</td> <td> B-Hyb</td> </tr> <tr> <th colspan=9> <a href="#sec:Algorithmchoice">Algorithm choice</a> </th> </tr> <tr> <td>algorithm</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <th colspan=9> <a href="#sec:Branch-and-boundoptions">Branch-and-bound options</a> </th> </tr> <tr> <td>allowable_fraction_gap</td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>allowable_gap</td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>cutoff</td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>cutoff_decr</td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>enable_dynamic_nlp</td> <td>S</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>integer_tolerance</td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>iteration_limit</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>nlp_failure_behavior</td> <td>S</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>node_comparison</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>node_limit</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>num_cut_passes</td> <td>I</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <td>num_cut_passes_at_root</td> <td>I</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <td>number_before_trust</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>number_strong_branch</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>random_generator_seed</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>read_solution_file</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>solution_limit</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>sos_constraints</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>time_limit</td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>tree_search_strategy</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>variable_selection</td> <td>S</td> <td> +</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <th colspan=9> <a href="#sec:ECPcutsgeneration">ECP cuts generation</a> </th> </tr> <tr> <td>ecp_abs_tol</td> <td>F</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <td>ecp_max_rounds</td> <td>I</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <td>ecp_probability_factor</td> <td>F</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <td>ecp_rel_tol</td> <td>F</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <td>filmint_ecp_cuts</td> <td>I</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <th colspan=9> <a href="#sec:FeasibilitycheckerusingOAcuts">Feasibility checker using OA cuts</a> </th> </tr> <tr> <td>feas_check_cut_types</td> <td>S</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <td>feas_check_discard_policy</td> <td>S</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <td>generate_benders_after_so_many_oa</td> <td>I</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <th colspan=9> <a href="#sec:MILPSolver">MILP Solver</a> </th> </tr> <tr> <td>cpx_parallel_strategy</td> <td>I</td> <td> -</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>milp_solver</td> <td>S</td> <td> -</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>milp_strategy</td> <td>S</td> <td> -</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>number_cpx_threads</td> <td>I</td> <td> -</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <th colspan=9> <a href="#sec:MILPcuttingplanesinhybridalgorithm">MILP cutting planes in hybrid algorithm</a> </th> </tr> <tr> <td>2mir_cuts</td> <td>I</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>Gomory_cuts</td> <td>I</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>clique_cuts</td> <td>I</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>cover_cuts</td> <td>I</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>flow_cover_cuts</td> <td>I</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>lift_and_project_cuts</td> <td>I</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>mir_cuts</td> <td>I</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>reduce_and_split_cuts</td> <td>I</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <th colspan=9> <a href="#sec:NLPinterface">NLP interface</a> </th> </tr> <tr> <td>nlp_solver</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>warm_start</td> <td>S</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <th colspan=9> <a href="#sec:NLPsolutionrobustness">NLP solution robustness</a> </th> </tr> <tr> <td>max_consecutive_failures</td> <td>I</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>max_random_point_radius</td> <td>F</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>num_iterations_suspect</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>num_retry_unsolved_random_point</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>random_point_perturbation_interval</td> <td>F</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>random_point_type</td> <td>S</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>resolve_on_small_infeasibility</td> <td>F</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <th colspan=9> <a href="#sec:NLPsolvesinhybridalgorithm(B-Hyb)">NLP solves in hybrid algorithm (B-Hyb)</a> </th> </tr> <tr> <td>nlp_solve_frequency</td> <td>I</td> <td> -</td> <td>-</td> <td>-</td> <td>+</td> </tr> <tr> <td>nlp_solve_max_depth</td> <td>I</td> <td> -</td> <td>-</td> <td>-</td> <td>+</td> </tr> <tr> <td>nlp_solves_per_depth</td> <td>F</td> <td> -</td> <td>-</td> <td>-</td> <td>+</td> </tr> <tr> <th colspan=9> <a href="#sec:Nonconvexproblems">Nonconvex problems</a> </th> </tr> <tr> <td>coeff_var_threshold</td> <td>F</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>dynamic_def_cutoff_decr</td> <td>S</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>first_perc_for_cutoff_decr</td> <td>F</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>max_consecutive_infeasible</td> <td>I</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>num_resolve_at_infeasibles</td> <td>I</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>num_resolve_at_node</td> <td>I</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>num_resolve_at_root</td> <td>I</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>second_perc_for_cutoff_decr</td> <td>F</td> <td> +</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <th colspan=9> <a href="#sec:OuterApproximationDecomposition(B-OA)">Outer Approximation Decomposition (B-OA)</a> </th> </tr> <tr> <td>oa_decomposition</td> <td>S</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <th colspan=9> <a href="#sec:OuterApproximationcutsgeneration">Outer Approximation cuts generation</a> </th> </tr> <tr> <td>add_only_violated_oa</td> <td>S</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>oa_cuts_scope</td> <td>S</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>oa_rhs_relax</td> <td>F</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>tiny_element</td> <td>F</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>very_tiny_element</td> <td>F</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <th colspan=9> <a href="#sec:OutputandLoglevel">Output and Loglevel</a> </th> </tr> <tr> <td>bb_log_interval</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>bb_log_level</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>file_solution</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>fp_log_frequency</td> <td>F</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <td>fp_log_level</td> <td>I</td> <td> -</td> <td>-</td> <td>+</td> <td>+</td> </tr> <tr> <td>lp_log_level</td> <td>I</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>milp_log_level</td> <td>I</td> <td> -</td> <td>-</td> <td>-</td> <td>-</td> </tr> <tr> <td>nlp_log_at_root</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>nlp_log_level</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>oa_cuts_log_level</td> <td>I</td> <td> -</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>oa_log_frequency</td> <td>F</td> <td> +</td> <td>-</td> <td>-</td> <td>+</td> </tr> <tr> <td>oa_log_level</td> <td>I</td> <td> +</td> <td>-</td> <td>-</td> <td>+</td> </tr> <tr> <th colspan=9> <a href="#sec:PrimalHeuristics">Primal Heuristics</a> </th> </tr> <tr> <td>feasibility_pump_objective_norm</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>fp_pass_infeasible</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>heuristic_RINS</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>heuristic_dive_MIP_fractional</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>heuristic_dive_MIP_vectorLength</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>heuristic_dive_fractional</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>heuristic_dive_vectorLength</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>heuristic_feasibility_pump</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>pump_for_minlp</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <th colspan=9> <a href="#sec:Strongbranchingsetup">Strong branching setup</a> </th> </tr> <tr> <td>candidate_sort_criterion</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>maxmin_crit_have_sol</td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>maxmin_crit_no_sol</td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>min_number_strong_branch</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>number_before_trust_list</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>number_look_ahead</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>number_strong_branch_root</td> <td>I</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>setup_pseudo_frac</td> <td>F</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> <tr> <td>trust_strong_branching_for_pseudo_cost</td> <td>S</td> <td> +</td> <td>+</td> <td>+</td> <td>+</td> </tr> </tr> </table> 
+   <h4 class="subsectionHead"><span class="titlemark">0.1   </span> <a 
+ id="x1-10000.1"></a>Algorithm choice</h4>
+<!--l. 832--><p class="noindent" ><a id="sec:Algorithmchoice"></a>
+<!--l. 833--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-20000.1"></a><span 
+class="cmbx-10">algorithm:</span></span>
+   Choice of the algorithm. <br 
+class="newline" />This will preset some of the options of bonmin depending on the algorithm choice.
+The default value for this string option is &#8221;B-BB&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">B-BB: simple branch-and-bound algorithm,
+     </li>
+     <li class="itemize">B-OA: OA Decomposition algorithm,
+     </li>
+     <li class="itemize">B-QG: Quesada and Grossmann branch-and-cut algorithm,
+     </li>
+     <li class="itemize">B-Hyb: hybrid outer approximation based branch-and-cut,
+     </li>
+     <li class="itemize">B-Ecp: ECP cuts based branch-and-cut a la FilMINT.
+     </li>
+     <li class="itemize">B-iFP: Iterated Feasibility Pump for MINLP.</li></ul>
+<!--l. 846--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.2   </span> <a 
+ id="x1-30000.2"></a>Branch-and-bound options</h4>
+<!--l. 848--><p class="noindent" ><a id="sec:Branch-and-boundoptions"></a>
+<!--l. 849--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-40000.2"></a><span 
+class="cmbx-10">allowable</span><span 
+class="cmbx-10">_fraction</span><span 
+class="cmbx-10">_gap:</span></span>
+   Specify the value of relative gap under which the algorithm stops. <br 
+class="newline" />Stop the tree search when the gap between the objective value of the best known
+solution and the best bound on the objective of any solution is less than this fraction
+of the absolute value of the best known solution value. The valid range for this real
+option is <span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+20</span></sup> <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">allowable</span>_<span 
+class="cmmi-10">fraction</span>_<span 
+class="cmmi-10">gap</span> <span 
+class="cmsy-10">&#x2264; </span>1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+20</span></sup> and its default value is
+0.
+                                                                  
+
+                                                                  
+<!--l. 855--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-50000.2"></a><span 
+class="cmbx-10">allowable</span><span 
+class="cmbx-10">_gap:</span></span>
+   Specify the value of absolute gap under which the algorithm stops. <br 
+class="newline" />Stop the tree search when the gap between the objective value of the best known
+solution and the best bound on the objective of any solution is less than this. The
+valid range for this real option is <span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+20</span></sup> <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">allowable</span>_<span 
+class="cmmi-10">gap</span> <span 
+class="cmsy-10">&#x2264; </span>1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+20</span></sup> and its
+default value is 0.
+<!--l. 861--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-60000.2"></a><span 
+class="cmbx-10">cutoff:</span></span>
+   Specify cutoff value. <br 
+class="newline" />cutoff should be the value of a feasible solution known by the user (if any). The
+algorithm will only look for solutions better than cutoff. The valid range for
+this real option is <span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+100</span></sup> <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">cutoff</span> <span 
+class="cmsy-10">&#x2264; </span>1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+100</span></sup> and its default value is
+1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+100</span></sup>.
+<!--l. 867--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-70000.2"></a><span 
+class="cmbx-10">cutoff</span><span 
+class="cmbx-10">_decr:</span></span>
+   Specify cutoff decrement. <br 
+class="newline" />Specify the amount by which cutoff is decremented below a new best upper-bound
+(usually a small positive value but in non-convex problems it may be a negative
+value). The valid range for this real option is <span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+10</span></sup> <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">cutoff</span>_<span 
+class="cmmi-10">decr</span> <span 
+class="cmsy-10">&#x2264; </span>1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+10</span></sup>
+and its default value is 1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmsy-7">-</span><span 
+class="cmr-7">05</span></sup>.
+<!--l. 873--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-80000.2"></a><span 
+class="cmbx-10">enable</span><span 
+class="cmbx-10">_dynamic</span><span 
+class="cmbx-10">_nlp:</span></span>
+   Enable dynamic linear and quadratic rows addition in nlp <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+     </li>
+     <li class="itemize">yes</li></ul>
+<!--l. 882--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-90000.2"></a><span 
+class="cmbx-10">integer</span><span 
+class="cmbx-10">_tolerance:</span></span>
+   Set integer tolerance. <br 
+class="newline" />Any number within that value of an integer is considered integer. The valid range for
+this real option is 0 <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">integer</span>_<span 
+class="cmmi-10">tolerance</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmsy-7">-</span><span 
+class="cmr-7">06</span></sup>.
+                                                                  
+
+                                                                  
+<!--l. 888--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-100000.2"></a><span 
+class="cmbx-10">iteration</span><span 
+class="cmbx-10">_limit:</span></span>
+   Set the cumulative maximum number of iteration in the algorithm used to process
+nodes continuous relaxations in the branch-and-bound. <br 
+class="newline" />value 0 deactivates option. The valid range for this integer option is
+0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">iteration</span>_<span 
+class="cmmi-10">limit</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is 2147483647.
+<!--l. 894--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-110000.2"></a><span 
+class="cmbx-10">nlp</span><span 
+class="cmbx-10">_failure</span><span 
+class="cmbx-10">_behavior:</span></span>
+   Set the behavior when an NLP or a series of NLP are unsolved by Ipopt (we call
+unsolved an NLP for which Ipopt is not able to guarantee optimality within the
+specified tolerances). <br 
+class="newline" />If set to &#8221;fathom&#8221;, the algorithm will fathom the node when Ipopt fails to find a
+solution to the nlp at that node within the specified tolerances. The algorithm
+then becomes a heuristic, and the user will be warned that the solution
+might not be optimal. The default value for this string option is &#8221;stop&#8221;.
+<br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">stop: Stop when failure happens.
+     </li>
+     <li class="itemize">fathom: Continue when failure happens.</li></ul>
+<!--l. 903--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-120000.2"></a><span 
+class="cmbx-10">node</span><span 
+class="cmbx-10">_comparison:</span></span>
+   Choose the node selection strategy. <br 
+class="newline" />Choose the strategy for selecting the next node to be processed. The default value for
+this string option is &#8221;best-bound&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">best-bound: choose node with the smallest bound,
+     </li>
+     <li class="itemize">depth-first: Perform depth first search,
+     </li>
+     <li class="itemize">breadth-first: Perform breadth first search,
+     </li>
+     <li class="itemize">dynamic: Cbc dynamic strategy (starts with a depth first search and turn
+     to best bound after 3 integer feasible solutions have been found).
+     </li>
+     <li class="itemize">best-guess: choose node with smallest guessed integer solution</li></ul>
+                                                                  
+
+                                                                  
+<!--l. 915--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-130000.2"></a><span 
+class="cmbx-10">node</span><span 
+class="cmbx-10">_limit:</span></span>
+   Set the maximum number of nodes explored in the branch-and-bound search.
+<br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">node</span>_<span 
+class="cmmi-10">limit</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default
+value is 2147483647.
+<!--l. 921--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-140000.2"></a><span 
+class="cmbx-10">num</span><span 
+class="cmbx-10">_cut</span><span 
+class="cmbx-10">_passes:</span></span>
+   Set the maximum number of cut passes at regular nodes of the branch-and-cut.
+<br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">num</span>_<span 
+class="cmmi-10">cut</span>_<span 
+class="cmmi-10">passes</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default
+value is 1.
+<!--l. 927--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-150000.2"></a><span 
+class="cmbx-10">num</span><span 
+class="cmbx-10">_cut</span><span 
+class="cmbx-10">_passes</span><span 
+class="cmbx-10">_at</span><span 
+class="cmbx-10">_root:</span></span>
+   Set the maximum number of cut passes at regular nodes of the branch-and-cut.
+<br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">num</span>_<span 
+class="cmmi-10">cut</span>_<span 
+class="cmmi-10">passes</span>_<span 
+class="cmmi-10">at</span>_<span 
+class="cmmi-10">root</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and
+its default value is 20.
+<!--l. 933--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-160000.2"></a><span 
+class="cmbx-10">number</span><span 
+class="cmbx-10">_before</span><span 
+class="cmbx-10">_trust:</span></span>
+   Set the number of branches on a variable before its pseudo costs are to be
+believed in dynamic strong branching. <br 
+class="newline" />A value of 0 disables pseudo costs. The valid range for this integer option is
+0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">number</span>_<span 
+class="cmmi-10">before</span>_<span 
+class="cmmi-10">trust</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is 8.
+<!--l. 939--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-170000.2"></a><span 
+class="cmbx-10">number</span><span 
+class="cmbx-10">_strong</span><span 
+class="cmbx-10">_branch:</span></span>
+   Choose the maximum number of variables considered for strong branching.
+<br 
+class="newline" />Set the number of variables on which to do strong branching. The valid range for this
+integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">number</span>_<span 
+class="cmmi-10">strong</span>_<span 
+class="cmmi-10">branch</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+20.
+<!--l. 945--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-180000.2"></a><span 
+class="cmbx-10">random</span><span 
+class="cmbx-10">_generator</span><span 
+class="cmbx-10">_seed:</span></span>
+   Set seed for random number generator (a value of -1 sets seeds to time since
+Epoch). <br 
+class="newline" />The valid range for this integer option is <span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">random</span>_<span 
+class="cmmi-10">generator</span>_<span 
+class="cmmi-10">seed</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and
+its default value is 0.
+                                                                  
+
+                                                                  
+<!--l. 951--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-190000.2"></a><span 
+class="cmbx-10">read</span><span 
+class="cmbx-10">_solution</span><span 
+class="cmbx-10">_file:</span></span>
+   Read a file with the optimal solution to test if algorithms cuts it. <br 
+class="newline" />For Debugging purposes only. The default value for this string option is &#8221;no&#8221;.
+<br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+     </li>
+     <li class="itemize">yes</li></ul>
+<!--l. 960--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-200000.2"></a><span 
+class="cmbx-10">solution</span><span 
+class="cmbx-10">_limit:</span></span>
+   Abort after that much integer feasible solution have been found by algorithm
+<br 
+class="newline" />value 0 deactivates option The valid range for this integer option is
+0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">solution</span>_<span 
+class="cmmi-10">limit</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is 2147483647.
+<!--l. 966--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-210000.2"></a><span 
+class="cmbx-10">sos</span><span 
+class="cmbx-10">_constraints:</span></span>
+   Whether or not to activate SOS constraints. <br 
+class="newline" />(only type 1 SOS are supported at the moment) The default value for this string
+option is &#8221;enable&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">enable
+     </li>
+     <li class="itemize">disable</li></ul>
+<!--l. 975--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-220000.2"></a><span 
+class="cmbx-10">time</span><span 
+class="cmbx-10">_limit:</span></span>
+   Set the global maximum computation time (in secs) for the algorithm.
+<br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">time</span>_<span 
+class="cmmi-10">limit</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+10</span></sup>.
+<!--l. 981--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-230000.2"></a><span 
+class="cmbx-10">tree</span><span 
+class="cmbx-10">_search</span><span 
+class="cmbx-10">_strategy:</span></span>
+   Pick a strategy for traversing the tree <br 
+class="newline" />All strategies can be used in conjunction with any of the node comparison functions.
+Options which affect dfs-dive are max-backtracks-in-dive and max-dive-depth. The
+dfs-dive won&#8217;t work in a non-convex problem where objective does not decrease
+                                                                  
+
+                                                                  
+down branches. The default value for this string option is &#8221;probed-dive&#8221;.
+<br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">top-node: Always pick the top node as sorted by the node comparison
+     function
+     </li>
+     <li class="itemize">dive: Dive in the tree if possible, otherwise pick top node as sorted by the
+     tree comparison function.
+     </li>
+     <li class="itemize">probed-dive: Dive in the tree exploring two children before continuing the
+     dive at each level.
+     </li>
+     <li class="itemize">dfs-dive: Dive in the tree if possible doing a depth first search. Backtrack
+     on leaves or when a prescribed depth is attained or when estimate of best
+     possible integer feasible solution in subtree is worst than cutoff. Once a
+     prescribed limit of backtracks is attained pick top node as sorted by the
+     tree comparison function
+     </li>
+     <li class="itemize">dfs-dive-dynamic: Same as dfs-dive but once enough solution are found
+     switch to best-bound and if too many nodes switch to depth-first.</li></ul>
+<!--l. 993--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-240000.2"></a><span 
+class="cmbx-10">variable</span><span 
+class="cmbx-10">_selection:</span></span>
+   Chooses variable selection strategy <br 
+class="newline" />The default value for this string option is &#8221;strong-branching&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">most-fractional: Choose most fractional variable
+     </li>
+     <li class="itemize">strong-branching: Perform strong branching
+     </li>
+     <li class="itemize">reliability-branching: Use reliability branching
+     </li>
+     <li class="itemize">qp-strong-branching: Perform strong branching with QP approximation
+     </li>
+     <li class="itemize">lp-strong-branching: Perform strong branching with LP approximation
+                                                                  
+
+                                                                  
+     </li>
+     <li class="itemize">nlp-strong-branching: Perform strong branching with NLP approximation
+     </li>
+     <li class="itemize">osi-simple: Osi method to do simple branching
+     </li>
+     <li class="itemize">osi-strong: Osi method to do strong branching
+     </li>
+     <li class="itemize">random: Method to choose branching variable randomly</li></ul>
+<!--l. 1009--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.3   </span> <a 
+ id="x1-250000.3"></a>ECP cuts generation</h4>
+<!--l. 1011--><p class="noindent" ><a id="sec:ECPcutsgeneration"></a>
+<!--l. 1012--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-260000.3"></a><span 
+class="cmbx-10">ecp</span><span 
+class="cmbx-10">_abs</span><span 
+class="cmbx-10">_tol:</span></span>
+   Set the absolute termination tolerance for ECP rounds. <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">ecp</span>_<span 
+class="cmmi-10">abs</span>_<span 
+class="cmmi-10">tol</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmsy-7">-</span><span 
+class="cmr-7">06</span></sup>.
+<!--l. 1018--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-270000.3"></a><span 
+class="cmbx-10">ecp</span><span 
+class="cmbx-10">_max</span><span 
+class="cmbx-10">_rounds:</span></span>
+   Set the maximal number of rounds of ECP cuts. <br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">ecp</span>_<span 
+class="cmmi-10">max</span>_<span 
+class="cmmi-10">rounds</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its
+default value is 5.
+<!--l. 1024--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-280000.3"></a><span 
+class="cmbx-10">ecp</span><span 
+class="cmbx-10">_probability</span><span 
+class="cmbx-10">_factor:</span></span>
+   Factor appearing in formula for skipping ECP cuts. <br 
+class="newline" />Choosing -1 disables the skipping. The valid range for this real option is
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">inf</span> <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">ecp</span>_<span 
+class="cmmi-10">probability</span>_<span 
+class="cmmi-10">factor</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is 10.
+<!--l. 1030--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-290000.3"></a><span 
+class="cmbx-10">ecp</span><span 
+class="cmbx-10">_rel</span><span 
+class="cmbx-10">_tol:</span></span>
+   Set the relative termination tolerance for ECP rounds. <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">ecp</span>_<span 
+class="cmmi-10">rel</span>_<span 
+class="cmmi-10">tol</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+0.
+                                                                  
+
+                                                                  
+<!--l. 1036--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-300000.3"></a><span 
+class="cmbx-10">filmint</span><span 
+class="cmbx-10">_ecp</span><span 
+class="cmbx-10">_cuts:</span></span>
+   Specify the frequency (in terms of nodes) at which some a la filmint ecp cuts are
+generated. <br 
+class="newline" />A frequency of 0 amounts to to never solve the NLP relaxation. The valid range for
+this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">filmint</span>_<span 
+class="cmmi-10">ecp</span>_<span 
+class="cmmi-10">cuts</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+0.
+<!--l. 1042--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.4   </span> <a 
+ id="x1-310000.4"></a>Feasibility checker using OA cuts</h4>
+<!--l. 1044--><p class="noindent" ><a id="sec:FeasibilitycheckerusingOAcuts"></a>
+<!--l. 1045--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-320000.4"></a><span 
+class="cmbx-10">feas</span><span 
+class="cmbx-10">_check</span><span 
+class="cmbx-10">_cut</span><span 
+class="cmbx-10">_types:</span></span>
+   Choose the type of cuts generated when an integer feasible solution is found
+<br 
+class="newline" />If it seems too much memory is used should try Benders to use less The default value
+for this string option is &#8221;outer-approx&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">outer-approx: Generate a set of Outer Approximations cuts.
+     </li>
+     <li class="itemize">Benders: Generate a single Benders cut.</li></ul>
+<!--l. 1054--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-330000.4"></a><span 
+class="cmbx-10">feas</span><span 
+class="cmbx-10">_check</span><span 
+class="cmbx-10">_discard</span><span 
+class="cmbx-10">_policy:</span></span>
+   How cuts from feasibility checker are discarded <br 
+class="newline" />Normally to avoid cycle cuts from feasibility checker should not be discarded in the
+node where they are generated. However Cbc sometimes does it if no care is taken
+which can lead to an infinite loop in Bonmin (usually on simple problems). To
+avoid this one can instruct Cbc to never discard a cut but if we do that
+for all cuts it can lead to memory problems. The default policy here is to
+detect cycles and only then impose to Cbc to keep the cut. The two other
+alternative are to instruct Cbc to keep all cuts or to just ignore the problem and
+hope for the best The default value for this string option is &#8221;detect-cycles&#8221;.
+<br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">detect-cycles: Detect if a cycle occurs and only in this case force not to
+     discard.
+     </li>
+     <li class="itemize">keep-all: Force cuts from feasibility checker not to be discarded (memory
+     hungry but sometimes better).
+                                                                  
+
+                                                                  
+     </li>
+     <li class="itemize">treated-as-normal: Cuts from memory checker can be discarded as any
+     other cuts (code may cycle then)</li></ul>
+<!--l. 1064--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-340000.4"></a><span 
+class="cmbx-10">generate</span><span 
+class="cmbx-10">_benders</span><span 
+class="cmbx-10">_after</span><span 
+class="cmbx-10">_so</span><span 
+class="cmbx-10">_many</span><span 
+class="cmbx-10">_oa:</span></span>
+   Specify that after so many oa cuts have been generated Benders cuts should be
+generated instead. <br 
+class="newline" />It seems that sometimes generating too many oa cuts slows down the optimization
+compared to Benders due to the size of the LP. With this option we specify that after
+so many OA cuts have been generated we should switch to Benders cuts. The valid
+range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">generate</span>_<span 
+class="cmmi-10">benders</span>_<span 
+class="cmmi-10">after</span>_<span 
+class="cmmi-10">so</span>_<span 
+class="cmmi-10">many</span>_<span 
+class="cmmi-10">oa</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span>
+and its default value is 5000.
+<!--l. 1070--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.5   </span> <a 
+ id="x1-350000.5"></a>MILP Solver</h4>
+<!--l. 1072--><p class="noindent" ><a id="sec:MILPSolver"></a>
+<!--l. 1073--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-360000.5"></a><span 
+class="cmbx-10">cpx</span><span 
+class="cmbx-10">_parallel</span><span 
+class="cmbx-10">_strategy:</span></span>
+   Strategy of parallel search mode in CPLEX. <br 
+class="newline" />-1 = opportunistic, 0 = automatic, 1 = deterministic (refer to CPLEX documentation)
+The valid range for this integer option is <span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">cpx</span>_<span 
+class="cmmi-10">parallel</span>_<span 
+class="cmmi-10">strategy</span> <span 
+class="cmsy-10">&#x2264; </span>1 and its
+default value is 0.
+<!--l. 1079--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-370000.5"></a><span 
+class="cmbx-10">milp</span><span 
+class="cmbx-10">_solver:</span></span>
+   Choose the subsolver to solve MILP sub-problems in OA decompositions.
+<br 
+class="newline" />To use Cplex, a valid license is required and you should have compiled OsiCpx in
+COIN-OR (see Osi documentation). The default value for this string option is
+&#8221;Cbc_D&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">Cbc_D: Coin Branch and Cut with its default
+     </li>
+     <li class="itemize">Cbc_Par: Coin Branch and Cut with passed parameters
+     </li>
+     <li class="itemize">Cplex: IBM Cplex</li></ul>
+                                                                  
+
+                                                                  
+<!--l. 1089--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-380000.5"></a><span 
+class="cmbx-10">milp</span><span 
+class="cmbx-10">_strategy:</span></span>
+   Choose a strategy for MILPs. <br 
+class="newline" />The default value for this string option is &#8221;solve_to_optimality&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">find_good_sol: Stop sub milps when a solution improving the incumbent
+     is found
+     </li>
+     <li class="itemize">solve_to_optimality: Solve MILPs to optimality</li></ul>
+<!--l. 1098--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-390000.5"></a><span 
+class="cmbx-10">number</span><span 
+class="cmbx-10">_cpx</span><span 
+class="cmbx-10">_threads:</span></span>
+   Set number of threads to use with cplex. <br 
+class="newline" />(refer to CPLEX documentation) The valid range for this integer option is
+0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">number</span>_<span 
+class="cmmi-10">cpx</span>_<span 
+class="cmmi-10">threads</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is 0.
+<!--l. 1104--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.6   </span> <a 
+ id="x1-400000.6"></a>MILP cutting planes in hybrid algorithm</h4>
+<!--l. 1106--><p class="noindent" ><a id="sec:MILPcuttingplanesinhybridalgorithm"></a>
+<!--l. 1107--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-410000.6"></a><span 
+class="cmbx-10">2mir</span><span 
+class="cmbx-10">_cuts:</span></span>
+   Frequency (in terms of nodes) for generating 2-MIR cuts in branch-and-cut
+<br 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every <span 
+class="cmmi-10">k </span>nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are generated at
+the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not
+generate cuts. The valid range for this integer option is <span 
+class="cmsy-10">-</span>100 <span 
+class="cmsy-10">&#x2264;</span> 2<span 
+class="cmmi-10">mir</span>_<span 
+class="cmmi-10">cuts</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span>
+and its default value is 0.
+<!--l. 1113--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-420000.6"></a><span 
+class="cmbx-10">Gomory</span><span 
+class="cmbx-10">_cuts:</span></span>
+   Frequency (in terms of nodes) for generating Gomory cuts in branch-and-cut.
+<br 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every <span 
+class="cmmi-10">k </span>nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are
+generated at the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if
+<span 
+class="cmmi-10">k </span>= 0 or 100 do not generate cuts. The valid range for this integer option is
+<span 
+class="cmsy-10">-</span>100 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">Gomory</span>_<span 
+class="cmmi-10">cuts</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is <span 
+class="cmsy-10">-</span>5.
+                                                                  
+
+                                                                  
+<!--l. 1119--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-430000.6"></a><span 
+class="cmbx-10">clique</span><span 
+class="cmbx-10">_cuts:</span></span>
+   Frequency (in terms of nodes) for generating clique cuts in branch-and-cut
+<br 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every <span 
+class="cmmi-10">k </span>nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are generated at
+the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not
+generate cuts. The valid range for this integer option is <span 
+class="cmsy-10">-</span>100 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">clique</span>_<span 
+class="cmmi-10">cuts</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span>
+and its default value is <span 
+class="cmsy-10">-</span>5.
+<!--l. 1125--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-440000.6"></a><span 
+class="cmbx-10">cover</span><span 
+class="cmbx-10">_cuts:</span></span>
+   Frequency (in terms of nodes) for generating cover cuts in branch-and-cut
+<br 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every <span 
+class="cmmi-10">k </span>nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are generated at
+the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not
+generate cuts. The valid range for this integer option is <span 
+class="cmsy-10">-</span>100 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">cover</span>_<span 
+class="cmmi-10">cuts</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span>
+and its default value is 0.
+<!--l. 1131--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-450000.6"></a><span 
+class="cmbx-10">flow</span><span 
+class="cmbx-10">_cover</span><span 
+class="cmbx-10">_cuts:</span></span>
+   Frequency (in terms of nodes) for generating flow cover cuts in branch-and-cut
+<br 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every <span 
+class="cmmi-10">k </span>nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are
+generated at the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if
+<span 
+class="cmmi-10">k </span>= 0 or 100 do not generate cuts. The valid range for this integer option is
+<span 
+class="cmsy-10">-</span>100 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">flow</span>_<span 
+class="cmmi-10">cover</span>_<span 
+class="cmmi-10">cuts</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is <span 
+class="cmsy-10">-</span>5.
+<!--l. 1137--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-460000.6"></a><span 
+class="cmbx-10">lift</span><span 
+class="cmbx-10">_and</span><span 
+class="cmbx-10">_project</span><span 
+class="cmbx-10">_cuts:</span></span>
+   Frequency (in terms of nodes) for generating lift-and-project cuts in
+branch-and-cut <br 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every <span 
+class="cmmi-10">k </span>nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated
+every <span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough
+are generated at the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root
+node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not generate cuts. The valid range for this integer
+option is <span 
+class="cmsy-10">-</span>100 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">lift</span>_<span 
+class="cmmi-10">and</span>_<span 
+class="cmmi-10">project</span>_<span 
+class="cmmi-10">cuts</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+0.
+<!--l. 1143--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-470000.6"></a><span 
+class="cmbx-10">mir</span><span 
+class="cmbx-10">_cuts:</span></span>
+   Frequency (in terms of nodes) for generating MIR cuts in branch-and-cut
+<br 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every <span 
+class="cmmi-10">k </span>nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated every
+                                                                  
+
+                                                                  
+<span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough are generated at
+the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not
+generate cuts. The valid range for this integer option is <span 
+class="cmsy-10">-</span>100 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">mir</span>_<span 
+class="cmmi-10">cuts</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span>
+and its default value is <span 
+class="cmsy-10">-</span>5.
+<!--l. 1149--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-480000.6"></a><span 
+class="cmbx-10">reduce</span><span 
+class="cmbx-10">_and</span><span 
+class="cmbx-10">_split</span><span 
+class="cmbx-10">_cuts:</span></span>
+   Frequency (in terms of nodes) for generating reduce-and-split cuts in
+branch-and-cut <br 
+class="newline" />If <span 
+class="cmmi-10">k &#x003E; </span>0, cuts are generated every <span 
+class="cmmi-10">k </span>nodes, if <span 
+class="cmsy-10">-</span>99 <span 
+class="cmmi-10">&#x003C; k &#x003C; </span>0 cuts are generated
+every <span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">k </span>nodes but Cbc may decide to stop generating cuts, if not enough
+are generated at the root node, if <span 
+class="cmmi-10">k </span>= <span 
+class="cmsy-10">-</span>99 generate cuts only at the root
+node, if <span 
+class="cmmi-10">k </span>= 0 or 100 do not generate cuts. The valid range for this integer
+option is <span 
+class="cmsy-10">-</span>100 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">reduce</span>_<span 
+class="cmmi-10">and</span>_<span 
+class="cmmi-10">split</span>_<span 
+class="cmmi-10">cuts</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+0.
+<!--l. 1155--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.7   </span> <a 
+ id="x1-490000.7"></a>NLP interface</h4>
+<!--l. 1157--><p class="noindent" ><a id="sec:NLPinterface"></a>
+<!--l. 1158--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-500000.7"></a><span 
+class="cmbx-10">nlp</span><span 
+class="cmbx-10">_solver:</span></span>
+   Choice of the solver for local optima of continuous NLP&#8217;s <br 
+class="newline" />Note that option will work only if the specified solver has been installed. Ipopt
+will usually be installed with Bonmin by default. For FilterSQP please see
+http://www-unix.mcs.anl.gov/&#x00A0;leyffer/solvers.html on how to obtain it and
+https://projects.coin-or.org/Bonmin/wiki/HintTricks on how to configure Bonmin to
+use it. The default value for this string option is &#8221;Ipopt&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">Ipopt: Interior Point OPTimizer (https://projects.coin-or.org/Ipopt)
+     </li>
+     <li class="itemize">filterSQP:  Sequential  quadratic  programming  trust  region  algorithm
+     (http://www-unix.mcs.anl.gov/&#x00A0;leyffer/solvers.html)
+     </li>
+     <li class="itemize">all: run all available solvers at each node</li></ul>
+<!--l. 1168--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-510000.7"></a><span 
+class="cmbx-10">warm</span><span 
+class="cmbx-10">_start:</span></span>
+   Select the warm start method <br 
+class="newline" />This will affect the function getWarmStart(), and as a consequence the warm starting
+in the various algorithms. The default value for this string option is &#8221;none&#8221;.
+                                                                  
+
+                                                                  
+<br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">none: No warm start, just start NLPs from optimal solution of the root
+     relaxation
+     </li>
+     <li class="itemize">fake_basis: builds fake basis, useful for cut management in Cbc (warm
+     start is the same as in none)
+     </li>
+     <li class="itemize">optimum: Warm start with direct parent optimum
+     </li>
+     <li class="itemize">interior_point: Warm start with an interior point of direct parent</li></ul>
+<!--l. 1179--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.8   </span> <a 
+ id="x1-520000.8"></a>NLP solution robustness</h4>
+<!--l. 1181--><p class="noindent" ><a id="sec:NLPsolutionrobustness"></a>
+<!--l. 1182--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-530000.8"></a><span 
+class="cmbx-10">max</span><span 
+class="cmbx-10">_consecutive</span><span 
+class="cmbx-10">_failures:</span></span>
+   (temporarily removed) Number <span 
+class="cmmi-10">n </span>of consecutive unsolved problems before
+aborting a branch of the tree. <br 
+class="newline" />When <span 
+class="cmmi-10">n &#x003E; </span>0, continue exploring a branch of the tree until <span 
+class="cmmi-10">n </span>consecutive problems in
+the branch are unsolved (we call unsolved a problem for which Ipopt can not
+guarantee optimality within the specified tolerances). The valid range for this integer
+option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">max</span>_<span 
+class="cmmi-10">consecutive</span>_<span 
+class="cmmi-10">failures</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+10.
+<!--l. 1188--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-540000.8"></a><span 
+class="cmbx-10">max</span><span 
+class="cmbx-10">_random</span><span 
+class="cmbx-10">_point</span><span 
+class="cmbx-10">_radius:</span></span>
+   Set max value r for coordinate of a random point. <br 
+class="newline" />When picking a random point, coordinate i will be in the interval [min(max(l,-r),u-r),
+max(min(u,r),l+r)] (where l is the lower bound for the variable and u is its upper bound)
+The valid range for this real option is 0 <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">max</span>_<span 
+class="cmmi-10">random</span>_<span 
+class="cmmi-10">point</span>_<span 
+class="cmmi-10">radius</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and
+its default value is 100000.
+<!--l. 1194--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-550000.8"></a><span 
+class="cmbx-10">num</span><span 
+class="cmbx-10">_iterations</span><span 
+class="cmbx-10">_suspect:</span></span>
+   Number of iterations over which a node is considered &#8221;suspect&#8221; (for debugging
+purposes only, see detailed documentation). <br 
+class="newline" />When the number of iterations to solve a node is above this number, the
+subproblem at this node is considered to be suspect and it will be written into a
+file (set to -1 to deactivate this). The valid range for this integer option is
+                                                                  
+
+                                                                  
+<span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">num</span>_<span 
+class="cmmi-10">iterations</span>_<span 
+class="cmmi-10">suspect</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is <span 
+class="cmsy-10">-</span>1.
+<!--l. 1200--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-560000.8"></a><span 
+class="cmbx-10">num</span><span 
+class="cmbx-10">_retry</span><span 
+class="cmbx-10">_unsolved</span><span 
+class="cmbx-10">_random</span><span 
+class="cmbx-10">_point:</span></span>
+   Number <span 
+class="cmmi-10">k </span>of times that the algorithm will try to resolve an unsolved NLP with a
+random starting point (we call unsolved an NLP for which Ipopt is not able to
+guarantee optimality within the specified tolerances). <br 
+class="newline" />When Ipopt fails to solve a continuous NLP sub-problem, if <span 
+class="cmmi-10">k &#x003E; </span>0, the algorithm will
+try again to solve the failed NLP with <span 
+class="cmmi-10">k </span>new randomly chosen starting points or until
+the problem is solved with success. The valid range for this integer option is
+0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">num</span>_<span 
+class="cmmi-10">retry</span>_<span 
+class="cmmi-10">unsolved</span>_<span 
+class="cmmi-10">random</span>_<span 
+class="cmmi-10">point</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+0.
+<!--l. 1206--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-570000.8"></a><span 
+class="cmbx-10">random</span><span 
+class="cmbx-10">_point</span><span 
+class="cmbx-10">_perturbation</span><span 
+class="cmbx-10">_interval:</span></span>
+   Amount by which starting point is perturbed when choosing to pick random point
+by perturbing starting point <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">random</span>_<span 
+class="cmmi-10">point</span>_<span 
+class="cmmi-10">perturbation</span>_<span 
+class="cmmi-10">interval</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span>
+and its default value is 1.
+<!--l. 1212--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-580000.8"></a><span 
+class="cmbx-10">random</span><span 
+class="cmbx-10">_point</span><span 
+class="cmbx-10">_type:</span></span>
+   method to choose a random starting point <br 
+class="newline" />The default value for this string option is &#8221;Jon&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">Jon: Choose random point uniformly between the bounds
+     </li>
+     <li class="itemize">Andreas: perturb the starting point of the problem within a prescribed
+     interval
+     </li>
+     <li class="itemize">Claudia: perturb the starting point using the perturbation radius suffix
+     information</li></ul>
+<!--l. 1222--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-590000.8"></a><span 
+class="cmbx-10">resolve</span><span 
+class="cmbx-10">_on</span><span 
+class="cmbx-10">_small</span><span 
+class="cmbx-10">_infeasibility:</span></span>
+   If a locally infeasible problem is infeasible by less than this, resolve it with initial
+starting point. <br 
+class="newline" />It is set to 0 by default with Ipopt. When using FilterSQP, Bonmin sets it to a small
+value. The valid range for this real option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">resolve</span>_<span 
+class="cmmi-10">on</span>_<span 
+class="cmmi-10">small</span>_<span 
+class="cmmi-10">infeasibility</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span>
+and its default value is 0.
+                                                                  
+
+                                                                  
+<!--l. 1228--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.9   </span> <a 
+ id="x1-600000.9"></a>NLP solves in hybrid algorithm (B-Hyb)</h4>
+<!--l. 1230--><p class="noindent" ><a id="sec:NLPsolvesinhybridalgorithm(B-Hyb)"></a>
+<!--l. 1231--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-610000.9"></a><span 
+class="cmbx-10">nlp</span><span 
+class="cmbx-10">_solve</span><span 
+class="cmbx-10">_frequency:</span></span>
+   Specify the frequency (in terms of nodes) at which NLP relaxations are solved in
+B-Hyb. <br 
+class="newline" />A frequency of 0 amounts to to never solve the NLP relaxation. The valid range for
+this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">nlp</span>_<span 
+class="cmmi-10">solve</span>_<span 
+class="cmmi-10">frequency</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+10.
+<!--l. 1237--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-620000.9"></a><span 
+class="cmbx-10">nlp</span><span 
+class="cmbx-10">_solve</span><span 
+class="cmbx-10">_max</span><span 
+class="cmbx-10">_depth:</span></span>
+   Set maximum depth in the tree at which NLP relaxations are solved in B-Hyb.
+<br 
+class="newline" />A depth of 0 amounts to to never solve the NLP relaxation. The valid range for this
+integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">nlp</span>_<span 
+class="cmmi-10">solve</span>_<span 
+class="cmmi-10">max</span>_<span 
+class="cmmi-10">depth</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+10.
+<!--l. 1243--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-630000.9"></a><span 
+class="cmbx-10">nlp</span><span 
+class="cmbx-10">_solves</span><span 
+class="cmbx-10">_per</span><span 
+class="cmbx-10">_depth:</span></span>
+   Set average number of nodes in the tree at which NLP relaxations are solved in
+B-Hyb for each depth. <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">nlp</span>_<span 
+class="cmmi-10">solves</span>_<span 
+class="cmmi-10">per</span>_<span 
+class="cmmi-10">depth</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its
+default value is 1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmr-7">+100</span></sup>.
+<!--l. 1249--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.10   </span> <a 
+ id="x1-640000.10"></a>Nonconvex problems</h4>
+<!--l. 1251--><p class="noindent" ><a id="sec:Nonconvexproblems"></a>
+<!--l. 1252--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-650000.10"></a><span 
+class="cmbx-10">coeff</span><span 
+class="cmbx-10">_var</span><span 
+class="cmbx-10">_threshold:</span></span>
+   Coefficient of variation threshold (for dynamic definition of cutoff_decr).
+<br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">coeff</span>_<span 
+class="cmmi-10">var</span>_<span 
+class="cmmi-10">threshold</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its
+default value is 0<span 
+class="cmmi-10">.</span>1.
+<!--l. 1258--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-660000.10"></a><span 
+class="cmbx-10">dynamic</span><span 
+class="cmbx-10">_def</span><span 
+class="cmbx-10">_cutoff</span><span 
+class="cmbx-10">_decr:</span></span>
+   Do you want to define the parameter cutoff_decr dynamically? <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+                                                                  
+
+                                                                  
+     </li>
+     <li class="itemize">yes</li></ul>
+<!--l. 1267--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-670000.10"></a><span 
+class="cmbx-10">first</span><span 
+class="cmbx-10">_perc</span><span 
+class="cmbx-10">_for</span><span 
+class="cmbx-10">_cutoff</span><span 
+class="cmbx-10">_decr:</span></span>
+   The percentage used when, the coeff of variance is smaller than the threshold, to
+compute the cutoff_decr dynamically. <br 
+class="newline" />The valid range for this real option is <span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">inf</span> <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">first</span>_<span 
+class="cmmi-10">perc</span>_<span 
+class="cmmi-10">for</span>_<span 
+class="cmmi-10">cutoff</span>_<span 
+class="cmmi-10">decr</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span>
+and its default value is <span 
+class="cmsy-10">-</span>0<span 
+class="cmmi-10">.</span>02.
+<!--l. 1273--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-680000.10"></a><span 
+class="cmbx-10">max</span><span 
+class="cmbx-10">_consecutive</span><span 
+class="cmbx-10">_infeasible:</span></span>
+   Number of consecutive infeasible subproblems before aborting a branch.
+<br 
+class="newline" />Will continue exploring a branch of the tree until &#8221;max_consecutive_infeasible&#8221;consecutive
+problems are locally infeasible by the NLP sub-solver. The valid range for this integer
+option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">max</span>_<span 
+class="cmmi-10">consecutive</span>_<span 
+class="cmmi-10">infeasible</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+0.
+<!--l. 1279--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-690000.10"></a><span 
+class="cmbx-10">num</span><span 
+class="cmbx-10">_resolve</span><span 
+class="cmbx-10">_at</span><span 
+class="cmbx-10">_infeasibles:</span></span>
+   Number <span 
+class="cmmi-10">k </span>of tries to resolve an infeasible node (other than the root) of the tree
+with different starting point. <br 
+class="newline" />The algorithm will solve all the infeasible nodes with <span 
+class="cmmi-10">k </span>different random starting
+points and will keep the best local optimum found. The valid range for this integer
+option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">num</span>_<span 
+class="cmmi-10">resolve</span>_<span 
+class="cmmi-10">at</span>_<span 
+class="cmmi-10">infeasibles</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+0.
+<!--l. 1285--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-700000.10"></a><span 
+class="cmbx-10">num</span><span 
+class="cmbx-10">_resolve</span><span 
+class="cmbx-10">_at</span><span 
+class="cmbx-10">_node:</span></span>
+   Number <span 
+class="cmmi-10">k </span>of tries to resolve a node (other than the root) of the tree with different
+starting point. <br 
+class="newline" />The algorithm will solve all the nodes with <span 
+class="cmmi-10">k </span>different random starting points and
+will keep the best local optimum found. The valid range for this integer option is
+0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">num</span>_<span 
+class="cmmi-10">resolve</span>_<span 
+class="cmmi-10">at</span>_<span 
+class="cmmi-10">node</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is 0.
+<!--l. 1291--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-710000.10"></a><span 
+class="cmbx-10">num</span><span 
+class="cmbx-10">_resolve</span><span 
+class="cmbx-10">_at</span><span 
+class="cmbx-10">_root:</span></span>
+   Number <span 
+class="cmmi-10">k </span>of tries to resolve the root node with different starting points.
+<br 
+class="newline" />The algorithm will solve the root node with <span 
+class="cmmi-10">k </span>random starting points and will keep
+the best local optimum found. The valid range for this integer option is
+0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">num</span>_<span 
+class="cmmi-10">resolve</span>_<span 
+class="cmmi-10">at</span>_<span 
+class="cmmi-10">root</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is 0.
+                                                                  
+
+                                                                  
+<!--l. 1297--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-720000.10"></a><span 
+class="cmbx-10">second</span><span 
+class="cmbx-10">_perc</span><span 
+class="cmbx-10">_for</span><span 
+class="cmbx-10">_cutoff</span><span 
+class="cmbx-10">_decr:</span></span>
+   The percentage used when, the coeff of variance is greater than the threshold, to
+compute the cutoff_decr dynamically. <br 
+class="newline" />The valid range for this real option is <span 
+class="cmsy-10">-</span><span 
+class="cmmi-10">inf</span> <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">second</span>_<span 
+class="cmmi-10">perc</span>_<span 
+class="cmmi-10">for</span>_<span 
+class="cmmi-10">cutoff</span>_<span 
+class="cmmi-10">decr</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span>
+and its default value is <span 
+class="cmsy-10">-</span>0<span 
+class="cmmi-10">.</span>05.
+<!--l. 1303--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.11   </span> <a 
+ id="x1-730000.11"></a>Outer Approximation Decomposition (B-OA)</h4>
+<!--l. 1305--><p class="noindent" ><a id="sec:OuterApproximationDecomposition(B-OA)"></a>
+<!--l. 1306--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-740000.11"></a><span 
+class="cmbx-10">oa</span><span 
+class="cmbx-10">_decomposition:</span></span>
+   If yes do initial OA decomposition <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+     </li>
+     <li class="itemize">yes</li></ul>
+<!--l. 1315--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.12   </span> <a 
+ id="x1-750000.12"></a>Outer Approximation cuts generation</h4>
+<!--l. 1317--><p class="noindent" ><a id="sec:OuterApproximationcutsgeneration"></a>
+<!--l. 1318--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-760000.12"></a><span 
+class="cmbx-10">add</span><span 
+class="cmbx-10">_only</span><span 
+class="cmbx-10">_violated</span><span 
+class="cmbx-10">_oa:</span></span>
+   Do we add all OA cuts or only the ones violated by current point? <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no: Add all cuts
+     </li>
+     <li class="itemize">yes: Add only violated cuts</li></ul>
+<!--l. 1327--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-770000.12"></a><span 
+class="cmbx-10">oa</span><span 
+class="cmbx-10">_cuts</span><span 
+class="cmbx-10">_scope:</span></span>
+   Specify if OA cuts added are to be set globally or locally valid <br 
+class="newline" />The default value for this string option is &#8221;global&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">local: Cuts are treated as locally valid
+                                                                  
+
+                                                                  
+     </li>
+     <li class="itemize">global: Cuts are treated as globally valid</li></ul>
+<!--l. 1336--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-780000.12"></a><span 
+class="cmbx-10">oa</span><span 
+class="cmbx-10">_rhs</span><span 
+class="cmbx-10">_relax:</span></span>
+   Value by which to relax OA cut <br 
+class="newline" />RHS of OA constraints will be relaxed by this amount times the absolute value
+of the initial rhs if it is ¿= 1 (otherwise by this amount). The valid range
+for this real option is <span 
+class="cmsy-10">-</span>0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">oa</span>_<span 
+class="cmmi-10">rhs</span>_<span 
+class="cmmi-10">relax</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmsy-7">-</span><span 
+class="cmr-7">08</span></sup>.
+<!--l. 1342--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-790000.12"></a><span 
+class="cmbx-10">tiny</span><span 
+class="cmbx-10">_element:</span></span>
+   Value for tiny element in OA cut <br 
+class="newline" />We will remove &#8221;cleanly&#8221; (by relaxing cut) an element lower than this. The valid
+range for this real option is <span 
+class="cmsy-10">-</span>0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">tiny</span>_<span 
+class="cmmi-10">element</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmsy-7">-</span><span 
+class="cmr-7">08</span></sup>.
+<!--l. 1348--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-800000.12"></a><span 
+class="cmbx-10">very</span><span 
+class="cmbx-10">_tiny</span><span 
+class="cmbx-10">_element:</span></span>
+   Value for very tiny element in OA cut <br 
+class="newline" />Algorithm will take the risk of neglecting an element lower than this. The valid range
+for this real option is <span 
+class="cmsy-10">-</span>0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">very</span>_<span 
+class="cmmi-10">tiny</span>_<span 
+class="cmmi-10">element</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+1 <span 
+class="cmsy-10">&#x22C5; </span>10<sup><span 
+class="cmsy-7">-</span><span 
+class="cmr-7">17</span></sup>.
+<!--l. 1354--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.13   </span> <a 
+ id="x1-810000.13"></a>Output and Loglevel</h4>
+<!--l. 1356--><p class="noindent" ><a id="sec:OutputandLoglevel"></a>
+<!--l. 1357--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-820000.13"></a><span 
+class="cmbx-10">bb</span><span 
+class="cmbx-10">_log</span><span 
+class="cmbx-10">_interval:</span></span>
+   Interval at which node level output is printed. <br 
+class="newline" />Set the interval (in terms of number of nodes) at which a log on node resolutions
+(consisting of lower and upper bounds) is given. The valid range for this integer
+option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">bb</span>_<span 
+class="cmmi-10">log</span>_<span 
+class="cmmi-10">interval</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is 100.
+<!--l. 1363--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-830000.13"></a><span 
+class="cmbx-10">bb</span><span 
+class="cmbx-10">_log</span><span 
+class="cmbx-10">_level:</span></span>
+   specify main branch-and-bound log level. <br 
+class="newline" />Set the level of output of the branch-and-bound : 0 - none, 1 - minimal, 2 - normal
+low, 3 - normal high The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">bb</span>_<span 
+class="cmmi-10">log</span>_<span 
+class="cmmi-10">level</span> <span 
+class="cmsy-10">&#x2264; </span>5
+and its default value is 1.
+                                                                  
+
+                                                                  
+<!--l. 1369--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-840000.13"></a><span 
+class="cmbx-10">file</span><span 
+class="cmbx-10">_solution:</span></span>
+   Write a file bonmin.sol with the solution <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">yes
+     </li>
+     <li class="itemize">no</li></ul>
+<!--l. 1378--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-850000.13"></a><span 
+class="cmbx-10">fp</span><span 
+class="cmbx-10">_log</span><span 
+class="cmbx-10">_frequency:</span></span>
+   display an update on lower and upper bounds in FP every n seconds
+<br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">fp</span>_<span 
+class="cmmi-10">log</span>_<span 
+class="cmmi-10">frequency</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default
+value is 100.
+<!--l. 1384--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-860000.13"></a><span 
+class="cmbx-10">fp</span><span 
+class="cmbx-10">_log</span><span 
+class="cmbx-10">_level:</span></span>
+   specify FP iterations log level. <br 
+class="newline" />Set the level of output of OA decomposition solver : 0 - none, 1 - normal, 2 - verbose
+The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">fp</span>_<span 
+class="cmmi-10">log</span>_<span 
+class="cmmi-10">level</span> <span 
+class="cmsy-10">&#x2264; </span>2 and its default value is
+1.
+<!--l. 1390--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-870000.13"></a><span 
+class="cmbx-10">lp</span><span 
+class="cmbx-10">_log</span><span 
+class="cmbx-10">_level:</span></span>
+   specify LP log level. <br 
+class="newline" />Set the level of output of the linear programming sub-solver in B-Hyb or B-QG : 0 -
+none, 1 - minimal, 2 - normal low, 3 - normal high, 4 - verbose The valid
+range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">lp</span>_<span 
+class="cmmi-10">log</span>_<span 
+class="cmmi-10">level</span> <span 
+class="cmsy-10">&#x2264; </span>4 and its default value is
+0.
+<!--l. 1396--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-880000.13"></a><span 
+class="cmbx-10">milp</span><span 
+class="cmbx-10">_log</span><span 
+class="cmbx-10">_level:</span></span>
+   specify MILP solver log level. <br 
+class="newline" />Set the level of output of the MILP subsolver in OA : 0 - none, 1 - minimal,
+2 - normal low, 3 - normal high The valid range for this integer option is
+0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">milp</span>_<span 
+class="cmmi-10">log</span>_<span 
+class="cmmi-10">level</span> <span 
+class="cmsy-10">&#x2264; </span>4 and its default value is 0.
+<!--l. 1402--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-890000.13"></a><span 
+class="cmbx-10">nlp</span><span 
+class="cmbx-10">_log</span><span 
+class="cmbx-10">_at</span><span 
+class="cmbx-10">_root:</span></span>
+   specify a different log level for root relaxation. <br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">nlp</span>_<span 
+class="cmmi-10">log</span>_<span 
+class="cmmi-10">at</span>_<span 
+class="cmmi-10">root</span> <span 
+class="cmsy-10">&#x2264; </span>12 and its default
+value is 0.
+                                                                  
+
+                                                                  
+<!--l. 1408--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-900000.13"></a><span 
+class="cmbx-10">nlp</span><span 
+class="cmbx-10">_log</span><span 
+class="cmbx-10">_level:</span></span>
+   specify NLP solver interface log level (independent from ipopt print_level).
+<br 
+class="newline" />Set the level of output of the OsiTMINLPInterface : 0 - none, 1 - normal, 2 - verbose
+The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">nlp</span>_<span 
+class="cmmi-10">log</span>_<span 
+class="cmmi-10">level</span> <span 
+class="cmsy-10">&#x2264; </span>2 and its default value
+is 1.
+<!--l. 1414--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-910000.13"></a><span 
+class="cmbx-10">oa</span><span 
+class="cmbx-10">_cuts</span><span 
+class="cmbx-10">_log</span><span 
+class="cmbx-10">_level:</span></span>
+   level of log when generating OA cuts. <br 
+class="newline" />0: outputs nothing, 1: when a cut is generated, its violation and index of row
+from which it originates, 2: always output violation of the cut. 3: output
+generated cuts incidence vectors. The valid range for this integer option is
+0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">oa</span>_<span 
+class="cmmi-10">cuts</span>_<span 
+class="cmmi-10">log</span>_<span 
+class="cmmi-10">level</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is 0.
+<!--l. 1423--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-920000.13"></a><span 
+class="cmbx-10">oa</span><span 
+class="cmbx-10">_log</span><span 
+class="cmbx-10">_frequency:</span></span>
+   display an update on lower and upper bounds in OA every n seconds
+<br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmmi-10">&#x003C;</span> <span 
+class="cmmi-10">oa</span>_<span 
+class="cmmi-10">log</span>_<span 
+class="cmmi-10">frequency</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default
+value is 100.
+<!--l. 1429--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-930000.13"></a><span 
+class="cmbx-10">oa</span><span 
+class="cmbx-10">_log</span><span 
+class="cmbx-10">_level:</span></span>
+   specify OA iterations log level. <br 
+class="newline" />Set the level of output of OA decomposition solver : 0 - none, 1 - normal, 2 - verbose
+The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">oa</span>_<span 
+class="cmmi-10">log</span>_<span 
+class="cmmi-10">level</span> <span 
+class="cmsy-10">&#x2264; </span>2 and its default value is
+1.
+<!--l. 1435--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.14   </span> <a 
+ id="x1-940000.14"></a>Primal Heuristics</h4>
+<!--l. 1437--><p class="noindent" ><a id="sec:PrimalHeuristics"></a>
+<!--l. 1438--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-950000.14"></a><span 
+class="cmbx-10">feasibility</span><span 
+class="cmbx-10">_pump</span><span 
+class="cmbx-10">_objective</span><span 
+class="cmbx-10">_norm:</span></span>
+   Norm of feasibility pump objective function <br 
+class="newline" />The valid range for this integer option is 1 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">feasibility</span>_<span 
+class="cmmi-10">pump</span>_<span 
+class="cmmi-10">objective</span>_<span 
+class="cmmi-10">norm</span> <span 
+class="cmsy-10">&#x2264; </span>2
+and its default value is 1.
+<!--l. 1444--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-960000.14"></a><span 
+class="cmbx-10">fp</span><span 
+class="cmbx-10">_pass</span><span 
+class="cmbx-10">_infeasible:</span></span>
+   Say whether feasibility pump should claim to converge or not <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+                                                                  
+
+                                                                  
+     <ul class="itemize1">
+     <li class="itemize">no: When master MILP is infeasible just bail out (don&#8217;t stop all algorithm).
+     This is the option for using in B-Hyb.
+     </li>
+     <li class="itemize">yes: Claim convergence, numerically dangerous.</li></ul>
+<!--l. 1453--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-970000.14"></a><span 
+class="cmbx-10">heuristic</span><span 
+class="cmbx-10">_RINS:</span></span>
+   if yes runs the RINS heuristic <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+     </li>
+     <li class="itemize">yes</li></ul>
+<!--l. 1462--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-980000.14"></a><span 
+class="cmbx-10">heuristic</span><span 
+class="cmbx-10">_dive</span><span 
+class="cmbx-10">_MIP</span><span 
+class="cmbx-10">_fractional:</span></span>
+   if yes runs the Dive MIP Fractional heuristic <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+     </li>
+     <li class="itemize">yes</li></ul>
+<!--l. 1471--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-990000.14"></a><span 
+class="cmbx-10">heuristic</span><span 
+class="cmbx-10">_dive</span><span 
+class="cmbx-10">_MIP</span><span 
+class="cmbx-10">_vectorLength:</span></span>
+   if yes runs the Dive MIP VectorLength heuristic <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+     </li>
+     <li class="itemize">yes</li></ul>
+                                                                  
+
+                                                                  
+<!--l. 1480--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1000000.14"></a><span 
+class="cmbx-10">heuristic</span><span 
+class="cmbx-10">_dive</span><span 
+class="cmbx-10">_fractional:</span></span>
+   if yes runs the Dive Fractional heuristic <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+     </li>
+     <li class="itemize">yes</li></ul>
+<!--l. 1489--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1010000.14"></a><span 
+class="cmbx-10">heuristic</span><span 
+class="cmbx-10">_dive</span><span 
+class="cmbx-10">_vectorLength:</span></span>
+   if yes runs the Dive VectorLength heuristic <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+     </li>
+     <li class="itemize">yes</li></ul>
+<!--l. 1498--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1020000.14"></a><span 
+class="cmbx-10">heuristic</span><span 
+class="cmbx-10">_feasibility</span><span 
+class="cmbx-10">_pump:</span></span>
+   whether the heuristic feasibility pump should be used <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+     </li>
+     <li class="itemize">yes</li></ul>
+<!--l. 1507--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1030000.14"></a><span 
+class="cmbx-10">pump</span><span 
+class="cmbx-10">_for</span><span 
+class="cmbx-10">_minlp:</span></span>
+   whether to run the feasibility pump heuristic for MINLP <br 
+class="newline" />The default value for this string option is &#8221;no&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+     </li>
+     <li class="itemize">yes</li></ul>
+                                                                  
+
+                                                                  
+<!--l. 1516--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">0.15   </span> <a 
+ id="x1-1040000.15"></a>Strong branching setup</h4>
+<!--l. 1518--><p class="noindent" ><a id="sec:Strongbranchingsetup"></a>
+<!--l. 1519--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1050000.15"></a><span 
+class="cmbx-10">candidate</span><span 
+class="cmbx-10">_sort</span><span 
+class="cmbx-10">_criterion:</span></span>
+   Choice of the criterion to choose candidates in strong-branching <br 
+class="newline" />The default value for this string option is &#8221;best-ps-cost&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">best-ps-cost: Sort by decreasing pseudo-cost
+     </li>
+     <li class="itemize">worst-ps-cost: Sort by increasing pseudo-cost
+     </li>
+     <li class="itemize">most-fractional: Sort by decreasing integer infeasibility
+     </li>
+     <li class="itemize">least-fractional: Sort by increasing integer infeasibility</li></ul>
+<!--l. 1530--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1060000.15"></a><span 
+class="cmbx-10">maxmin</span><span 
+class="cmbx-10">_crit</span><span 
+class="cmbx-10">_have</span><span 
+class="cmbx-10">_sol:</span></span>
+   Weight towards minimum in of lower and upper branching estimates when a
+solution has been found. <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">maxmin</span>_<span 
+class="cmmi-10">crit</span>_<span 
+class="cmmi-10">have</span>_<span 
+class="cmmi-10">sol</span> <span 
+class="cmsy-10">&#x2264; </span>1 and its default
+value is 0<span 
+class="cmmi-10">.</span>1.
+<!--l. 1536--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1070000.15"></a><span 
+class="cmbx-10">maxmin</span><span 
+class="cmbx-10">_crit</span><span 
+class="cmbx-10">_no</span><span 
+class="cmbx-10">_sol:</span></span>
+   Weight towards minimum in of lower and upper branching estimates when no
+solution has been found yet. <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">maxmin</span>_<span 
+class="cmmi-10">crit</span>_<span 
+class="cmmi-10">no</span>_<span 
+class="cmmi-10">sol</span> <span 
+class="cmsy-10">&#x2264; </span>1 and its default
+value is 0<span 
+class="cmmi-10">.</span>7.
+<!--l. 1542--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1080000.15"></a><span 
+class="cmbx-10">min</span><span 
+class="cmbx-10">_number</span><span 
+class="cmbx-10">_strong</span><span 
+class="cmbx-10">_branch:</span></span>
+   Sets minimum number of variables for strong branching (overriding trust)
+<br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">min</span>_<span 
+class="cmmi-10">number</span>_<span 
+class="cmmi-10">strong</span>_<span 
+class="cmmi-10">branch</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span>
+and its default value is 0.
+                                                                  
+
+                                                                  
+<!--l. 1548--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1090000.15"></a><span 
+class="cmbx-10">number</span><span 
+class="cmbx-10">_before</span><span 
+class="cmbx-10">_trust</span><span 
+class="cmbx-10">_list:</span></span>
+   Set the number of branches on a variable before its pseudo costs are to be
+believed during setup of strong branching candidate list. <br 
+class="newline" />The default value is that of &#8221;number_before_trust&#8221; The valid range for this integer
+option is <span 
+class="cmsy-10">-</span>1 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">number</span>_<span 
+class="cmmi-10">before</span>_<span 
+class="cmmi-10">trust</span>_<span 
+class="cmmi-10">list</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its default value is
+0.
+<!--l. 1554--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1100000.15"></a><span 
+class="cmbx-10">number</span><span 
+class="cmbx-10">_look</span><span 
+class="cmbx-10">_ahead:</span></span>
+   Sets limit of look-ahead strong-branching trials <br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">number</span>_<span 
+class="cmmi-10">look</span>_<span 
+class="cmmi-10">ahead</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span> and its
+default value is 0.
+<!--l. 1560--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1110000.15"></a><span 
+class="cmbx-10">number</span><span 
+class="cmbx-10">_strong</span><span 
+class="cmbx-10">_branch</span><span 
+class="cmbx-10">_root:</span></span>
+   Maximum number of variables considered for strong branching in root node.
+<br 
+class="newline" />The valid range for this integer option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">number</span>_<span 
+class="cmmi-10">strong</span>_<span 
+class="cmmi-10">branch</span>_<span 
+class="cmmi-10">root</span> <span 
+class="cmmi-10">&#x003C;</span> +<span 
+class="cmmi-10">inf</span>
+and its default value is 2147483647.
+<!--l. 1566--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1120000.15"></a><span 
+class="cmbx-10">setup</span><span 
+class="cmbx-10">_pseudo</span><span 
+class="cmbx-10">_frac:</span></span>
+   Proportion of strong branching list that has to be taken from most-integer-infeasible
+list. <br 
+class="newline" />The valid range for this real option is 0 <span 
+class="cmsy-10">&#x2264;</span> <span 
+class="cmmi-10">setup</span>_<span 
+class="cmmi-10">pseudo</span>_<span 
+class="cmmi-10">frac</span> <span 
+class="cmsy-10">&#x2264; </span>1 and its default
+value is 0<span 
+class="cmmi-10">.</span>5.
+<!--l. 1572--><p class="noindent" ><span class="paragraphHead"><a 
+ id="x1-1130000.15"></a><span 
+class="cmbx-10">trust</span><span 
+class="cmbx-10">_strong</span><span 
+class="cmbx-10">_branching</span><span 
+class="cmbx-10">_for</span><span 
+class="cmbx-10">_pseudo</span><span 
+class="cmbx-10">_cost:</span></span>
+   Whether or not to trust strong branching results for updating pseudo costs.
+<br 
+class="newline" />The default value for this string option is &#8221;yes&#8221;. <br 
+class="newline" />Possible values:
+     <ul class="itemize1">
+     <li class="itemize">no
+     </li>
+     <li class="itemize">yes</li></ul>
+    
+</body></html> 
+
+                                                                  
+
+
