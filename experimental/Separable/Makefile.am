@@ -6,8 +6,6 @@
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
-AUTOMAKE_OPTIONS = foreign
-
 # What is done in this directory:
 bin_PROGRAMS = sepa
 
@@ -26,7 +24,7 @@ AM_CPPFLAGS = \
 	$(BONMINLIB_CFLAGS) $(BONMINAMPLINTERFACELIB_CFLAGS)
 
 # add libtool flags
-LDFLAGS += $(LT_LDFLAGS)
+AM_LDFLAGS = $(LT_LDFLAGS)
 
 ########################################################################
 #                                sepa                                  #

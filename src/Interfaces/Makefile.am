@@ -6,8 +6,6 @@
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
-AUTOMAKE_OPTIONS = foreign
-
 # We need to do autothings in the subdirectories for the different interfaces
 SUBDIRS = Ipopt
 if COIN_HAS_ASL

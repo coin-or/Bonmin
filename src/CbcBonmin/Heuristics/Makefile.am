@@ -6,8 +6,6 @@
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
-AUTOMAKE_OPTIONS = foreign
-
 # Name of the library in this directory
 noinst_LTLIBRARIES = libbonheuristics.la
 

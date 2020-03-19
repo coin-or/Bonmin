@@ -9,6 +9,7 @@
 /LICENSE -text
 /README.md -text
 /appveyor.yml -text
+/ar-lib -text
 /bonmin.pc.in -text
 /compile -text
 /config.guess -text

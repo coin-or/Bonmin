@@ -6,8 +6,6 @@
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
-AUTOMAKE_OPTIONS = foreign
-
 SUBDIRS = Heuristics
 
 # Name of the library in this directory
@@ -17,7 +15,7 @@ if COIN_HAS_ASL
 endif
 
 # add libtool flags
-LDFLAGS += $(LT_LDFLAGS)
+AM_LDFLAGS = $(LT_LDFLAGS)
 
 ########################################################################
 #                          bonmin library                              #

@@ -6,16 +6,13 @@
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
-AUTOMAKE_OPTIONS = foreign
-
 # What is done in this directory:
-
 if COIN_HAS_ASL
   bin_PROGRAMS = bonmin
   noinst_PROGRAMS = BonNodeSolver
 endif
 
-LDFLAGS += $(LT_LDFLAGS)
+AM_LDFLAGS = $(LT_LDFLAGS)
 
 ########################################################################
 #                                bonmin                                #

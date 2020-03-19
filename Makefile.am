@@ -6,8 +6,6 @@
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
-AUTOMAKE_OPTIONS = foreign
-
 ########################################################################
 #                          Subdirectories                              #
 ########################################################################
@@ -55,9 +53,6 @@ clean-doxydoc:
 
 clean-local: clean-doxydoc
 	if test -r test/Makefile; then cd test; $(MAKE) clean; fi
-
-distclean-local:
-	if test -r test/Makefile; then cd test; $(MAKE) distclean; fi
 
 install-exec-local: install-doc
 

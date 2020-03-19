@@ -4,8 +4,6 @@
 
 ## $Id$
 
-AUTOMAKE_OPTIONS = foreign
-
 # What is done in this directory:
 
 if COIN_HAS_ASL
@@ -147,5 +145,3 @@ DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/inc
 ########################################################################
 
 CLEANFILES = $(LIBCBCCOPY) amplsolver.a
-
-DISTCLEANFILES = 
