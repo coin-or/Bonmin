@@ -25,7 +25,7 @@ libfilterinterface_la_SOURCES = \
 	BonFilterWarmStart.cpp
 
 # Here list all include flags, relative to this "srcdir" directory.
-AM_CPPFLAGS = -I$(srcdir)/.. $(BONMINLIB_CFLAGS) -DBONMIN_BUILD
+AM_CPPFLAGS = -I$(srcdir)/.. $(BONMINLIB_CFLAGS)
 
 ########################################################################
 #                Headers that need to be installed                     #

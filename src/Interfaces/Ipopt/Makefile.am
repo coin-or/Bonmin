@@ -20,7 +20,7 @@ libipoptinterface_la_SOURCES = \
 	BonIpoptWarmStart.cpp
 
 # Here list all include flags, relative to this "srcdir" directory.
-AM_CPPFLAGS = -I$(srcdir)/.. $(BONMINLIB_CFLAGS) -DBONMIN_BUILD
+AM_CPPFLAGS = -I$(srcdir)/.. $(BONMINLIB_CFLAGS)
 
 ########################################################################
 #                Headers that need to be installed                     #

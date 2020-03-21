@@ -18849,6 +18849,9 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+      # add -DXYZ_BUILD to XYZ_CFLAGS
+      BONMINLIB_CFLAGS="${BONMINLIB_CFLAGS} -DBONMINLIB_BUILD"
+
 # Define BUILDTOOLS_DEBUG to enable debugging output
 
       if test "$BUILDTOOLS_DEBUG" = 1 ; then
@@ -18895,6 +18898,9 @@ cat >>confdefs.h <<_ACEOF
 #define BONMINAMPLINTERFACELIB_EXPORT $libexport_attribute
 _ACEOF
 
+
+      # add -DXYZ_BUILD to XYZ_CFLAGS
+      BONMINAMPLINTERFACELIB_CFLAGS="${BONMINAMPLINTERFACELIB_CFLAGS} -DBONMINAMPLINTERFACELIB_BUILD"
 
 # Define BUILDTOOLS_DEBUG to enable debugging output
 

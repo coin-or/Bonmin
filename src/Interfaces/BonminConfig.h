@@ -25,7 +25,7 @@
 
 #ifdef HAVE_CONFIG_H
 
-#if defined(BONMIN_BUILD) || defined(BONMINAMPL_BUILD)
+#if defined(BONMINLIB_BUILD) || defined(BONMINAMPLINTERFACELIB_BUILD)
 #include "config.h"
 #else
 #include "config_bonmin.h"
@@ -33,7 +33,7 @@
 
 #else /* HAVE_CONFIG_H */
 
-#if defined(BONMIN_BUILD) || defined(BONMINAMPL_BUILD)
+#if defined(BONMINLIB_BUILD) || defined(BONMINAMPLINTERFACELIB_BUILD)
 #include "config_default.h"
 #else
 #include "config_bonmin_default.h"
@@ -46,7 +46,7 @@
  * we want it to be __attribute__((__visibility__("default"))) when building with GCC,
  *   so user can compile with -fvisibility=hidden
  */
-#ifdef BONMIN_BUILD
+#ifdef BONMINLIB_BUILD
 #ifdef DLL_EXPORT
 #undef BONMINLIB_EXPORT
 #define BONMINLIB_EXPORT __declspec(dllexport)
@@ -56,7 +56,7 @@
 #endif
 #endif
 
-#ifdef BONMINAMPL_BUILD
+#ifdef BONMINAMPLINTERFACELIB_BUILD
 #ifdef DLL_EXPORT
 #undef BONMINAMPLINTERFACELIB_EXPORT
 #define BONMINAMPLINTERFACELIB_EXPORT __declspec(dllexport)

@@ -54,7 +54,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../Algorithms/OaGenerators \
 	-I$(srcdir)/../Algorithms/Branching \
 	-I$(srcdir)/../CbcBonmin \
-	$(BONMINLIB_CFLAGS) -DBONMIN_BUILD
+	$(BONMINLIB_CFLAGS)
 
 ########################################################################
 #                Headers that need to be installed                     #

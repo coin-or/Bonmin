@@ -25,7 +25,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../../Interfaces/Ipopt \
 	-I$(srcdir)/../../Interfaces/Filter \
 	-I$(srcdir)/../../Interfaces/Ampl \
-	$(BONMINLIB_CFLAGS) $(BONMINAMPLINTERFACELIB_CFLAGS) -DBONMINAMPL_BUILD
+	$(BONMINAMPLINTERFACELIB_CFLAGS)
 
 ########################################################################
 #                Headers that need to be installed                     #

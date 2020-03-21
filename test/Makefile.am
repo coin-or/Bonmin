@@ -57,7 +57,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../src/Algorithms/Branching \
 	-I$(srcdir)/../src/Algorithms/OaGenerators \
 	-I$(srcdir)/../src/Algorithms/Ampl \
-	$(BONMINLIB_CFLAGS) $(BONMINAMPLINTERFACELIB_CFLAGS) 
+	$(BONMINLIB_CFLAGS) -UBONMINLIB_BUILD
 
 #test: unitTest$(EXEEXT) CppExample$(EXEEXT) CExample$(EXEEXT)
 test: unitTest$(EXEEXT) CppExample$(EXEEXT)

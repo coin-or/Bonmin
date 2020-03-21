@@ -33,7 +33,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../Interfaces/Ipopt \
 	-I$(srcdir)/../Interfaces/Ampl \
 	-I$(srcdir)/../CbcBonmin \
-	$(BONMINLIB_CFLAGS) -DBONMIN_BUILD
+	$(BONMINAMPLINTERFACELIB_CFLAGS)
 
 ########################################################################
 #                              nodeSolver                              #
