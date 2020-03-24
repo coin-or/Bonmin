@@ -15,7 +15,7 @@
 #include "BonAmplInterface.hpp"
 #include "BonIpoptSolver.hpp"
 #include "BonColReader.hpp"
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
 # include "BonFilterSolver.hpp"
 #endif
 #include <string>

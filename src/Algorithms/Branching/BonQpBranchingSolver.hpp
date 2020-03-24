@@ -7,7 +7,7 @@
 #include "BonStrongBranchingSolver.hpp"
 #include "BonBranchingTQP.hpp"
 
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #include "BonBqpdSolver.hpp"
 #endif

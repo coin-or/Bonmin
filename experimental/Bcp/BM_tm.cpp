@@ -13,7 +13,7 @@
 #include "BCP_lp.hpp"
 
 // #include "BonIpoptSolver.hpp"
-// #ifdef COIN_HAS_FILTERSQP
+// #ifdef BONMIN_HAS_FILTERSQP
 // # include "BonFilterSolver.hpp"
 // #endif
 // #include "BonOACutGenerator2.hpp"

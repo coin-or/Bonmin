@@ -25,8 +25,7 @@ under the Eclipse Public License.])
 AC_CONFIG_SRCDIR(src/CbcBonmin/BonCbc.hpp)
 
 # Do some initialization work (version numbers, change prefix default, ...)
-
-AC_COIN_INITIALIZE(Bonmin)
+AC_COIN_INITIALIZE
 
 #############################################################################
 #                         Standard build tool stuff                         #
@@ -154,7 +153,7 @@ if test -n "$filtersqp_libs" ; then
   if test $ac_success = yes ; then
     AC_COIN_DEFINENAMEMANGLING([FILTERSQP],[$filtersqp_namemangling])
     BONMINLIB_LFLAGS="$filtersqp_libs $BONMINLIB_LFLAGS"
-    AC_DEFINE(COIN_HAS_FILTERSQP,1,[Define to 1 if FilterSQP is available])
+    AC_DEFINE(BONMIN_HAS_FILTERSQP,1,[Define to 1 if FilterSQP is available])
   else
     AC_MSG_ERROR([Symbol filterSQP not found with FilterSQP flags $filtersqp_libs.])
   fi

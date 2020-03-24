@@ -27,7 +27,7 @@
 
 #include "Ipopt/BonIpoptSolver.hpp"
 #include "Ipopt/BonIpoptWarmStart.hpp"
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
 #include "Filter/BonFilterSolver.hpp"
 #include "Filter/BonFilterWarmStart.hpp"
 //#include "Filter/BonBqpdWarmStart.hpp"
@@ -276,7 +276,7 @@ OsiTMINLPInterface::registerOptions
   try {
     register_general_options(roptions);
     register_OA_options(roptions);
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
     FilterSolver::RegisterOptions(roptions);
 #endif
     IpoptSolver::RegisterOptions(roptions);
@@ -457,7 +457,7 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
   Solver s = (Solver) ival;
   if(s == EFilterSQP){
     testOthers_ = false;;
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
     app_ = new Bonmin::FilterSolver(roptions, options, journalist, prefix);
 #else
    throw SimpleError("createApplication",
@@ -470,12 +470,12 @@ OsiTMINLPInterface::createApplication(Ipopt::SmartPtr<Bonmin::RegisteredOptions>
     testOthers_ = false;
     app_ = new IpoptSolver(roptions, options, journalist, prefix);
 
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
     debug_apps_.push_back(new Bonmin::FilterSolver(roptions, options, journalist, prefix));
 #endif
   }
   else if(s == EAll){
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
     app_ = new Bonmin::FilterSolver(roptions, options, journalist, prefix);
 #else
    throw SimpleError("createApplication",
@@ -2962,14 +2962,14 @@ OsiTMINLPInterface::extractInterfaceParams()
     app_->options()->GetIntegerValue("nlp_log_level", logLevel,app_->prefix());
     messageHandler()->setLogLevel(logLevel);
 
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
     FilterSolver * filter = dynamic_cast<FilterSolver *>(GetRawPtr(app_));
 
     bool is_given =
 #endif
       app_->options()->GetNumericValue("max_random_point_radius",maxRandomRadius_,app_->prefix());
 
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
     if(filter && !is_given){
       // overwriting default for filter
       maxRandomRadius_ = 10.;
@@ -3004,12 +3004,12 @@ OsiTMINLPInterface::extractInterfaceParams()
     app_->options()->GetNumericValue("nlp_upper_bound_inf",up_inf, app_->prefix());
     infty_ = std::min(fabs(lo_inf), fabs(up_inf));
 
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
     is_given =
 #endif
     app_->options()->GetNumericValue("resolve_on_small_infeasibility", infeasibility_epsilon_, app_->prefix());
 
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
     if(filter && !is_given){
       // overwriting default for filter
       infeasibility_epsilon_ = 1e-06;

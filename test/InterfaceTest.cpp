@@ -12,7 +12,7 @@
 #include "OsiClpSolverInterface.hpp"
 #include "BonTMINLP.hpp"
 #include "IpIpoptApplication.hpp"
-#ifdef COIN_HAS_ASL
+#ifdef BONMIN_HAS_ASL
 #include "BonAmplTMINLP.hpp"
 #include "BonAmplSetup.hpp"
 #endif
@@ -20,7 +20,7 @@
 #include "BonIpoptSolver.hpp"
 #include "BonminConfig.h"
 
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #endif
 
@@ -281,7 +281,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
   std::cout<<"Test OsiTMINLPInterface with "
 	   <<solver->solverName()<<" solver"<<std::endl;
   // Test usefull constructor
-#ifdef COIN_HAS_ASL
+#ifdef BONMIN_HAS_ASL
   {
         //read a toy problem and do various tests
 //        var x binary;
@@ -383,7 +383,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
 //	     <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
  //   testFp(si);
 //  }
-#endif // COIN_HAS_ASL
+#endif // BONMIN_HAS_ASL
   std::cout<<"All test passed successfully"<<std::endl;
 } 
 
@@ -394,7 +394,7 @@ int main()
   Ipopt::SmartPtr<IpoptSolver> ipopt_solver = new IpoptSolver;
   interfaceTest(GetRawPtr(ipopt_solver));
 
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
   Ipopt::SmartPtr<FilterSolver> filter_solver = new FilterSolver;
   interfaceTest(GetRawPtr(filter_solver));
 #endif

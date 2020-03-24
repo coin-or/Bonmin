@@ -8,7 +8,7 @@
 // Date : 04/12/2007
 
 #include "BonminConfig.h"
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
 # include "BonFilterSolver.hpp"
 #endif
 #include "BonBabSetupBase.hpp"
@@ -633,7 +633,7 @@ namespace Bonmin
     /* Branching options.*/
     LpBranchingSolver::registerOptions(roptions);
 
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
     FilterSolver::registerOptions(roptions);
     BqpdSolver::registerOptions(roptions);
 #endif
@@ -765,7 +765,7 @@ namespace Bonmin
       categories.push_back("ECP based strong branching");
       categories.push_back("Primal Heuristics (undocumented)");
       categories.push_back("Outer Approximation strengthening");
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
       categories.push_back("FilterSQP options");
 #endif
       //    roptions->OutputLatexOptionDocumentation2(*app_->Jnlst(),categories);

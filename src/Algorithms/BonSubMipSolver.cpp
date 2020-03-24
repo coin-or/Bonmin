@@ -20,11 +20,11 @@
 
 // if we use OsiCpx, then we also need to get access to Cplex directly
 // so disable OsiCpx if no Cplex
-#if defined(COIN_HAS_OSICPX) && !defined(COIN_HAS_CPLEX)
-#undef COIN_HAS_OSICPX
+#if defined(BONMIN_HAS_OSICPX) && !defined(BONMIN_HAS_CPLEX)
+#undef BONMIN_HAS_OSICPX
 #endif
 
-#ifdef COIN_HAS_OSICPX
+#ifdef BONMIN_HAS_OSICPX
 #include "OsiCpxSolverInterface.hpp"
 #include "cplex.h"
 void throw_error(const std::string &s, const std::string &f, const std::string &func){
@@ -70,7 +70,7 @@ namespace Bonmin {
      clp_->messageHandler()->setLogLevel(logLevel);
    }
    else if (ivalue == 2) {
-#ifdef COIN_HAS_OSICPX
+#ifdef BONMIN_HAS_OSICPX
       OsiCpxSolverInterface * cpxSolver = new OsiCpxSolverInterface;
 #if 1
       
@@ -113,7 +113,7 @@ namespace Bonmin {
       gap_tol_(copy.gap_tol_),
       ownClp_(copy.ownClp_)
   {
-#ifdef COIN_HAS_OSICPX
+#ifdef BONMIN_HAS_OSICPX
      if(copy.cpx_ != NULL){
        cpx_ = new OsiCpxSolverInterface(*copy.cpx_);
       int ival;
@@ -136,7 +136,7 @@ namespace Bonmin {
   {
     if (strategy_) delete strategy_;
     if (integerSolution_) delete [] integerSolution_;
-#ifdef COIN_HAS_OSICPX
+#ifdef BONMIN_HAS_OSICPX
     if(cpx_) delete cpx_;
 #endif
     if(ownClp_) delete clp_;
@@ -146,7 +146,7 @@ namespace Bonmin {
   void
   SubMipSolver::setLpSolver(OsiSolverInterface * lp)
   {
-#ifdef COIN_HAS_OSICPX
+#ifdef BONMIN_HAS_OSICPX
     if(cpx_){
       clp_ = NULL;
       cpx_->loadProblem(*lp->getMatrixByCol(), lp->getColLower(), lp->getColUpper(), lp->getObjCoefficients(), lp->getRowLower(), lp->getRowUpper());
@@ -165,7 +165,7 @@ namespace Bonmin {
       clp_ = (lp == NULL) ? NULL :
               dynamic_cast<OsiClpSolverInterface *>(lp);
       assert(clp_);
-#ifdef COIN_HAS_OSICPX
+#ifdef BONMIN_HAS_OSICPX
     }
 #endif
     lowBound_ = -COIN_DBL_MAX;
@@ -181,7 +181,7 @@ namespace Bonmin {
          if(clp_ != NULL)
            return clp_;
          else
-#ifdef COIN_HAS_OSICPX
+#ifdef BONMIN_HAS_OSICPX
            return cpx_;
 #else
          return NULL;
@@ -241,7 +241,7 @@ namespace Bonmin {
       }
      }
      else if (cpx_){
-#ifndef COIN_HAS_OSICPX
+#ifndef BONMIN_HAS_OSICPX
         throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
             "performLocalSearch",
             "OaDecompositionBase::SubMipSolver");
@@ -371,7 +371,7 @@ namespace Bonmin {
       delete strat_default;
     }
     else 
-#ifdef COIN_HAS_OSICPX
+#ifdef BONMIN_HAS_OSICPX
     if (cpx_) {
       cpx_->switchToMIP();
       CPXENVptr env = cpx_->getEnvironmentPtr();
@@ -446,7 +446,7 @@ namespace Bonmin {
       optimize(cutoff,loglevel, maxTime);
     }
     else 
-#ifdef COIN_HAS_OSICPX
+#ifdef BONMIN_HAS_OSICPX
     if (cpx_) {
       cpx_->switchToMIP();
       CPXENVptr env = cpx_->getEnvironmentPtr();

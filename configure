@@ -2428,7 +2428,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 # Do some initialization work (version numbers, change prefix default, ...)
-
 ac_aux_dir=
 for ac_dir in "$srcdir" "$srcdir/.." "$srcdir/../.."; do
   if test -f "$ac_dir/install-sh"; then
@@ -3097,8 +3096,6 @@ _ACEOF
 cat >>confdefs.h <<_ACEOF
 #define BONMIN_VERSION_RELEASE 9999
 _ACEOF
-
-
 
 
 
@@ -17106,7 +17103,7 @@ fi
 
   if test $coin_has_cbc = yes ; then
 
-$as_echo "#define COIN_HAS_CBC 1" >>confdefs.h
+$as_echo "#define BONMIN_HAS_CBC 1" >>confdefs.h
 
     if test -n "$cbc_pcfiles" ; then BONMINLIB_PCFILES="$cbc_pcfiles $BONMINLIB_PCFILES" ; fi
        BONMINLIB_LFLAGS="$cbc_lflags $BONMINLIB_LFLAGS"
@@ -17368,7 +17365,7 @@ fi
 
   if test $coin_has_ipopt = yes ; then
 
-$as_echo "#define COIN_HAS_IPOPT 1" >>confdefs.h
+$as_echo "#define BONMIN_HAS_IPOPT 1" >>confdefs.h
 
     if test -n "$ipopt_pcfiles" ; then BONMINLIB_PCFILES="$ipopt_pcfiles $BONMINLIB_PCFILES" ; fi
        BONMINLIB_LFLAGS="$ipopt_lflags $BONMINLIB_LFLAGS"
@@ -17626,7 +17623,7 @@ fi
 
   if test $coin_has_osiclp = yes ; then
 
-$as_echo "#define COIN_HAS_OSICLP 1" >>confdefs.h
+$as_echo "#define BONMIN_HAS_OSICLP 1" >>confdefs.h
 
     if test -n "$osiclp_pcfiles" ; then BONMINLIB_PCFILES="$osiclp_pcfiles $BONMINLIB_PCFILES" ; fi
        BONMINLIB_LFLAGS="$osiclp_lflags $BONMINLIB_LFLAGS"
@@ -17884,7 +17881,7 @@ fi
 
   if test $coin_has_asl = yes ; then
 
-$as_echo "#define COIN_HAS_ASL 1" >>confdefs.h
+$as_echo "#define BONMIN_HAS_ASL 1" >>confdefs.h
 
     if test -n "$asl_pcfiles" ; then BONMINAMPLINTERFACELIB_PCFILES="$asl_pcfiles $BONMINAMPLINTERFACELIB_PCFILES" ; fi
        BONMINAMPLINTERFACELIB_LFLAGS="$asl_lflags $BONMINAMPLINTERFACELIB_LFLAGS"
@@ -18157,7 +18154,7 @@ fi
 
   if test $coin_has_osicpx = yes ; then
 
-$as_echo "#define COIN_HAS_OSICPX 1" >>confdefs.h
+$as_echo "#define BONMIN_HAS_OSICPX 1" >>confdefs.h
 
     if test -n "$osicpx_pcfiles" ; then BONMINLIB_PCFILES="$osicpx_pcfiles $BONMINLIB_PCFILES" ; fi
        BONMINLIB_LFLAGS="$osicpx_lflags $BONMINLIB_LFLAGS"
@@ -18420,7 +18417,7 @@ fi
 
   if test $coin_has_cplex = yes ; then
 
-$as_echo "#define COIN_HAS_CPLEX 1" >>confdefs.h
+$as_echo "#define BONMIN_HAS_CPLEX 1" >>confdefs.h
 
     BONMINLIB_LFLAGS="$cplex_lflags $BONMINLIB_LFLAGS"
        BONMINLIB_CFLAGS="$cplex_cflags $BONMINLIB_CFLAGS"
@@ -18573,7 +18570,7 @@ $as_echo "$as_me: WARNING: Unsupported or unknown name-mangling scheme: $filters
 
     BONMINLIB_LFLAGS="$filtersqp_libs $BONMINLIB_LFLAGS"
 
-$as_echo "#define COIN_HAS_FILTERSQP 1" >>confdefs.h
+$as_echo "#define BONMIN_HAS_FILTERSQP 1" >>confdefs.h
 
   else
     as_fn_error $? "Symbol filterSQP not found with FilterSQP flags $filtersqp_libs." "$LINENO" 5

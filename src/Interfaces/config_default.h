@@ -20,4 +20,4 @@
 /***************************************************************************/
 
 /* If defined, the Ampl Solver Library is available. */
-#define COIN_HAS_ASL 1
+#define BONMIN_HAS_ASL 1

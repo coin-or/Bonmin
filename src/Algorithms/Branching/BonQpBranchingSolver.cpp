@@ -9,7 +9,7 @@
 #define Verbose
 #include "BonQpBranchingSolver.hpp"
 
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
 #include "BonFilterSolver.hpp"
 #include "BonBqpdSolver.hpp"
 #endif
@@ -54,7 +54,7 @@ namespace Bonmin
     branching_tqp_ = new BranchingTQP(tminlp2tnlp);
 
     first_solve_ = true;
-#ifdef COIN_HAS_FILTERSQP
+#ifdef BONMIN_HAS_FILTERSQP
     FilterSolver* filter_solver =
       dynamic_cast<FilterSolver*> (tminlp_interface->solver());
     if (filter_solver) {

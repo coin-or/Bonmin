@@ -6,6 +6,27 @@
 /* Library Visibility Attribute */
 #undef BONMINLIB_EXPORT
 
+/* Define to 1 if ASL is available. */
+#undef BONMIN_HAS_ASL
+
+/* Define to 1 if Cbc is available. */
+#undef BONMIN_HAS_CBC
+
+/* Define to 1 if the Cplex package is available */
+#undef BONMIN_HAS_CPLEX
+
+/* Define to 1 if FilterSQP is available */
+#undef BONMIN_HAS_FILTERSQP
+
+/* Define to 1 if Ipopt is available. */
+#undef BONMIN_HAS_IPOPT
+
+/* Define to 1 if OsiClp is available. */
+#undef BONMIN_HAS_OSICLP
+
+/* Define to 1 if OsiCpx is available. */
+#undef BONMIN_HAS_OSICPX
+
 /* Version number of project */
 #undef BONMIN_VERSION
 
@@ -17,27 +38,6 @@
 
 /* Release version number of project. */
 #undef BONMIN_VERSION_RELEASE
-
-/* Define to 1 if ASL is available. */
-#undef COIN_HAS_ASL
-
-/* Define to 1 if Cbc is available. */
-#undef COIN_HAS_CBC
-
-/* Define to 1 if the Cplex package is available */
-#undef COIN_HAS_CPLEX
-
-/* Define to 1 if FilterSQP is available */
-#undef COIN_HAS_FILTERSQP
-
-/* Define to 1 if Ipopt is available. */
-#undef COIN_HAS_IPOPT
-
-/* Define to 1 if OsiClp is available. */
-#undef COIN_HAS_OSICLP
-
-/* Define to 1 if OsiCpx is available. */
-#undef COIN_HAS_OSICPX
 
 /* Define to 1 if your C++ compiler doesn't accept -c and -o together. */
 #undef CXX_NO_MINUS_C_MINUS_O
