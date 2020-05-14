@@ -2,7 +2,6 @@
 // All Rights Reserved.
 // This code is published under the Eclipse Public License.
 //
-// $Id$
 //
 // Authors:  Andreas Waechter          IBM    2006-03-09
 

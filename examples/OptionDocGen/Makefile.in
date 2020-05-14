@@ -4,7 +4,6 @@
 #
 # Author: Andreas Waechter       IBM      2006-03-14
 
-# $Id: Makefile.in,v 1.1.2.1 2006/04/19 23:25:14 andreasw Exp $
 
 ##########################################################################
 #    You can modify this example makefile to fit for your own program.   #

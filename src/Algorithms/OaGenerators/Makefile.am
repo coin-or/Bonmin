@@ -2,7 +2,6 @@
 # All Rights Reserved.
 # This file is distributed under the Eclipse Public License.
 
-## $Id: Makefile.am 204 2006-12-28 18:57:46Z pbonami $
 
 # Author:  Andreas Waechter           IBM    2006-04-13
 
