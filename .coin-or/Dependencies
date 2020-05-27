@@ -1,8 +1,8 @@
-ThirdParty/HSL    https://github.com/coin-or/BuildTools/ThirdParty/HSL master
-ThirdParty/ASL    https://github.com/coin-or/BuildTools/ThirdParty/ASL master
-ThirdParty/Mumps  https://github.com/coin-or/BuildTools/ThirdParty/Mumps master
-ThirdParty/Metis  https://github.com/coin-or/BuildTools/ThirdParty/Metis master
-Data/Sample       https://github.com/coin-or/Data/Samplemaster
+ThirdParty/HSL    https://github.com/coin-or-tools/ThirdParty-HSL master
+ThirdParty/ASL    https://github.com/coin-or-tools/ThirdParty-ASL master
+ThirdParty/Mumps  https://github.com/coin-or-tools/ThirdParty-Mumps master
+ThirdParty/Metis  https://github.com/coin-or-tools/ThirdParty-Metis master
+Data/Sample       https://github.com/coin-or-tools/Data-Sample master
 CoinUtils         https://github.com/coin-or/CoinUtils master
 Osi               https://github.com/coin-or/Osi master
 Clp               https://github.com/coin-or/Clp master
