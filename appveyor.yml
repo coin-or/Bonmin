@@ -21,5 +21,5 @@ install:
 
 build_script:
   - C:\msys64\usr\bin\bash -lc "cd C:\projects; ln -s %APPVEYOR_PROJECT_SLUG% %APPVEYOR_PROJECT_NAME%; wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew"
-  - C:\msys64\usr\bin\bash -lc "cd C:\projects; ./coinbrew fetch https://github.com/%APPVEYOR_REPO_NAME%:%APPVEYOR_REPO_BRANCH% --no-prompt --skip-update"
-  - C:\msys64\usr\bin\bash -lc "cd C:\projects; export PATH=$ADD_PATH:$PATH; export JAVA_HOME=/c/Progra~2/Java/jdk1.8.0; ./coinbrew build %APPVEYOR_PROJECT_NAME% --no-prompt --no-third-party --verbosity 2 --test"
+  - C:\msys64\usr\bin\bash -lc "cd C:\projects; ./coinbrew fetch https://github.com/%APPVEYOR_REPO_NAME%@%APPVEYOR_REPO_BRANCH% --no-prompt --skip-update"
+  - C:\msys64\usr\bin\bash -lc "cd C:\projects; export PATH=$ADD_PATH:$PATH; export JAVA_HOME=/c/Progra~2/Java/jdk1.8.0; ./coinbrew build %APPVEYOR_PROJECT_NAME% --no-prompt --no-third-party --verbosity 2 --tests main"
