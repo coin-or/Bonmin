@@ -4,9 +4,9 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@/coin
 
-Name: Bonmin
+Name: @PACKAGE_NAME@
 Description: Basic Open-source Nonlinear Mixed Integer programming
-URL: https://github.com/coin-or/Bonmin
+URL: @PACKAGE_URL@
 Version: @PACKAGE_VERSION@
 Cflags: -I${includedir}
 @COIN_STATIC_BUILD_FALSE@Libs: -L${libdir} -lbonmin

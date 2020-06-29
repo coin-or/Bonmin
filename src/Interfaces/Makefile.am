@@ -1,11 +1,9 @@
 # Copyright (C) 2006 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Eclipse Public License.
-
-
+#
 # Author:  Andreas Waechter           IBM    2006-04-13
 
-# We need to do autothings in the subdirectories for the different interfaces
 SUBDIRS = Ipopt
 if COIN_HAS_ASL
   SUBDIRS += Ampl

@@ -1,9 +1,10 @@
 # Copyright (C) 2006, 2008 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Eclipse Public License.
-
-
+#
 # Author:  Andreas Waechter           IBM    2006-04-13
+
+include BuildTools/Makemain.inc
 
 ########################################################################
 #                          Subdirectories                              #
@@ -14,14 +15,6 @@ SUBDIRS = src/Interfaces \
 	src/Algorithms \
 	src/CbcBonmin \
 	src/Apps
-
-# We don't want to compile the test subdirectory, unless the test target is
-# specified.  But we need to list it as subdirectory to make sure that it is
-# included in the tarball
-
-if ALWAYS_FALSE
-  SUBDIRS += test
-endif
 
 ########################################################################
 #                           Extra Targets                              #
@@ -73,14 +66,7 @@ astyle:
 #                  Installation of the .pc file                        #
 ########################################################################
 
-pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = bonmin.pc
 if COIN_HAS_ASL
   pkgconfiglib_DATA += bonminamplinterface.pc
 endif
-
-########################################################################
-#                         Maintainer Stuff                             #
-########################################################################
-
-include BuildTools/Makemain.inc

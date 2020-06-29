@@ -17,7 +17,7 @@
 # Copyright (C) 2006 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Eclipse Public License.
-
+#
 # Author:  Andreas Waechter           IBM    2006-04-13
 
 
@@ -389,8 +389,6 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-
-# We need to do autothings in the subdirectories for the different interfaces
 SUBDIRS = Ipopt $(am__append_1) $(am__append_2)
 
 ########################################################################

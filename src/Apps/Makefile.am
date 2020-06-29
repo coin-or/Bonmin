@@ -1,8 +1,7 @@
 # Copyright (C) 2006, 2007 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Eclipse Public License.
-
-
+#
 # Author:  Andreas Waechter           IBM    2006-04-13
 
 # What is done in this directory:
@@ -10,17 +9,6 @@ if COIN_HAS_ASL
   bin_PROGRAMS = bonmin
   noinst_PROGRAMS = BonNodeSolver
 endif
-
-AM_LDFLAGS = $(LT_LDFLAGS)
-
-########################################################################
-#                                bonmin                                #
-########################################################################
-
-bonmin_SOURCES = BonMin.cpp
-
-bonmin_LDADD = \
-	../CbcBonmin/libbonminampl.la
 
 # Here list all include flags, relative to this "srcdir" directory.
 AM_CPPFLAGS = \
@@ -33,6 +21,17 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../Interfaces/Ampl \
 	-I$(srcdir)/../CbcBonmin \
 	$(BONMINAMPLINTERFACELIB_CFLAGS)
+
+AM_LDFLAGS = $(LT_LDFLAGS)
+
+########################################################################
+#                                bonmin                                #
+########################################################################
+
+bonmin_SOURCES = BonMin.cpp
+
+bonmin_LDADD = \
+	../CbcBonmin/libbonminampl.la
 
 ########################################################################
 #                              nodeSolver                              #
@@ -53,8 +52,6 @@ ASTYLE_FILES = \
              BonNodeSolver.cppbak
 
 CLEANFILES = $(ASTYLE_FILES)
-
-DISTCLEANFILES =
 
 SUFFIXES = .cppbak .hppbak
 

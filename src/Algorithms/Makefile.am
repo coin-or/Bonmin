@@ -1,14 +1,10 @@
 # Copyright (C) 2006, 2007 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Eclipse Public License.
-
-
+#
 # Author:  Andreas Waechter           IBM    2006-04-13
 
-SUBDIRS = \
-       OaGenerators \
-       Branching \
-       QuadCuts
+SUBDIRS = OaGenerators Branching QuadCuts
 
 if COIN_HAS_ASL
   SUBDIRS += Ampl

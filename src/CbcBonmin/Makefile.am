@@ -1,8 +1,7 @@
 # Copyright (C) 2006, 2007 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Eclipse Public License.
-
-
+#
 # Author:  Andreas Waechter           IBM    2006-04-13
 
 SUBDIRS = Heuristics
@@ -12,6 +11,18 @@ lib_LTLIBRARIES = libbonmin.la
 if COIN_HAS_ASL
   lib_LTLIBRARIES += libbonminampl.la
 endif
+
+# Here list all include flags, relative to this "srcdir" directory.
+AM_CPPFLAGS = \
+	-I$(srcdir)/../Algorithms \
+	-I$(srcdir)/../Algorithms/OaGenerators \
+	-I$(srcdir)/../Algorithms/Branching \
+	-I$(srcdir)/../Algorithms/QuadCuts \
+	-I$(srcdir)/../Interfaces \
+	-I$(srcdir)/../Interfaces/Ipopt \
+	-I$(srcdir)/../Interfaces/Ampl \
+	-I$(srcdir)/../Interfaces/Filter \
+	$(BONMINLIB_CFLAGS)
 
 # add libtool flags
 AM_LDFLAGS = $(LT_LDFLAGS)
@@ -51,18 +62,6 @@ libbonminampl_la_LIBADD = \
 	../Interfaces/Ampl/libbonamplinterface.la \
 	libbonmin.la \
 	$(BONMINAMPLINTERFACELIB_LFLAGS)
-
-# Here list all include flags, relative to this "srcdir" directory.
-AM_CPPFLAGS = \
-	-I$(srcdir)/../Algorithms \
-	-I$(srcdir)/../Algorithms/OaGenerators \
-	-I$(srcdir)/../Algorithms/Branching \
-	-I$(srcdir)/../Algorithms/QuadCuts \
-	-I$(srcdir)/../Interfaces \
-	-I$(srcdir)/../Interfaces/Ipopt \
-	-I$(srcdir)/../Interfaces/Ampl \
-	-I$(srcdir)/../Interfaces/Filter \
-	$(BONMINLIB_CFLAGS)
 
 ########################################################################
 #                Headers that need to be installed                     #

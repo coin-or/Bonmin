@@ -17,27 +17,8 @@
 # Copyright (C) 2006, 2008 International Business Machines and others.
 # All Rights Reserved.
 # This file is distributed under the Eclipse Public License.
-
+#
 # Author:  Andreas Waechter           IBM    2006-04-13
-
-########################################################################
-#                          Subdirectories                              #
-########################################################################
-
-# Copyright (C) 2006, 2007 International Business Machines and others.
-# All Rights Reserved.
-# This file is distributed under the Eclipse Public License.
-
-# Author:  Andreas Waechter           IBM    2006-04-13
-
-########################################################################
-#        Variables for documentation and data directories              #
-########################################################################
-
-# Set these up to provide some uniformity in naming while also conforming
-# to Gnu directory standards. For reasons known only to the autoconf
-# developers, autoconf leaves datadir = $(datarootdir) but forces docdir
-# to $(datarootdir)/doc/$(PACKAGE_TARNAME).
 
 VPATH = @srcdir@
 am__is_gnu_make = { \
@@ -111,12 +92,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-
-# We don't want to compile the test subdirectory, unless the test target is
-# specified.  But we need to list it as subdirectory to make sure that it is
-# included in the tarball
-@ALWAYS_FALSE@am__append_1 = test
-@COIN_HAS_ASL_TRUE@am__append_2 = bonminamplinterface.pc
+@COIN_HAS_ASL_TRUE@am__append_1 = bonminamplinterface.pc
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -216,8 +192,7 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-DIST_SUBDIRS = src/Interfaces src/Algorithms src/CbcBonmin src/Apps \
-	test
+DIST_SUBDIRS = $(SUBDIRS)
 pkgdatadir = $(datadir)/$(PACKAGE_TARNAME)
 pkgincludedir = $(includedir)/coin-or
 ACLOCAL = @ACLOCAL@
@@ -367,17 +342,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-
-# Here list all subdirectories into which to recurse
-SUBDIRS = src/Interfaces src/Algorithms src/CbcBonmin src/Apps \
-	$(am__append_1)
-
-########################################################################
-#                  Installation of the .pc file                        #
-########################################################################
-pkgconfiglibdir = $(libdir)/pkgconfig
-pkgconfiglib_DATA = bonmin.pc $(am__append_2)
 pkgdocdir = $(docdir)
+pkgconfiglibdir = $(libdir)/pkgconfig
 
 # doxydocdir is the top-level directory for doxygen documentation. It holds
 # the tag file and possibly the PDF or Postscript version. doxyhtmldir is
@@ -385,17 +351,26 @@ pkgdocdir = $(docdir)
 # html documentation.
 doxydocdir = $(pkgdocdir)/doxydoc
 doxyhtmldir = $(doxydocdir)/html
-
-########################################################################
-#                    Documentation installation                        #
-########################################################################
-DocFiles = README AUTHORS LICENSE
+DocFiles = README README.md AUTHORS AUTHORS.md LICENSE LICENSE.md
 COIN_HAS_DOXYGEN = @COIN_HAS_DOXYGEN_TRUE@TRUE
 COIN_HAS_LATEX = @COIN_HAS_LATEX_TRUE@TRUE
-
-# Needless to say, it's important that baredocdir_nosub not be a target for
-# autoconf substitution.
 DOXYTAG_EDIT = sed -e 's|@baredocdir_nosub@|$(datarootdir)/doc|g'
+
+########################################################################
+#                          Subdirectories                              #
+########################################################################
+
+# Here list all subdirectories into which to recurse
+SUBDIRS = src/Interfaces \
+	src/Algorithms \
+	src/CbcBonmin \
+	src/Apps
+
+
+########################################################################
+#                  Installation of the .pc file                        #
+########################################################################
+pkgconfiglib_DATA = bonmin.pc $(am__append_1)
 all: all-recursive
 
 .SUFFIXES:
@@ -709,52 +684,6 @@ uninstall-am: uninstall-local uninstall-pkgconfiglibDATA
 .PRECIOUS: Makefile
 
 
-########################################################################
-#                           Extra Targets                              #
-########################################################################
-
-.PHONY: doc test unitTest userman astyle nodeSolver doxydoc
-
-test: unitTest
-
-unitTest: all
-	cd test; $(MAKE) test
-
-nodeSolver: all
-	cd src/Apps; $(MAKE) nodeSolver
-
-doc:	userman
-
-userman: $(top_srcdir)/doc/BONMIN_UsersManual.tex
-	cd $(top_srcdir)/doc && pdflatex BONMIN_UsersManual.tex
-
-# Doxygen documentation
-
-doxydoc:
-	doxygen doxydoc/doxygen.conf
-
-clean-doxydoc:
-	( cd doxydoc ; rm -rf html *.log *.tag )
-
-clean-local: clean-doxydoc
-	if test -r test/Makefile; then cd test; $(MAKE) clean; fi
-
-install-exec-local: install-doc
-
-uninstall-local: uninstall-doc
-
-astyle:
-	cd src/Algorithms; $(MAKE) astyle
-	cd src/Algorithms/Ampl; $(MAKE) astyle
-	cd src/Algorithms/Branching; $(MAKE) astyle
-	cd src/Algorithms/OaGenerators; $(MAKE) astyle
-	cd src/Apps; $(MAKE) astyle
-	cd src/CbcBonmin; $(MAKE) astyle
-	cd src/Interfaces; $(MAKE) astyle
-	cd src/Interfaces/Ampl; $(MAKE) astyle
-	cd src/Interfaces/Filter; $(MAKE) astyle
-	cd src/Interfaces/Ipopt; $(MAKE) astyle
-
 doxygen-docs: 
 	if test "$(COIN_HAS_DOXYGEN)" = TRUE; then \
 	  if test -d "doxydoc/"; then \
@@ -831,40 +760,55 @@ uninstall-doc:
 	done
 	rmdir $(DESTDIR)$(pkgdocdir) || true
 
-########################################################################
-#                         Maintainer Stuff                             #
-########################################################################
-
-# Make sure acinclude is using most recent coin.m4
-@MAINTAINER_MODE_TRUE@$(srcdir)/acinclude.m4: $(BUILDTOOLSDIR)/coin.m4
-@MAINTAINER_MODE_TRUE@	cat $(LIBTOOLM4) $< > $@
-
-# Make sure the autotools scripts are up to date
-@MAINTAINER_MODE_TRUE@$(AUX_DIR)/install-sh: $(BUILDTOOLSDIR)/install-sh
-@MAINTAINER_MODE_TRUE@	cp $< $@
-
-@MAINTAINER_MODE_TRUE@$(AUX_DIR)/missing: $(BUILDTOOLSDIR)/missing
-@MAINTAINER_MODE_TRUE@	cp $< $@
-
-@MAINTAINER_MODE_TRUE@$(AUX_DIR)/config.guess: $(BUILDTOOLSDIR)/config.guess
-@MAINTAINER_MODE_TRUE@	cp $< $@
-
-@MAINTAINER_MODE_TRUE@$(AUX_DIR)/config.sub: $(BUILDTOOLSDIR)/config.sub
-@MAINTAINER_MODE_TRUE@	cp $< $@
-
-@MAINTAINER_MODE_TRUE@$(AUX_DIR)/depcomp: $(BUILDTOOLSDIR)/depcomp
-@MAINTAINER_MODE_TRUE@	cp $< $@
-
-@MAINTAINER_MODE_TRUE@$(AUX_DIR)/ltmain.sh: $(BUILDTOOLSDIR)/ltmain.sh
-@MAINTAINER_MODE_TRUE@	cp $< $@
-
 .PHONY: install-doc uninstall-doc \
 	doxygen-docs pdf-doxygen-docs clean-doxygen-docs \
 	install-doxygen-docs uninstall-doxygen-docs
 
 ########################################################################
-#                         Maintainer Stuff                             #
+#                           Extra Targets                              #
 ########################################################################
+
+.PHONY: doc test unitTest userman astyle nodeSolver doxydoc
+
+test: unitTest
+
+unitTest: all
+	cd test; $(MAKE) test
+
+nodeSolver: all
+	cd src/Apps; $(MAKE) nodeSolver
+
+doc:	userman
+
+userman: $(top_srcdir)/doc/BONMIN_UsersManual.tex
+	cd $(top_srcdir)/doc && pdflatex BONMIN_UsersManual.tex
+
+# Doxygen documentation
+
+doxydoc:
+	doxygen doxydoc/doxygen.conf
+
+clean-doxydoc:
+	( cd doxydoc ; rm -rf html *.log *.tag )
+
+clean-local: clean-doxydoc
+	if test -r test/Makefile; then cd test; $(MAKE) clean; fi
+
+install-exec-local: install-doc
+
+uninstall-local: uninstall-doc
+
+astyle:
+	cd src/Algorithms; $(MAKE) astyle
+	cd src/Algorithms/Ampl; $(MAKE) astyle
+	cd src/Algorithms/Branching; $(MAKE) astyle
+	cd src/Algorithms/OaGenerators; $(MAKE) astyle
+	cd src/Apps; $(MAKE) astyle
+	cd src/CbcBonmin; $(MAKE) astyle
+	cd src/Interfaces; $(MAKE) astyle
+	cd src/Interfaces/Ampl; $(MAKE) astyle
+	cd src/Interfaces/Filter; $(MAKE) astyle
+	cd src/Interfaces/Ipopt; $(MAKE) astyle
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

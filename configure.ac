@@ -1,17 +1,14 @@
 # Copyright (C) 2006, 2008 International Business Machines.
 # All Rights Reserved.
 # This file is distributed under the Eclipse Public License.
-
-
+#
 # Author:  Andreas Waechter            IBM    2006-04-13
 
 #############################################################################
 #                       Names and other basic things                        #
 #############################################################################
 
-AC_PREREQ(2.59)
-
-AC_INIT([Bonmin],[trunk],[https://github.com/coin-or/Bonmin/issues/new],[coin-or-bonmin],[https://github.com/coin-or/Bonmin])
+AC_INIT([Bonmin],[devel],[https://github.com/coin-or/Bonmin/issues/new],[coin-or-bonmin],[https://github.com/coin-or/Bonmin])
 
 AC_COPYRIGHT([
 Copyright 2006, 2008 International Business Machines and others.
@@ -31,11 +28,9 @@ AC_COIN_INITIALIZE
 #############################################################################
 
 # Get the name of the C++ compiler and appropriate compiler options
-
 AC_COIN_PROG_CXX
 
 # Initialize libtool
-
 AC_COIN_PROG_LIBTOOL
 
 # set RPATH_FLAGS to the compiler link flags required to hardcode location
@@ -196,8 +191,7 @@ AC_CONFIG_LINKS([test/MyBonmin.cpp:examples/CppExample/MyBonmin.cpp
 #                  Check for doxygen                                        #
 #############################################################################
 
-#AC_COIN_DOXYGEN(CoinUtils Osi Clp Cgl Cbc Ipopt)
-AC_COIN_DOXYGEN
+AC_COIN_DOXYGEN(CoinUtils Osi Clp Cgl Cbc Ipopt)
 
 ##############################################################################
 #                   Finishing up by writing all the output                   #
