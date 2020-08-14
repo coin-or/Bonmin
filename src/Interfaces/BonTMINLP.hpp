@@ -233,11 +233,11 @@ namespace Bonmin
      *  method should return true only if the scaling parameters could
      *  be provided.
      */
-    virtual bool get_scaling_parameters(Ipopt::Number& obj_scaling,
-                                        bool& use_x_scaling, Ipopt::Index n,
-                                        Ipopt::Number* x_scaling,
-                                        bool& use_g_scaling, Ipopt::Index m,
-                                        Ipopt::Number* g_scaling)
+    virtual bool get_scaling_parameters(Ipopt::Number& /*obj_scaling*/,
+                                        bool& /*use_x_scaling*/, Ipopt::Index /*n*/,
+                                        Ipopt::Number* /*x_scaling*/,
+                                        bool& /*use_g_scaling*/, Ipopt::Index /*m*/,
+                                        Ipopt::Number* /*g_scaling*/)
     {
       return false;
     }
@@ -315,8 +315,8 @@ namespace Bonmin
         Ipopt::Index* iRow, Ipopt::Index* jCol, Ipopt::Number* values)=0;
     /** Compute the value of a single constraint. The constraint
      *  number is i (starting counting from 0. */
-    virtual bool eval_gi(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
-			 Ipopt::Index i, Ipopt::Number& gi)
+    virtual bool eval_gi(Ipopt::Index /*n*/, const Ipopt::Number* /*x*/, bool /*new_x*/,
+			 Ipopt::Index /*i*/, Ipopt::Number& /*gi*/)
     {
       std::cerr << "Method eval_gi not overloaded from TMINLP\n";
       throw -1;
@@ -324,9 +324,9 @@ namespace Bonmin
     /** Compute the structure or values of the gradient for one
      *  constraint. The constraint * number is i (starting counting
      *  from 0.  Other things are like with eval_jac_g. */
-    virtual bool eval_grad_gi(Ipopt::Index n, const Ipopt::Number* x, bool new_x,
-			      Ipopt::Index i, Ipopt::Index& nele_grad_gi, Ipopt::Index* jCol,
-			      Ipopt::Number* values)
+    virtual bool eval_grad_gi(Ipopt::Index /*n*/, const Ipopt::Number* /*x*/, bool /*new_x*/,
+			      Ipopt::Index /*i*/, Ipopt::Index& /*nele_grad_gi*/, Ipopt::Index* /*jCol*/,
+			      Ipopt::Number* /*values*/)
     {
       std::cerr << "Method eval_grad_gi not overloaded from TMINLP\n";
       throw -1;
@@ -355,8 +355,8 @@ namespace Bonmin
     
     /** overload this method to return the value of an alternative objective function for
       upper bounding (to use it hasUpperBoundingObjective should return true).*/
-    virtual bool eval_upper_bound_f(Ipopt::Index n, const Ipopt::Number* x,
-                                    Ipopt::Number& obj_value){ return false; }
+    virtual bool eval_upper_bound_f(Ipopt::Index /*n*/, const Ipopt::Number* /*x*/,
+                                    Ipopt::Number& /*obj_value*/){ return false; }
 
    /** Used to mark constraints of the problem.*/
    enum Convexity {
