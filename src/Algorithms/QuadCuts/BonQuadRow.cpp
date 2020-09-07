@@ -69,8 +69,8 @@ QuadRow::operator=(const QuadCut &cut){
     a_grad_idx_.clear();
     Q_row_grad_idx_.clear();
     Q_col_grad_idx_.clear();
-    //Q_hessian_idx.empty();
-    //H_Hes_idx_.empty()
+    //Q_hessian_idx.clear();
+    //H_Hes_idx_.clear()
     initialize();
     return (*this);
 }
@@ -89,12 +89,12 @@ QuadRow::operator=(const OsiRowCut &cut){
     c_ = 0;
     a_ = cut.row();
     Q_ = TMat();
-    g_.empty();
-    a_grad_idx_.empty();
+    g_.clear();
+    a_grad_idx_.clear();
     Q_row_grad_idx_.clear();
     Q_col_grad_idx_.clear();
-    //Q_hessian_idx.empty();
-    //H_Hes_idx_.empty()
+    //Q_hessian_idx.clear();
+    //H_Hes_idx_.clear()
     initialize();
     return (*this);
 }
