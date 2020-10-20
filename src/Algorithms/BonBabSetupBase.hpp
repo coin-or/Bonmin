@@ -183,7 +183,7 @@ namespace Bonmin
     /** Register all the options for this algorithm instance.*/
     virtual void registerOptions();
     /** Setup the defaults options for this algorithm. */
-    virtual void setBabDefaultOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions)
+    virtual void setBabDefaultOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> /*roptions*/)
     {}
     /** Register all the options for this algorithm instance.*/
     static void registerAllOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions);

@@ -369,7 +369,7 @@ namespace Bonmin
 
 
     /** Add some linear cuts to the problem formulation (not implemented yet in base class).*/
-   virtual void addCuts(unsigned int numberCuts, const OsiRowCut ** cuts){
+   virtual void addCuts(unsigned int numberCuts, const OsiRowCut ** /*cuts*/){
     if(numberCuts > 0)
     throw CoinError("BonTMINLP2TNLP", "addCuts", "Not implemented");}
 
@@ -380,7 +380,7 @@ namespace Bonmin
     throw CoinError("BonTMINLP2TNLP", "addCuts", "Not implemented");}
 
   /** Remove some cuts to the formulation */
-  virtual void removeCuts(unsigned int number ,const int * toRemove){
+  virtual void removeCuts(unsigned int number, const int * /*toRemove*/){
     if(number > 0)
     throw CoinError("BonTMINLP2TNLP", "removeCuts", "Not implemented");}
 

@@ -172,7 +172,7 @@ TNLPSolver(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions,
     return prefix_.c_str();
   }
    /// Register this solver options into passed roptions
-static void RegisterOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> roptions){}
+static void RegisterOptions(Ipopt::SmartPtr<Bonmin::RegisteredOptions> /*roptions*/){}
 
    /// Get the CpuTime of the last optimization.
    virtual double CPUTime() = 0;

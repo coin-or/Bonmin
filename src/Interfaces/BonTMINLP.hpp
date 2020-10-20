@@ -397,12 +397,14 @@ namespace Bonmin
     number_concave = 0;
     return true;} 
   /** Get array describing the constraints marked nonconvex in the model.*/
-  virtual bool get_constraint_convexities(int number_non_conv, MarkedNonConvex * non_convs) const{
+  virtual bool get_constraint_convexities(int number_non_conv, MarkedNonConvex * /*non_convs*/) const{
     assert(number_non_conv == 0);
+    (void)number_non_conv;
     return true;}
   /** Fill array containing indices of simple concave constraints.*/ 
-  virtual bool get_simple_concave_constraints(int number_concave, SimpleConcaveConstraint * simple_concave) const{
+  virtual bool get_simple_concave_constraints(int number_concave, SimpleConcaveConstraint * /*simple_concave*/) const{
     assert(number_concave == 0);
+    (void)number_concave;
     return true;}
 
   /** Say if problem has a linear objective (for OA) */
