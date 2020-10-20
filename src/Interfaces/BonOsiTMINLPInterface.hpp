@@ -644,7 +644,7 @@ class Messages : public CoinMessages
 
   /** We have to keep this but it will throw an error.
   */
-  virtual void setObjCoeff( int elementIndex, double elementValue )
+  virtual void setObjCoeff(int /*elementIndex*/, double /*elementValue*/)
   {
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "setObjCoeff");
@@ -652,16 +652,16 @@ class Messages : public CoinMessages
 
   /** We have to keep this but it will throw an error.
   */
-  virtual void addCol(const CoinPackedVectorBase& vec,
-      const double collb, const double colub,
-      const double obj)
+  virtual void addCol(const CoinPackedVectorBase& /*vec*/,
+      const double /*collb*/, const double /*colub*/,
+      const double /*obj*/)
   {
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "addCol");
   }
   /** We have to keep this but it will throw an error.
   */
-  virtual void deleteCols(const int num, const int * colIndices)
+  virtual void deleteCols(const int /*num*/, const int * /*colIndices*/)
   {
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "deleteCols");
@@ -669,17 +669,17 @@ class Messages : public CoinMessages
 
   /** We have to keep this but it will throw an error.
   */
-  virtual void addRow(const CoinPackedVectorBase& vec,
-      const double rowlb, const double rowub)
+  virtual void addRow(const CoinPackedVectorBase& /*vec*/,
+      const double /*rowlb*/, const double /*rowub*/)
   {
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "addRow");
   }
   /** We have to keep this but it will throw an error.
   */
-  virtual void addRow(const CoinPackedVectorBase& vec,
-      const char rowsen, const double rowrhs,
-      const double rowrng)
+  virtual void addRow(const CoinPackedVectorBase& /*vec*/,
+      const char /*rowsen*/, const double /*rowrhs*/,
+      const double /*rowrng*/)
   {
     throw SimpleError("OsiTMINLPInterface model does not implement this function.",
         "addRow");
@@ -696,10 +696,10 @@ class Messages : public CoinMessages
 
   /** We have to keep this but it will throw an error
   */
-  virtual void loadProblem(const CoinPackedMatrix& matrix,
-      const double* collb, const double* colub,
-      const double* obj,
-      const double* rowlb, const double* rowub)
+  virtual void loadProblem(const CoinPackedMatrix& /*matrix*/,
+      const double* /*collb*/, const double* /*colub*/,
+      const double* /*obj*/,
+      const double* /*rowlb*/, const double* /*rowub*/)
   {
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "loadProblem");
@@ -708,9 +708,9 @@ class Messages : public CoinMessages
 
   /** We have to keep this but it will throw an error.
   */
-  virtual void assignProblem(CoinPackedMatrix*& matrix,
-      double*& collb, double*& colub, double*& obj,
-      double*& rowlb, double*& rowub)
+  virtual void assignProblem(CoinPackedMatrix*& /*matrix*/,
+      double*& /*collb*/, double*& /*colub*/, double*& /*obj*/,
+      double*& /*rowlb*/, double*& /*rowub*/)
   {
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "assignProblem");
@@ -718,11 +718,11 @@ class Messages : public CoinMessages
 
   /** We have to keep this but it will throw an error.
   */
-  virtual void loadProblem(const CoinPackedMatrix& matrix,
-      const double* collb, const double* colub,
-      const double* obj,
-      const char* rowsen, const double* rowrhs,
-      const double* rowrng)
+  virtual void loadProblem(const CoinPackedMatrix& /*matrix*/,
+      const double* /*collb*/, const double* /*colub*/,
+      const double* /*obj*/,
+      const char* /*rowsen*/, const double* /*rowrhs*/,
+      const double* /*rowrng*/)
   {
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "loadProblem");
@@ -730,10 +730,10 @@ class Messages : public CoinMessages
 
   /** We have to keep this but it will throw an error.
   */
-  virtual void assignProblem(CoinPackedMatrix*& matrix,
-      double*& collb, double*& colub, double*& obj,
-      char*& rowsen, double*& rowrhs,
-      double*& rowrng)
+  virtual void assignProblem(CoinPackedMatrix*& /*matrix*/,
+      double*& /*collb*/, double*& /*colub*/, double*& /*obj*/,
+      char*& /*rowsen*/, double*& /*rowrhs*/,
+      double*& /*rowrng*/)
   {
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "assignProblem");
@@ -742,12 +742,12 @@ class Messages : public CoinMessages
 
   /** We have to keep this but it will throw an error.
   */
-  virtual void loadProblem(const int numcols, const int numrows,
-      const int* start, const int* index,
-      const double* value,
-      const double* collb, const double* colub,
-      const double* obj,
-      const double* rowlb, const double* rowub)
+  virtual void loadProblem(const int /*numcols*/, const int /*numrows*/,
+      const int* /*start*/, const int* /*index*/,
+      const double* /*value*/,
+      const double* /*collb*/, const double* /*colub*/,
+      const double* /*obj*/,
+      const double* /*rowlb*/, const double* /*rowub*/)
   {
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "loadProblem");
@@ -755,13 +755,13 @@ class Messages : public CoinMessages
 
   /** We have to keep this but it will throw an error.
   */
-  virtual void loadProblem(const int numcols, const int numrows,
-      const int* start, const int* index,
-      const double* value,
-      const double* collb, const double* colub,
-      const double* obj,
-      const char* rowsen, const double* rowrhs,
-      const double* rowrng)
+  virtual void loadProblem(const int /*numcols*/, const int /*numrows*/,
+      const int* /*start*/, const int* /*index*/,
+      const double* /*value*/,
+      const double* /*collb*/, const double* /*colub*/,
+      const double* /*obj*/,
+      const char* /*rowsen*/, const double* /*rowrhs*/,
+      const double* /*rowrng*/)
   {
     throw SimpleError("OsiTMINLPInterface model does not implement this function.",
         "loadProblem");
@@ -769,9 +769,10 @@ class Messages : public CoinMessages
 
   /** We have to keep this but it will throw an error.
   */
-  virtual int readMps(const char *filename,
-      const char *extension = "mps")
+  virtual int readMps(const char * /*filename*/,
+      const char * extension = "mps")
   {
+    (void)extension;
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "readMps");
   }
@@ -779,23 +780,26 @@ class Messages : public CoinMessages
 
   /** We have to keep this but it will throw an error.
   */
-  virtual void writeMps(const char *filename,
-      const char *extension = "mps",
+  virtual void writeMps(const char * /*filename*/,
+      const char * extension = "mps",
       double objSense=0.0) const
   {
+    (void)extension;
+    (void)objSense;
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "writeMps");
   }
 
   /** Throws an error */
-  virtual std::vector<double*> getDualRays(int maxNumRays, bool fullRay = false) const
+  virtual std::vector<double*> getDualRays(int /*maxNumRays*/, bool fullRay = false) const
   {
+    (void)fullRay;
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "getDualRays");
   }
 
   /** Throws an error */
-  virtual std::vector<double*> getPrimalRays(int maxNumRays) const
+  virtual std::vector<double*> getPrimalRays(int /*maxNumRays*/) const
   {
     throw SimpleError("OsiTMINLPInterface does not implement this function.",
         "getPrimalRays");
@@ -958,7 +962,7 @@ void getBendersCut(OsiCuts &cs, bool global);
   void switchToOriginalProblem();
   
   /** round solution and check its feasibility.*/
-  void round_and_check(double tolerance,
+  void round_and_check(double /*tolerance*/,
                        OsiObject ** objects = 0, int nObjects = -1){
     if(!problem_->check_solution(objects, nObjects)){
       optimizationStatus_ = TNLPSolver::provenInfeasible;
@@ -1020,7 +1024,8 @@ void getBendersCut(OsiCuts &cs, bool global);
     */
     virtual ApplyCutsReturnCode applyCuts(const OsiCuts & cs,
 					  double effectivenessLb = 0.0){
-       freeCachedRowRim();
+      (void)effectivenessLb;
+      freeCachedRowRim();
       problem_->addCuts(cs);
       ApplyCutsReturnCode rc;
       return rc;}
@@ -1123,7 +1128,7 @@ protected:
   }
   /** We have to keep this but it will throw an error.
   */
-  virtual void applyColCut( const OsiColCut & cc )
+  virtual void applyColCut(const OsiColCut & /*cc*/)
   {
     throw SimpleError("Ipopt model does not implement this function.",
         "applyColCut");
