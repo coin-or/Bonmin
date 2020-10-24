@@ -16719,6 +16719,12 @@ $as_echo "no" >&6; }
     pkg_short_errors=""
   fi
 
+  # Check whether -static option of pkg-config should be used when requesting libs
+  pkg_static=
+  if test -n "$PKG_CONFIG" ; then
+    case "$LDFLAGS" in "-static" | "* -static*" ) pkg_static=--static ;; esac
+  fi
+
    if test -n "$PKG_CONFIG"; then
   COIN_HAS_PKGCONFIG_TRUE=
   COIN_HAS_PKGCONFIG_FALSE='#'
@@ -18557,18 +18563,7 @@ else
 fi
 
 
-  # Process the list of project names and massage each one into the name of
-  # a tag file. The value of coin_doxy_tagfiles is substituted for TAGFILES
-  # in doxygen.conf.in. Further substitution for @baredocdir_nosub@ will happen
-  # as an edit during make install. See comments in Makemain.inc.
-  coin_doxy_tagfiles=
-  tmp="CoinUtils Osi Clp Cgl Cbc Ipopt"
-  for proj in $tmp ; do
-    lc_proj=`echo $proj | tr [A-Z] [a-z]`
-    doxytag=${lc_proj}_doxy.tag
-    doxydir="@baredocdir_nosub@/coin-or-${lc_proj}/doxydoc"
-    coin_doxy_tagfiles="$coin_doxy_tagfiles $doxydir/$doxytag=$doxydir/html"
-  done
+  coin_doxy_tagfiles="@baredocdir_nosub@/coin-or-coinutils/doxydoc/coinutils_doxy.tag=@baredocdir_nosub@/coin-or-coinutils/doxydoc/html @baredocdir_nosub@/coin-or-osi/doxydoc/osi_doxy.tag=@baredocdir_nosub@/coin-or-osi/doxydoc/html @baredocdir_nosub@/coin-or-clp/doxydoc/clp_doxy.tag=@baredocdir_nosub@/coin-or-clp/doxydoc/html @baredocdir_nosub@/coin-or-cgl/doxydoc/cgl_doxy.tag=@baredocdir_nosub@/coin-or-cgl/doxydoc/html @baredocdir_nosub@/coin-or-cbc/doxydoc/cbc_doxy.tag=@baredocdir_nosub@/coin-or-cbc/doxydoc/html @baredocdir_nosub@/coin-or-ipopt/doxydoc/ipopt_doxy.tag=@baredocdir_nosub@/coin-or-ipopt/doxydoc/html "
 
 
 
@@ -18587,7 +18582,7 @@ $as_echo "$as_me: FINALIZE_FLAGS for BonminLib:" >&6;}
 
       if test -n "${BONMINLIB_PCFILES}" ; then
         temp_CFLAGS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --cflags ${BONMINLIB_PCFILES}`
-        temp_LFLAGS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --libs ${BONMINLIB_PCFILES}`
+        temp_LFLAGS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --libs $pkg_static ${BONMINLIB_PCFILES}`
         BONMINLIB_CFLAGS="$temp_CFLAGS ${BONMINLIB_CFLAGS}"
         BONMINLIB_LFLAGS="$temp_LFLAGS ${BONMINLIB_LFLAGS}"
       fi
@@ -18636,7 +18631,7 @@ $as_echo "$as_me: FINALIZE_FLAGS for BonminAmplInterfaceLib:" >&6;}
 
       if test -n "${BONMINAMPLINTERFACELIB_PCFILES}" ; then
         temp_CFLAGS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --cflags ${BONMINAMPLINTERFACELIB_PCFILES}`
-        temp_LFLAGS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --libs ${BONMINAMPLINTERFACELIB_PCFILES}`
+        temp_LFLAGS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --libs $pkg_static ${BONMINAMPLINTERFACELIB_PCFILES}`
         BONMINAMPLINTERFACELIB_CFLAGS="$temp_CFLAGS ${BONMINAMPLINTERFACELIB_CFLAGS}"
         BONMINAMPLINTERFACELIB_LFLAGS="$temp_LFLAGS ${BONMINAMPLINTERFACELIB_LFLAGS}"
       fi
