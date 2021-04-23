@@ -29,18 +29,11 @@ public:
 
 /** Access pointer to first element of storage.*/
 inline T* operator()(){
-#if defined(_MSC_VER)
-  if (std::vector<T>::size() == 0)
-    return NULL;
-#endif
-return &std::vector<T>::front();}
+  return &(*std::vector<T>::begin());
+}
 /** Access pointer to first element of storage.*/
 inline const T* operator()() const {
-#if defined(_MSC_VER)
-  if (std::vector<T>::size() == 0)
-    return NULL;
-#endif
-return &std::vector<T>::front();
+  return &(*std::vector<T>::begin());
 }
 };
 
