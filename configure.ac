@@ -62,8 +62,7 @@ AC_COIN_CHK_PKG(ASL,[BonminAmplInterfaceLib],[ipoptamplinterface])
 #AC_COIN_CHECK_PACKAGE(Bcp, [bcp])
 #
 #AC_ARG_WITH([bonminbcp],
-#            AC_HELP_STRING([--with-bonminbcp],
-#                           [Compile Bonmin with Bcp-based parallel version]),
+#            AS_HELP_STRING([--with-bonminbcp],[Compile Bonmin with Bcp-based parallel version]),
 #            [use_bcp="$withval"], [use_bcp=no])
 #if test "$use_bcp" = yes; then
 #  if test $coin_has_bcp != yes ; then
@@ -87,8 +86,7 @@ AC_COIN_CHK_LIB(Cplex,[BonminLib],[-lcplex -lpthread -lm -ldl],[],[],[CPXgetstat
 #############################################################################
 
 AC_ARG_WITH([filtersqp],
-            AC_HELP_STRING([--with-filtersqp],
-                           [Linker flags for FilterSQP]),
+            AS_HELP_STRING([--with-filtersqp],[Linker flags for FilterSQP]),
             [filtersqp_libs="$withval"])
 
 if test -n "$filtersqp_libs" ; then
@@ -225,6 +223,6 @@ if test $coin_has_asl = yes ; then
   AC_CONFIG_FILES([bonminamplinterface.pc:src/CbcBonmin/bonminamplinterface.pc.in])
 fi
 
-AC_CONFIG_HEADER([src/Interfaces/config.h src/Interfaces/config_bonmin.h])
+AC_CONFIG_HEADERS([src/Interfaces/config.h src/Interfaces/config_bonmin.h])
 
 AC_COIN_FINALIZE
