@@ -286,7 +286,7 @@ namespace Bonmin
     // for the strict feasibility check in BonHeuristicDive.cpp:isNlpFeasible, see also #24
     set = Options->GetBoolValue("honor_original_bounds",dummy_bool, "");
     if(!set)
-    Options->SetStringValue("honor_original_bounds","no", true, true);
+    Options->SetStringValue("honor_original_bounds","yes", true, true);
     if(!Options->GetIntegerValue("print_level",default_log_level_,"")) {
       default_log_level_ = 1;
       Options->SetIntegerValue("print_level",1, true, true);
