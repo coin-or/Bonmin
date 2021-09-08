@@ -663,7 +663,7 @@ namespace Bonmin
       E.ReportException(*journalist_);
       throw E;
     }
-    catch (std::bad_alloc) {
+    catch (std::bad_alloc &) {
       journalist_->Printf(Ipopt::J_ERROR, Ipopt::J_MAIN, "\n Not enough memory .... EXIT\n");
       throw -1;
     }
@@ -689,7 +689,7 @@ namespace Bonmin
       try {
         is.open(fileName.c_str());
       }
-      catch (std::bad_alloc) {
+      catch (std::bad_alloc &) {
         journalist_->Printf(Ipopt::J_SUMMARY, Ipopt::J_MAIN, "\nEXIT: Not enough memory.\n");
         throw -1;
       }
