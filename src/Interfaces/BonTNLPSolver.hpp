@@ -34,7 +34,7 @@ class BONMINLIB_EXPORT TNLPSolver: public Ipopt::ReferencedObject{
     notEnoughFreedom = -1/** not enough degrees of freedom.*/,
     illDefinedProblem = -4/** The solver finds that the problem is not well defined. */,
     illegalOption =-5/** An option is not valid. */,
-    externalException =-6/** Some unrecovered exception occured in an external tool used by the solver. */,
+    externalException =-6/** Some unrecovered exception occurred in an external tool used by the solver. */,
     exception =-7/** Some unrocevered exception */,
     solvedOptimal = 1/** Problem solved to an optimal solution.*/,
     solvedOptimalTol =2/** Problem solved to "acceptable level of tolerance. */,

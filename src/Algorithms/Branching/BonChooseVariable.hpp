@@ -154,8 +154,8 @@ namespace Bonmin
       provenInfeasible = -1 /** One branch has two infeasible children.*/,
       doneNoFixing /** All done no variable can be fixed.*/,
       doneCanFix /** Several variable can be fixed.*/,
-      interuptedCanFix /** Interupted and found a variable to fix.*/,
-      maxTime /** Interupted because of time limit.*/};
+      interuptedCanFix /** Interrupted and found a variable to fix.*/,
+      maxTime /** Interrupted because of time limit.*/};
 
     /** Return statuses for chooseVariable.*/
     enum chooseVariableReturnStatuses{

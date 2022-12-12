@@ -689,7 +689,7 @@ OsiTMINLPInterface & OsiTMINLPInterface::operator=(const OsiTMINLPInterface& rhs
         CoinCopyN(rhs.jRow_    , nnz_jac,jRow_    );
       }
       else if(nnz_jac > 0) {
-        throw CoinError("Arrays for storing jacobian are inconsistant.",
+        throw CoinError("Arrays for storing jacobian are inconsistent.",
             "copy constructor",
             "IpoptOAInterface");
       }
