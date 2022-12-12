@@ -228,7 +228,7 @@ TNLPSolver::UnsolvedError::writeDiffFiles(const std::string prefix) const{
 
     if(!primals)//No starting point no output
       {
-	std::cerr<<"A failure has occured but no starting point exists"<<std::endl;
+	std::cerr<<"A failure has occurred but no starting point exists"<<std::endl;
 	return;
       }
 

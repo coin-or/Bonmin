@@ -98,7 +98,7 @@ class SimpleError : public CoinError
     WARNING_RESOLVING /** Warn that a problem is resolved*/,
     WARN_SUCCESS_WS/** Problem not solved with warm start but solved without*/,
     WARN_SUCCESS_RANDOM/** Subproblem not solve with warm start but solved with random point*/,
-    WARN_CONTINUING_ON_FAILURE/** a failure occured but is continuing*/,
+    WARN_CONTINUING_ON_FAILURE/** a failure occurred but is continuing*/,
     SUSPECT_PROBLEM/** Output the number of the problem.*/,
     SUSPECT_PROBLEM2/** Output the number of the problem.*/,
     IPOPT_SUMMARY /** Output summary statistics on Ipopt solution.*/,

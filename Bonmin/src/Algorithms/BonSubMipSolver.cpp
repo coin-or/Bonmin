@@ -235,7 +235,7 @@ namespace Bonmin {
      }
      else if (cpx_){
 #ifndef COIN_HAS_CPX
-        throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
+        throw CoinError("Unsupported solver, for local searches you should use clp or cplex",
             "performLocalSearch",
             "OaDecompositionBase::SubMipSolver");
 #else
@@ -310,7 +310,7 @@ namespace Bonmin {
 #endif
     } 
     else {
-        throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
+        throw CoinError("Unsupported solver, for local searches you should use clp or cplex",
             "performLocalSearch",
             "OaDecompositionBase::SubMipSolver");
    }
@@ -425,7 +425,7 @@ namespace Bonmin {
 #else
      {
 #endif
-        throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
+        throw CoinError("Unsupported solver, for local searches you should use clp or cplex",
             "performLocalSearch",
             "OaDecompositionBase::SubMipSolver");
       }
@@ -531,7 +531,7 @@ namespace Bonmin {
 #else
      {
 #endif
-        throw CoinError("Unsuported solver, for local searches you should use clp or cplex",
+        throw CoinError("Unsupported solver, for local searches you should use clp or cplex",
             "performLocalSearch",
             "OaDecompositionBase::SubMipSolver");
       }

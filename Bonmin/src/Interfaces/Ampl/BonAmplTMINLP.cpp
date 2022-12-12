@@ -288,7 +288,7 @@ namespace Bonmin
       for (int ii=0;ii<sos_.num;ii++) {
         int ichar = sos_.types[ii] - '0';
         if (ichar != 1 && ichar != 2) {
-          std::cerr<<"Unsuported type of sos constraint: "<<sos_.types[ii]<<std::endl;
+          std::cerr<<"Unsupported type of sos constraint: "<<sos_.types[ii]<<std::endl;
           throw;
         }
         sos_.types[ii]= static_cast<char>(ichar);
