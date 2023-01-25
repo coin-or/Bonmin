@@ -26,6 +26,7 @@ namespace Bonmin
   /// Constructor
   IpoptSolver::IpoptSolver(bool createEmpty /*= false*/):
       TNLPSolver(),
+      optimizationStatus_(Ipopt::Internal_Error),
       problemHadZeroDimension_(false),
       warmStartStrategy_(1),
       enable_warm_start_(false),
@@ -44,6 +45,7 @@ namespace Bonmin
       Ipopt::SmartPtr<Ipopt::Journalist> journalist,
       const std::string & prefix):
       TNLPSolver(roptions, options, journalist, prefix),
+      optimizationStatus_(Ipopt::Internal_Error),
       problemHadZeroDimension_(false),
       warmStartStrategy_(1),
       enable_warm_start_(false),
@@ -61,6 +63,7 @@ namespace Bonmin
       Ipopt::SmartPtr<Ipopt::OptionsList> options,
       Ipopt::SmartPtr<Ipopt::Journalist> journalist):
       TNLPSolver(roptions, options, journalist, "bonmin."),
+      optimizationStatus_(Ipopt::Internal_Error),
       problemHadZeroDimension_(false),
       warmStartStrategy_(1),
       enable_warm_start_(false),

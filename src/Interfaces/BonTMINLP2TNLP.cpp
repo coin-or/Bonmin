@@ -52,6 +52,7 @@ namespace Bonmin
       nnz_jac_g_(0),
       nnz_h_lag_(0),
       index_style_(TNLP::FORTRAN_STYLE),
+      return_status_(Ipopt::UNASSIGNED),
       obj_value_(1e100),
       curr_warm_starter_(),
       nlp_lower_bound_inf_(-DBL_MAX),
