@@ -19,13 +19,15 @@ namespace Bonmin
       OsiTMINLPInterface * si)
       :
       CbcHeuristic(model),
-      nlp_(si)
+      nlp_(si),
+      knowsSolution(false)
   {}
 
   DummyHeuristic::DummyHeuristic(OsiTMINLPInterface * si)
       :
       CbcHeuristic(),
-      nlp_(si)
+      nlp_(si),
+      knowsSolution(false)
   {}
 /// Assign an OsiTMINLPInterface
   void
