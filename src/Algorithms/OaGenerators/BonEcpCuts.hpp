@@ -40,7 +40,7 @@ namespace Bonmin
     {}
     /** Standard cut generation methods. */
     virtual void generateCuts(const OsiSolverInterface &si,  OsiCuts & cs,
-        const CglTreeInfo info = CglTreeInfo()) const;
+        const CglTreeInfo info = CglTreeInfo());
     double doEcpRounds(OsiSolverInterface &si,
         bool leaveSiUnchanged,
         double* violation = NULL);
