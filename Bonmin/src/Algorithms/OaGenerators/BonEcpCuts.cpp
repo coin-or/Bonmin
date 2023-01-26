@@ -45,7 +45,7 @@ namespace Bonmin
   void
   EcpCuts::generateCuts(const OsiSolverInterface &si,
       OsiCuts & cs,
-      const CglTreeInfo info) const
+      const CglTreeInfo info)
   {
     if (beta_ >=0) {
       BabInfo * babInfo = dynamic_cast<BabInfo *> (si.getAuxiliaryInfo());
