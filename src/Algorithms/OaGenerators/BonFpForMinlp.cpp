@@ -158,7 +158,10 @@ namespace Bonmin
            //nlp is solved and feasible
            // Update the cutoff
            ub = std::min(ub, nlp_->getObjValue());
-           cutoff = ub * (1 - parameters_.cbcCutoffIncrement_);
+           cutoff = ub > 0 ?
+                    ub * (1 - parameters_.cbcCutoffIncrement_):
+                    ub * (1 + parameters_.cbcCutoffIncrement_);
+           assert(cutoff < ub);
            
            numSols_++;
          }
