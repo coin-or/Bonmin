@@ -375,7 +375,7 @@ DISTCLEANFILES = Test/*.$(OBJEXT) Test/unitTest$(EXEEXT) \
 	Test/CppExample/*.$(OBJEXT) \
 	Test/CppExample/CppExample$(EXEEXT) Test/testtoy.nl \
 	$(am__append_4) $(VPATH_DISTCLEANFILES)
-DocFiles = README AUTHORS LICENSE 
+DocFiles = README README.md AUTHORS AUTHORS.md LICENSE LICENSE.md 
 DocInstallDir = $(datadir)/coin/doc/$(PACKAGE_NAME)
 COIN_HAS_DOXYGEN = @COIN_HAS_DOXYGEN_TRUE@TRUE
 COIN_HAS_LATEX = @COIN_HAS_LATEX_TRUE@TRUE
@@ -972,7 +972,7 @@ uninstall-all-doxygen-docs:
 	  fi ; \
 	done ; 
 
-install-doc: $(DocFiles) 
+install-doc: 
 	test -z "$(DocInstallDir)" || $(mkdir_p) "$(DESTDIR)$(DocInstallDir)"
 	for file in $(DocFiles); do \
 	  if test -f "$$file"; then dir=; else dir="$(srcdir)/"; fi; \
