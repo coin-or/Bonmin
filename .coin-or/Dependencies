@@ -1,6 +1,6 @@
-ThirdParty/HSL    https://github.com/coin-or-tools/ThirdParty-HSL master
+ThirdParty/HSL    https://github.com/coin-or-tools/ThirdParty-HSL stable/2.2
 ThirdParty/ASL    https://github.com/coin-or-tools/ThirdParty-ASL master
-ThirdParty/Mumps  https://github.com/coin-or-tools/ThirdParty-Mumps master
+ThirdParty/Mumps  https://github.com/coin-or-tools/ThirdParty-Mumps stable/3.0
 ThirdParty/Metis  https://github.com/coin-or-tools/ThirdParty-Metis master
 Data/Sample       https://github.com/coin-or-tools/Data-Sample master
 CoinUtils         https://github.com/coin-or/CoinUtils master
