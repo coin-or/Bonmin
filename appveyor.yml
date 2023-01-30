@@ -3,14 +3,6 @@ platform:
 
 environment:
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      ARCH: win32-msvc14
-      HOST_ARCH_ARG: --enable-msvc
-      ADD_PATH: /mingw64/bin
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ARCH: win32-msvc15
-      HOST_ARCH_ARG: --enable-msvc
-      ADD_PATH: /mingw64/bin
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARCH: x86_64-w64-mingw32
       HOST_ARCH_ARG: --host=x86_64-w64-mingw32
@@ -22,8 +14,6 @@ environment:
 
 install:
   - for /f "delims=" %%i in ('C:\msys64\usr\bin\bash -lc "if [ $APPVEYOR_REPO_BRANCH = 'master' ]; then echo 'master'; else echo $APPVEYOR_REPO_BRANCH | cut -d "/" -f 2; fi"') do set VERSION=%%i
-  - IF %ARCH%==win32-msvc14 (CALL C:\"Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat")
-  - IF %ARCH%==win32-msvc15 (CALL C:\"Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 8.1)
   - C:\msys64\usr\bin\bash -lc ""
 
 build_script:
