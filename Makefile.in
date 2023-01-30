@@ -54,8 +54,8 @@ host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) \
 	$(srcdir)/BuildTools/Makemain.inc $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure \
-	$(top_srcdir)/doxydoc/doxygen.conf.in INSTALL config.guess \
-	config.sub depcomp install-sh ltmain.sh missing
+	$(top_srcdir)/doxydoc/doxygen.conf.in INSTALL compile \
+	config.guess config.sub depcomp install-sh ltmain.sh missing
 @HAVE_EXTERNALS_TRUE@am__append_1 = Dependencies
 @HAVE_EXTERNALS_TRUE@am__append_2 = .Dependencies-stamp
 subdir = .
