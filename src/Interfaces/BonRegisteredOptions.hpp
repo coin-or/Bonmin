@@ -69,6 +69,7 @@ class BONMINLIB_EXPORT RegisteredOptions: public Ipopt::RegisteredOptions{
 
    //DECLARE_STD_EXCEPTION(OPTION_NOT_REGISTERED); 
    /** Set registering category with extra information.*/
+   using Ipopt::RegisteredOptions::SetRegisteringCategory;
    void SetRegisteringCategory (const std::string &registering_category,
                                 const ExtraCategoriesInfo extra){
       Ipopt::RegisteredOptions::SetRegisteringCategory(registering_category);
