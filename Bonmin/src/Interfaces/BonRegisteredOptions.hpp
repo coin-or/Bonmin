@@ -67,6 +67,7 @@ class RegisteredOptions: public Ipopt::RegisteredOptions{
     }
 
    //DECLARE_STD_EXCEPTION(OPTION_NOT_REGISTERED); 
+   using Ipopt::RegisteredOptions::SetRegisteringCategory;
    /** Set registering category with extra information.*/
    void SetRegisteringCategory (const std::string &registering_category,
                                 const ExtraCategoriesInfo extra){

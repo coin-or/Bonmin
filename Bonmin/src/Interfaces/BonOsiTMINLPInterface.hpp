@@ -1007,6 +1007,7 @@ void getBendersCut(OsiCuts &cs, bool global);
     virtual CoinMessageHandler* clone() const{
       return new OaMessageHandler(*this);}
     /** print an OsiRowCut.*/
+    using CoinMessageHandler::print;
     void print(OsiRowCut &row);
   };
   void setOaMessageHandler(const CoinMessageHandler &handler){
