@@ -12,7 +12,7 @@
 #include "OsiClpSolverInterface.hpp"
 #include "BonTMINLP.hpp"
 #include "IpIpoptApplication.hpp"
-#ifdef COIN_HAS_ASL
+#ifdef COIN_HAS_IPOPTAMPL
 #include "BonAmplTMINLP.hpp"
 #include "BonAmplSetup.hpp"
 #endif
@@ -281,7 +281,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
   std::cout<<"Test OsiTMINLPInterface with "
 	   <<solver->solverName()<<" solver"<<std::endl;
   // Test usefull constructor
-#ifdef COIN_HAS_ASL
+#ifdef COIN_HAS_IPOPTAMPL
   {
         //read a toy problem and do various tests
 //        var x binary;
@@ -383,7 +383,7 @@ void interfaceTest(Ipopt::SmartPtr<TNLPSolver> solver)
 //	     <<"---------------------------------------------------------------------------------------------------------------------------------------------------------"<<std::endl;
  //   testFp(si);
 //  }
-#endif // COIN_HAS_ASL
+#endif // COIN_HAS_IPOPTAMPL
   std::cout<<"All test passed successfully"<<std::endl;
 } 
 

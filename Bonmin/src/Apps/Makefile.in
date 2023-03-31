@@ -42,8 +42,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@COIN_HAS_ASL_TRUE@bin_PROGRAMS = bonmin$(EXEEXT)
-@COIN_HAS_ASL_TRUE@noinst_PROGRAMS = BonNodeSolver$(EXEEXT)
+@COIN_HAS_IPOPTAMPL_TRUE@bin_PROGRAMS = bonmin$(EXEEXT)
+@COIN_HAS_IPOPTAMPL_TRUE@noinst_PROGRAMS = BonNodeSolver$(EXEEXT)
 subdir = src/Apps
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -89,13 +89,6 @@ AMDEP_FALSE = @AMDEP_FALSE@
 AMDEP_TRUE = @AMDEP_TRUE@
 AMTAR = @AMTAR@
 AR = @AR@
-ASL_CFLAGS = @ASL_CFLAGS@
-ASL_CFLAGS_INSTALLED = @ASL_CFLAGS_INSTALLED@
-ASL_DATA = @ASL_DATA@
-ASL_DATA_INSTALLED = @ASL_DATA_INSTALLED@
-ASL_DEPENDENCIES = @ASL_DEPENDENCIES@
-ASL_LIBS = @ASL_LIBS@
-ASL_LIBS_INSTALLED = @ASL_LIBS_INSTALLED@
 ASTYLE = @ASTYLE@
 ASTYLEFLAGS = @ASTYLEFLAGS@
 AUTOCONF = @AUTOCONF@
@@ -134,8 +127,6 @@ COIN_CC_IS_CL_FALSE = @COIN_CC_IS_CL_FALSE@
 COIN_CC_IS_CL_TRUE = @COIN_CC_IS_CL_TRUE@
 COIN_CXX_IS_CL_FALSE = @COIN_CXX_IS_CL_FALSE@
 COIN_CXX_IS_CL_TRUE = @COIN_CXX_IS_CL_TRUE@
-COIN_HAS_ASL_FALSE = @COIN_HAS_ASL_FALSE@
-COIN_HAS_ASL_TRUE = @COIN_HAS_ASL_TRUE@
 COIN_HAS_COINDEPEND_FALSE = @COIN_HAS_COINDEPEND_FALSE@
 COIN_HAS_COINDEPEND_TRUE = @COIN_HAS_COINDEPEND_TRUE@
 COIN_HAS_CPX_FALSE = @COIN_HAS_CPX_FALSE@
@@ -144,6 +135,8 @@ COIN_HAS_DOXYGEN_FALSE = @COIN_HAS_DOXYGEN_FALSE@
 COIN_HAS_DOXYGEN_TRUE = @COIN_HAS_DOXYGEN_TRUE@
 COIN_HAS_FILTERSQP_FALSE = @COIN_HAS_FILTERSQP_FALSE@
 COIN_HAS_FILTERSQP_TRUE = @COIN_HAS_FILTERSQP_TRUE@
+COIN_HAS_IPOPTAMPL_FALSE = @COIN_HAS_IPOPTAMPL_FALSE@
+COIN_HAS_IPOPTAMPL_TRUE = @COIN_HAS_IPOPTAMPL_TRUE@
 COIN_HAS_LATEX_FALSE = @COIN_HAS_LATEX_FALSE@
 COIN_HAS_LATEX_TRUE = @COIN_HAS_LATEX_TRUE@
 COIN_HAS_OSICPX_FALSE = @COIN_HAS_OSICPX_FALSE@
@@ -191,6 +184,13 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+IPOPTAMPL_CFLAGS = @IPOPTAMPL_CFLAGS@
+IPOPTAMPL_CFLAGS_INSTALLED = @IPOPTAMPL_CFLAGS_INSTALLED@
+IPOPTAMPL_DATA = @IPOPTAMPL_DATA@
+IPOPTAMPL_DATA_INSTALLED = @IPOPTAMPL_DATA_INSTALLED@
+IPOPTAMPL_DEPENDENCIES = @IPOPTAMPL_DEPENDENCIES@
+IPOPTAMPL_LIBS = @IPOPTAMPL_LIBS@
+IPOPTAMPL_LIBS_INSTALLED = @IPOPTAMPL_LIBS_INSTALLED@
 LDFLAGS = @LDFLAGS@
 LIBEXT = @LIBEXT@
 LIBOBJS = @LIBOBJS@
@@ -306,13 +306,13 @@ bonmin_LDADD = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_LIBS) \
-	$(ASL_LIBS)
+	$(IPOPTAMPL_LIBS)
 
 bonmin_DEPENDENCIES = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_DEPENDENCIES) \
-	$(ASL_DEPENDENCIES)
+	$(IPOPTAMPL_DEPENDENCIES)
 
 
 # Here list all include flags, relative to this "srcdir" directory.  This
@@ -340,13 +340,13 @@ BonNodeSolver_LDADD = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_LIBS) \
-	$(ASL_LIBS)
+	$(IPOPTAMPL_LIBS)
 
 BonNodeSolver_DEPENDENCIES = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_DEPENDENCIES) \
-	$(ASL_DEPENDENCIES)
+	$(IPOPTAMPL_DEPENDENCIES)
 
 
 ########################################################################
@@ -585,7 +585,7 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 @COIN_CXX_IS_CL_FALSE@install-exec-hook:
-@COIN_HAS_ASL_FALSE@install-exec-hook:
+@COIN_HAS_IPOPTAMPL_FALSE@install-exec-hook:
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool \
@@ -657,10 +657,10 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 #                     Installing manifest (MSVC++)                     #
 ########################################################################
 
-@COIN_CXX_IS_CL_TRUE@@COIN_HAS_ASL_TRUE@install-exec-hook:
-@COIN_CXX_IS_CL_TRUE@@COIN_HAS_ASL_TRUE@	test -s bonmin.exe.manifest && \
-@COIN_CXX_IS_CL_TRUE@@COIN_HAS_ASL_TRUE@	mt -manifest bonmin.exe.manifest -outputresource:bonmin.exe;\
-@COIN_CXX_IS_CL_TRUE@@COIN_HAS_ASL_TRUE@	cp bonmin.exe $(bindir)/bonmin.exe
+@COIN_CXX_IS_CL_TRUE@@COIN_HAS_IPOPTAMPL_TRUE@install-exec-hook:
+@COIN_CXX_IS_CL_TRUE@@COIN_HAS_IPOPTAMPL_TRUE@	test -s bonmin.exe.manifest && \
+@COIN_CXX_IS_CL_TRUE@@COIN_HAS_IPOPTAMPL_TRUE@	mt -manifest bonmin.exe.manifest -outputresource:bonmin.exe;\
+@COIN_CXX_IS_CL_TRUE@@COIN_HAS_IPOPTAMPL_TRUE@	cp bonmin.exe $(bindir)/bonmin.exe
 
 astyle: $(ASTYLE_FILES)
 

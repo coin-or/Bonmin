@@ -25,7 +25,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin/Heuristics` \
-	$(BONMINLIB_CFLAGS) $(ASL_CFLAGS)
+	$(BONMINLIB_CFLAGS) $(IPOPTAMPL_CFLAGS)
 
 ########################################################################
 #                                robotbonmin                                  #
@@ -37,7 +37,7 @@ robotbonmin_SOURCES = Robot-bonmin.cpp \
 robotbonmin_LDADD = \
 	../../src/Interfaces/Ampl/libbonamplinterface.la \
 	../../src/CbcBonmin/libbonmin.la \
-	$(ASL_LIBS) \
+	$(IPOPTAMPL_LIBS) \
 	$(BONMINLIB_LIBS)
 
 ########################################################################

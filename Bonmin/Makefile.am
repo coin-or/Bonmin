@@ -99,7 +99,7 @@ astyle:
 
 pkgconfiglibdir = $(libdir)/pkgconfig
 pkgconfiglib_DATA = bonmin.pc
-if COIN_HAS_ASL
+if COIN_HAS_IPOPTAMPL
 pkgconfiglib_DATA += bonminamplinterface.pc
 endif
 

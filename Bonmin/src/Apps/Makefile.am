@@ -10,7 +10,7 @@ AUTOMAKE_OPTIONS = foreign
 
 # What is done in this directory:
 
-if COIN_HAS_ASL
+if COIN_HAS_IPOPTAMPL
   bin_PROGRAMS = bonmin
   noinst_PROGRAMS = BonNodeSolver
 endif
@@ -25,13 +25,13 @@ bonmin_LDADD = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_LIBS) \
-	$(ASL_LIBS)
+	$(IPOPTAMPL_LIBS)
 
 bonmin_DEPENDENCIES = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_DEPENDENCIES) \
-	$(ASL_DEPENDENCIES)
+	$(IPOPTAMPL_DEPENDENCIES)
 
 # Here list all include flags, relative to this "srcdir" directory.  This
 # "cygpath" stuff is necessary to compile with native compilers on Windows
@@ -59,19 +59,19 @@ BonNodeSolver_LDADD = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_LIBS) \
-	$(ASL_LIBS)
+	$(IPOPTAMPL_LIBS)
 
 BonNodeSolver_DEPENDENCIES = \
 	../CbcBonmin/libbonminampl.la \
 	../CbcBonmin/libbonmin.la \
 	$(BONMINLIB_DEPENDENCIES) \
-	$(ASL_DEPENDENCIES)
+	$(IPOPTAMPL_DEPENDENCIES)
 
 ########################################################################
 #                     Installing manifest (MSVC++)                     #
 ########################################################################
 
-if COIN_HAS_ASL
+if COIN_HAS_IPOPTAMPL
 if COIN_CXX_IS_CL
 install-exec-hook:
 	test -s bonmin.exe.manifest && \

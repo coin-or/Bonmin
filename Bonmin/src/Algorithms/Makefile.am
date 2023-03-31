@@ -15,7 +15,7 @@ SUBDIRS = \
        Branching \
        QuadCuts
 
-if COIN_HAS_ASL
+if COIN_HAS_IPOPTAMPL
 SUBDIRS += Ampl
 endif
 

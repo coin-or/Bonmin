@@ -10,7 +10,7 @@ AUTOMAKE_OPTIONS = foreign
 
 #We need to do autothings in the subdirectories for the different interfaces
 SUBDIRS = Ipopt
-if COIN_HAS_ASL
+if COIN_HAS_IPOPTAMPL
 SUBDIRS += Ampl
 endif
 if COIN_HAS_FILTERSQP

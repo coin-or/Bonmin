@@ -25,7 +25,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/Interfaces/Ampl` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin` \
 	-I`$(CYGPATH_W) $(srcdir)/../../src/CbcBonmin/Heuristics` \
-	$(BONMINLIB_CFLAGS) $(ASL_CFLAGS)
+	$(BONMINLIB_CFLAGS) $(IPOPTAMPL_CFLAGS)
 
 ########################################################################
 #                                sepa                                  #
@@ -42,7 +42,7 @@ sepa_SOURCES = Sepa.cpp \
 sepa_LDADD = \
 	../../src/Interfaces/Ampl/libbonamplinterface.la \
 	../../src/CbcBonmin/libbonmin.la \
-	$(ASL_LIBS) \
+	$(IPOPTAMPL_LIBS) \
 	$(BONMINLIB_LIBS)
 
 ########################################################################

@@ -12,7 +12,7 @@ SUBDIRS = Heuristics
 
 # Name of the library in this directory
 lib_LTLIBRARIES = libbonmin.la
-if COIN_HAS_ASL
+if COIN_HAS_IPOPTAMPL
 lib_LTLIBRARIES += libbonminampl.la
 endif
 

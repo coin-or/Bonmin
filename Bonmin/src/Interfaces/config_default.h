@@ -17,4 +17,4 @@
 #define COIN_BONMIN_VERBOSITY 0
 
 /* If defined, the Ampl Solver Library is available. */
-#define COIN_HAS_ASL 1
+#define COIN_HAS_IPOPTAMPL 1

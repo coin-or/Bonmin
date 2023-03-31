@@ -21,9 +21,6 @@
 /* Define to the debug verbosity level (0 is no output) */
 #undef COIN_BONMIN_VERBOSITY
 
-/* Define to 1 if the ASL package is available */
-#undef COIN_HAS_ASL
-
 /* Define to 1 if the CoinDepend package is available */
 #undef COIN_HAS_COINDEPEND
 
@@ -32,6 +29,9 @@
 
 /* Define to 1 if the FilterSQP package is available */
 #undef COIN_HAS_FILTERSQP
+
+/* Define to 1 if the IpoptAmpl package is available */
+#undef COIN_HAS_IPOPTAMPL
 
 /* Define to 1 if the OsiCpx package is available */
 #undef COIN_HAS_OSICPX

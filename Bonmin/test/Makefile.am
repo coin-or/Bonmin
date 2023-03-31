@@ -14,7 +14,7 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_PROGRAMS = 
 
-if COIN_HAS_ASL
+if COIN_HAS_IPOPTAMPL
 noinst_PROGRAMS += unitTest
 endif
 
@@ -24,13 +24,13 @@ unitTest_SOURCES = \
 	InterfaceTest.cpp 
 
 # List libraries that need to be linked in
-# libs with AMPL interface have to come before ASLLIB
+# libs with AMPL interface have to come before IPOPTAMPL_LIBS
 unitTest_LDADD =
 unitTest_DEPENDENCIES =
 
-if COIN_HAS_ASL
-unitTest_LDADD        += ../src/CbcBonmin/libbonminampl.la $(ASL_LIBS)
-unitTest_DEPENDENCIES += ../src/CbcBonmin/libbonminampl.la $(ASL_DEPENDENCIES)
+if COIN_HAS_IPOPTAMPL
+unitTest_LDADD        += ../src/CbcBonmin/libbonminampl.la $(IPOPTAMPL_LIBS)
+unitTest_DEPENDENCIES += ../src/CbcBonmin/libbonminampl.la $(IPOPTAMPL_DEPENDENCIES)
 endif
 
 unitTest_LDADD        += ../src/CbcBonmin/libbonmin.la $(BONMINLIB_LIBS)
@@ -60,7 +60,7 @@ AM_CPPFLAGS = \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Branching` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/OaGenerators` \
 	-I`$(CYGPATH_W) $(srcdir)/../src/Algorithms/Ampl` \
-	$(BONMINLIB_CFLAGS) $(ASL_CFLAGS) 
+	$(BONMINLIB_CFLAGS) $(IPOPTAMPL_CFLAGS) 
 
 # This line is necessary to allow VPATH compilation
 DEFAULT_INCLUDES = -I. -I`$(CYGPATH_W) $(srcdir)` -I$(top_builddir)/src/Interfaces

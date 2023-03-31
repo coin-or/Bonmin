@@ -8,7 +8,7 @@ AUTOMAKE_OPTIONS = foreign
 
 # What is done in this directory:
 
-if COIN_HAS_ASL
+if COIN_HAS_IPOPTAMPL
   bin_PROGRAMS = bonminbcp
 endif
 
