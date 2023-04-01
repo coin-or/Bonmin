@@ -63,6 +63,7 @@ if test $coin_has_coindepend != yes ; then
 fi
 
 AC_COIN_CHECK_PACKAGE(IpoptAmpl, [ipoptamplinterface], [BonminAmplInterfaceLib])
+AC_COIN_CHECK_PACKAGE(ASL, [coinasl], [BonminAmplInterfaceLib])
 
 #AC_COIN_CHECK_PACKAGE(Bcp, [bcp])
 #

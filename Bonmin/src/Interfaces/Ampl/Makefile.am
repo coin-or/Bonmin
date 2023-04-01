@@ -30,7 +30,7 @@ libbonamplinterface_la_LDFLAGS = $(LT_LDFLAGS)
 AM_CPPFLAGS = \
         -I`$(CYGPATH_W) $(srcdir)/..` \
         -I`$(CYGPATH_W) $(srcdir)/../Ipopt` \
-        $(BONMINLIB_CFLAGS) $(IPOPTAMPL_CFLAGS)
+        $(BONMINLIB_CFLAGS) $(IPOPTAMPL_CFLAGS) $(ASL_CFLAGS)
 
 if COIN_HAS_FILTERSQP
   AM_CPPFLAGS += -I`$(CYGPATH_W) $(srcdir)/../Filter` 
