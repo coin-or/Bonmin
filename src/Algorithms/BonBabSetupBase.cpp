@@ -780,7 +780,7 @@ namespace Bonmin
     const double * upPsCosts = nonlinearSolver()->getUpPsCosts();
     const int * directions = nonlinearSolver()->getBranchingDirections();
     bool hasPseudo = (upPsCosts!=NULL);
-    if (priorities == NULL && directions && NULL && hasPseudo)
+    if ((priorities == NULL) && (directions == NULL) && hasPseudo)
       return;
     int n = nonlinearSolver()->numberObjects();
     OsiObject ** objects = nonlinearSolver()->objects();
