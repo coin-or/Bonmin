@@ -9,6 +9,9 @@
 /* Define to 1 if ASL is available. */
 #undef BONMIN_HAS_ASL
 
+/* Define to 1 if Cbc is available. */
+#undef BONMIN_HAS_CBC
+
 /* Define to 1 if Cgl is available. */
 #undef BONMIN_HAS_CGL
 

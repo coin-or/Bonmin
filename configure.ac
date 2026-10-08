@@ -42,7 +42,7 @@ AC_COIN_RPATH_FLAGS([$expanded_libdir])
 #                           COIN-OR components                              #
 #############################################################################
 
-m4_foreach_w([myvar],[CoinUtils Osi Cgl Clp],
+m4_foreach_w([myvar],[CoinUtils Osi Cgl Clp Cbc],
   [ AC_COIN_CHK_PKG(myvar,[BonminLib BonminAmplInterfaceLib])
     if test $coin_has_[]m4_tolower(myvar) != yes ; then
       AC_MSG_ERROR([Required package myvar is not available.])

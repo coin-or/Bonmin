@@ -690,6 +690,8 @@ COIN_HAS_OSICLP_FALSE
 COIN_HAS_OSICLP_TRUE
 COIN_HAS_IPOPT_FALSE
 COIN_HAS_IPOPT_TRUE
+COIN_HAS_CBC_FALSE
+COIN_HAS_CBC_TRUE
 COIN_HAS_CLP_FALSE
 COIN_HAS_CLP_TRUE
 COIN_HAS_CGL_FALSE
@@ -878,6 +880,9 @@ with_cgl_cflags
 with_clp
 with_clp_lflags
 with_clp_cflags
+with_cbc
+with_cbc_lflags
+with_cbc_cflags
 with_ipopt
 with_ipopt_lflags
 with_ipopt_cflags
@@ -1610,6 +1615,16 @@ Optional Packages:
   --with-clp-lflags       Linker flags for Clp appropriate for your
                           environment. (Most often, -l specs for libraries.)
   --with-clp-cflags       Compiler flags for Clp appropriate for your
+                          environment. (Most often, -I specs for header file
+                          directories.)
+  --without-cbc           Do not use Cbc. If an argument is given to
+                          --with-cbc, then 'yes' is equivalent to
+                          --with-cbc, 'no' is equivalent to
+                          --without-cbc and any other argument is applied as
+                          for --with-cbc-lflags.
+  --with-cbc-lflags       Linker flags for Cbc appropriate for your
+                          environment. (Most often, -l specs for libraries.)
+  --with-cbc-cflags       Compiler flags for Cbc appropriate for your
                           environment. (Most often, -I specs for header file
                           directories.)
   --without-ipopt         Do not use Ipopt. If an argument is given to
@@ -20364,6 +20379,257 @@ printf "%s\n" "#define BONMIN_HAS_CLP 1" >>confdefs.h
 
 
 
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for package Cbc" >&5
+printf %s "checking for package Cbc... " >&6; }
+
+
+
+
+
+
+
+
+
+
+
+  coin_has_cbc=noInfo
+  if test x"$COIN_SKIP_PROJECTS" != x ; then
+    for pkg in `echo $COIN_SKIP_PROJECTS | tr '[:upper:]' '[:lower:]'` ; do
+      if test "$pkg" = "cbc" ; then
+        coin_has_cbc=skipping
+      fi
+    done
+  fi
+
+
+  if test "$coin_has_cbc" != skipping ; then
+
+
+
+
+# Check whether --with-cbc was given.
+if test ${with_cbc+y}
+then :
+  withval=$with_cbc;
+fi
+
+
+
+# Check whether --with-cbc-lflags was given.
+if test ${with_cbc_lflags+y}
+then :
+  withval=$with_cbc_lflags;
+fi
+
+
+
+# Check whether --with-cbc-cflags was given.
+if test ${with_cbc_cflags+y}
+then :
+  withval=$with_cbc_cflags;
+fi
+
+
+
+
+
+
+
+
+
+
+
+
+  coin_has_cbc=requested
+
+  cbc_lflags=
+  cbc_cflags=
+  cbc_data=
+  cbc_pcfiles="cbc"
+
+
+  withval="$with_cbc"
+  if test -n "$withval" ; then
+    case "$withval" in
+      no )
+        coin_has_cbc=skipping
+        cbc_failmode='command line'
+        ;;
+      yes )
+        coin_has_cbc=requested
+        cbc_failmode=''
+        ;;
+      build )
+        coin_has_cbc=requested
+        cbc_build=yes
+        cbc_failmode=''
+        ;;
+      * )
+        coin_has_cbc=requested
+        cbc_failmode=''
+        cbc_lflags="$withval"
+        cbc_pcfiles=''
+        ;;
+    esac
+  else
+    if test -n "$with_cbc_lflags" ||
+       test -n "$with_cbc_cflags" ||
+       test -n "$with_cbc_data" ; then
+      coin_has_cbc=requested
+      cbc_failmode=''
+      cbc_pcfiles=''
+    fi
+  fi
+
+
+  if test "$coin_has_cbc" != skipping ; then
+       withval="$with_cbc_lflags"
+       if test -n "$withval" ; then
+         case "$withval" in
+           build | no | yes )
+             as_fn_error $? "\"$withval\" is not useful here; please specify link flags appropriate for your environment." "$LINENO" 5
+             ;;
+           * )
+             coin_has_cbc=yes
+             cbc_lflags="$withval"
+             cbc_pcfiles=''
+             ;;
+         esac
+       fi
+
+       withval="$with_cbc_cflags"
+       if test -n "$withval" ; then
+         case "$withval" in
+           build | no | yes )
+             as_fn_error $? "\"$withval\" is not useful here; please specify compile flags appropriate for your environment." "$LINENO" 5
+             ;;
+           * )
+             coin_has_cbc=yes
+             cbc_cflags="$withval"
+             cbc_pcfiles=''
+             ;;
+         esac
+       fi
+     fi
+
+
+
+
+
+  if test $coin_has_cbc = requested ; then
+    if test -n "$PKG_CONFIG" ; then
+      if test x"$cbc_build" = xyes ; then
+        pcfile="coin$cbc_pcfiles"
+
+
+
+  if test -n "$PKG_CONFIG" ; then
+    if PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --exists "$pcfile" ; then
+      CBC_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
+      coin_has_cbc=yes
+    else
+      CBC_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
+      coin_has_cbc=no
+    fi
+  else
+    as_fn_error $? "\"Cannot check for existence of module cbc without pkgconf\"" "$LINENO" 5
+  fi
+
+      fi
+      if ! test $coin_has_cbc = yes ; then
+        pcfile="$cbc_pcfiles"
+
+
+
+  if test -n "$PKG_CONFIG" ; then
+    if PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --exists "$pcfile" ; then
+      CBC_VERSIONS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --modversion "$pcfile" 2>/dev/null | tr '\n' ' '`
+      coin_has_cbc=yes
+    else
+      CBC_PKG_ERRORS=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG $pkg_short_errors --errors-to-stdout --print-errors "$pcfile"`
+      coin_has_cbc=no
+    fi
+  else
+    as_fn_error $? "\"Cannot check for existence of module cbc without pkgconf\"" "$LINENO" 5
+  fi
+
+      fi
+      if test $coin_has_cbc = yes ; then
+        cbc_data=`PKG_CONFIG_PATH="$COIN_PKG_CONFIG_PATH" $PKG_CONFIG --variable=datadir "$pcfile" 2>/dev/null`
+        cbc_pcfiles="$pcfile"
+      fi
+    else
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: Check for cbc via pkg-config could not be performed as there is no pkg-config available. Consider installing pkg-config or provide appropriate values for --with-cbc-lflags and --with-cbc-cflags." >&5
+printf "%s\n" "$as_me: WARNING: Check for cbc via pkg-config could not be performed as there is no pkg-config available. Consider installing pkg-config or provide appropriate values for --with-cbc-lflags and --with-cbc-cflags." >&2;}
+      coin_has_cbc=no
+    fi
+  fi
+
+
+  if test "$BUILDTOOLS_DEBUG" = 1 ; then
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: FIND_PRIM_PKG result for cbc: \"$coin_has_cbc\"" >&5
+printf "%s\n" "$as_me: FIND_PRIM_PKG result for cbc: \"$coin_has_cbc\"" >&6;}
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Collected values for package 'cbc'" >&5
+printf "%s\n" "$as_me: Collected values for package 'cbc'" >&6;}
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: cbc_lflags is \"$cbc_lflags\"" >&5
+printf "%s\n" "$as_me: cbc_lflags is \"$cbc_lflags\"" >&6;}
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: cbc_cflags is \"$cbc_cflags\"" >&5
+printf "%s\n" "$as_me: cbc_cflags is \"$cbc_cflags\"" >&6;}
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: cbc_data is \"$cbc_data\"" >&5
+printf "%s\n" "$as_me: cbc_data is \"$cbc_data\"" >&6;}
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: cbc_pcfiles is \"$cbc_pcfiles\"" >&5
+printf "%s\n" "$as_me: cbc_pcfiles is \"$cbc_pcfiles\"" >&6;}
+  fi
+
+
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $coin_has_cbc" >&5
+printf "%s\n" "$coin_has_cbc" >&6; }
+  else
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $coin_has_cbc (COIN_SKIP_PROJECTS)" >&5
+printf "%s\n" "$coin_has_cbc (COIN_SKIP_PROJECTS)" >&6; }
+  fi
+
+
+  if test "$coin_has_cbc" != yes ; then
+    coin_has_cbc=no
+  fi
+
+
+   if test $coin_has_cbc = yes; then
+  COIN_HAS_CBC_TRUE=
+  COIN_HAS_CBC_FALSE='#'
+else
+  COIN_HAS_CBC_TRUE='#'
+  COIN_HAS_CBC_FALSE=
+fi
+
+
+
+  if test $coin_has_cbc = yes ; then
+
+printf "%s\n" "#define BONMIN_HAS_CBC 1" >>confdefs.h
+
+    BONMINLIB_PCFILES="$cbc_pcfiles $BONMINLIB_PCFILES"
+       BONMINLIB_LFLAGS="$cbc_lflags $BONMINLIB_LFLAGS"
+       BONMINLIB_CFLAGS="$cbc_cflags $BONMINLIB_CFLAGS"
+      BONMINAMPLINTERFACELIB_PCFILES="$cbc_pcfiles $BONMINAMPLINTERFACELIB_PCFILES"
+       BONMINAMPLINTERFACELIB_LFLAGS="$cbc_lflags $BONMINAMPLINTERFACELIB_LFLAGS"
+       BONMINAMPLINTERFACELIB_CFLAGS="$cbc_cflags $BONMINAMPLINTERFACELIB_CFLAGS"
+
+
+
+  fi
+
+    if test $coin_has_cbc != yes ; then
+      as_fn_error $? "Required package Cbc is not available." "$LINENO" 5
+    fi
+
+
+
+
+
+
+
 
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for package Ipopt" >&5
@@ -22269,6 +22535,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${COIN_HAS_CLP_TRUE}" && test -z "${COIN_HAS_CLP_FALSE}"; then
   as_fn_error $? "conditional \"COIN_HAS_CLP\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${COIN_HAS_CBC_TRUE}" && test -z "${COIN_HAS_CBC_FALSE}"; then
+  as_fn_error $? "conditional \"COIN_HAS_CBC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${COIN_HAS_IPOPT_TRUE}" && test -z "${COIN_HAS_IPOPT_FALSE}"; then
