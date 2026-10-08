@@ -42,10 +42,12 @@ AC_COIN_RPATH_FLAGS([$expanded_libdir])
 #                           COIN-OR components                              #
 #############################################################################
 
-AC_COIN_CHK_PKG(Cbc,[BonminLib])
-if test $coin_has_cbc != yes ; then
-  AC_MSG_ERROR([Required package Cbc is not available.])
-fi
+m4_foreach_w([myvar],[CoinUtils Osi Cgl Clp],
+  [ AC_COIN_CHK_PKG(myvar,[BonminLib BonminAmplInterfaceLib])
+    if test $coin_has_[]m4_tolower(myvar) != yes ; then
+      AC_MSG_ERROR([Required package myvar is not available.])
+    fi
+  ])
 
 AC_COIN_CHK_PKG(Ipopt,[BonminLib])
 if test $coin_has_ipopt != yes ; then

@@ -9,8 +9,14 @@
 /* Define to 1 if ASL is available. */
 #undef BONMIN_HAS_ASL
 
-/* Define to 1 if Cbc is available. */
-#undef BONMIN_HAS_CBC
+/* Define to 1 if Cgl is available. */
+#undef BONMIN_HAS_CGL
+
+/* Define to 1 if Clp is available. */
+#undef BONMIN_HAS_CLP
+
+/* Define to 1 if CoinUtils is available. */
+#undef BONMIN_HAS_COINUTILS
 
 /* Define to 1 if the Cplex package is available */
 #undef BONMIN_HAS_CPLEX
@@ -20,6 +26,9 @@
 
 /* Define to 1 if Ipopt is available. */
 #undef BONMIN_HAS_IPOPT
+
+/* Define to 1 if Osi is available. */
+#undef BONMIN_HAS_OSI
 
 /* Define to 1 if OsiClp is available. */
 #undef BONMIN_HAS_OSICLP
@@ -100,7 +109,7 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Define to 1 if all of the C90 standard headers exist (not just the ones
+/* Define to 1 if all of the C89 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */
 #undef STDC_HEADERS
