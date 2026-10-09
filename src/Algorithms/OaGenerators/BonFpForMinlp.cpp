@@ -229,6 +229,24 @@ namespace Bonmin
         handler_->message(FP_MILP_VAL, messages_) 
         <<colsol[nlp_->getNumCols()]<<CoinMessageEol;
          
+      // If the MILP returns the integer assignment we just processed, the
+      // cuts and cutoff failed to exclude it (typically the violation is
+      // within the LP tolerances on degenerate problems). The next pass would
+      // generate the same cuts again, so stop instead of looping forever.
+      if(colsol){
+        bool sameAssignment = true;
+        for(unsigned int i = 0 ; i < indices.size() ; i++){
+          if(fabs(colsol[indices[i]] - x_bar[i]) > 0.5){
+            sameAssignment = false;
+            break;
+          }
+        }
+        if(sameAssignment){
+          handler_->message(FP_STALLED, messages_)<<CoinMessageEol;
+          break;
+        }
+      }
+
       }/** endif localSearch*/
       else {
         colsol = NULL;
