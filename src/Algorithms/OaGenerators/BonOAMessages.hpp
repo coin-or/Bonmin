@@ -31,6 +31,7 @@ namespace Bonmin
     FP_MILP_VAL,
     FP_MAJOR_ITERATION,
     FP_MINOR_ITERATION,
+    FP_STALLED,
     DUMMY_END
   };
 
