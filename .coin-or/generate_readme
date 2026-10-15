@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+# Exit when command fails
+set -e
+#Attempt to use undefined variable outputs error message, and forces an exit
+set -u
+#Causes a pipeline to return the exit status of the last command in the pipe
+#that returned a non-zero return value.
+set -o pipefail
+#set -x
+
+source $COINBREW_HOME/scripts/generate_readme
+
+pushd . > /dev/null
+cd $(dirname $0)
+SCRIPT_DIR=$PWD
+popd > /dev/null
+
+create_variables $SCRIPT_DIR/config.yml
+
+make_header
+
+echo "Bonmin (*B*asic *O*pen-source *N*onlinear *M*ixed *IN*teger programming) is
+an open-source code for solving general MINLP (Mixed Integer NonLinear
+Programming) problems. It builds on top of [Cbc](https://github.com/coin-or/Cbc)
+and [Ipopt](https://github.com/coin-or/Ipopt).
+It can be used as a callable library, through its C++ or C interfaces, or as
+a stand-alone executable that reads models written in [AMPL](https://ampl.com).
+
+Bonmin features several algorithms, selected with the \`algorithm\` option:
+ * B-BB, an NLP-based branch-and-bound algorithm (the default),
+ * B-OA, an outer-approximation decomposition algorithm,
+ * B-QG, an implementation of Quesada and Grossmann's branch-and-cut algorithm,
+ * B-Hyb, a hybrid outer-approximation based branch-and-cut algorithm,
+ * B-Ecp, an ECP cuts based branch-and-cut algorithm a la FilMINT,
+ * B-iFP, an iterated feasibility pump for MINLP.
+
+These algorithms are exact when the problem is convex. For nonconvex
+problems, they are heuristics.
+
+Bonmin can also be used through
+ * AMPL (natively, using the \`bonmin\` executable),
+ * GAMS (through the [GAMSlinks](https://github.com/coin-or/GAMSlinks) project),
+ * [JuMP](https://github.com/jump-dev/AmplNLWriter.jl) (Julia, via AmplNLWriter),
+ * [Pyomo](https://github.com/Pyomo/pyomo) (Python),
+ * [NEOS](https://neos-server.org/neos/solvers/minco:Bonmin/AMPL.html).
+
+This project was initiated in 2004 by IBM and Carnegie Mellon University as
+part of a joint effort to study algorithms for MINLP. You may find additional
+information at http://egon.cheme.cmu.edu/ibm/page.htm, in particular
+ * A publicly available library of test instances of convex MINLPs,
+ * Research papers on new algorithmic procedures for MINLP.
+
+Bonmin was developed by Pierre Bonami and the other contributors listed in
+[AUTHORS](AUTHORS). "
+
+# There is no Homebrew formula for Bonmin and Debian/Ubuntu only provide the
+# library package, so drop the Homebrew entries and fix the apt command.
+make_build_info | awk '
+  /^   \* linuxbrew:/ || /^ \* \*Mac OS X\*:/ { skip = 1; fences = 0; next }
+  skip { if (/```/ && ++fences == 2) skip = 0; next }
+  { sub(/coinor-bonmin coinor-libbonmin-dev/, "coinor-libbonmin-dev"); print }'
+
+echo "### Linear solvers for Ipopt
+
+Bonmin solves its NLP subproblems with Ipopt, which needs a sparse linear
+solver. When building with \`coinbrew\`, [MUMPS](https://github.com/coin-or-tools/ThirdParty-Mumps)
+is built by default. The HSL codes (e.g., MA27) are often faster. To use them,
+obtain the source from [HSL](https://www.hsl.rl.ac.uk/ipopt/) and follow the
+instructions in [ThirdParty-HSL](https://github.com/coin-or-tools/ThirdParty-HSL)
+before building.
+"
+
+make_doxygen_info
+
+echo "## DOCUMENTATION
+
+ * [User's Manual](https://coin-or.github.io/Bonmin) (LaTeX source in the [doc](doc) directory)
+ * [List of options](https://coin-or.github.io/Bonmin/options_list.html)
+ * Source code [examples](examples)
+"
+
+make_links
