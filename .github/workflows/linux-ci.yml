@@ -18,25 +18,29 @@ jobs:
     name: Run tests
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04]
         build_static: [true, false]
         flags: [ADD_CXXFLAGS=-fvisibility=hidden]
         download_requirements: [sudo apt install -y -qq gfortran liblapack-dev libmetis-dev libnauty-dev]
         include:
-          # gcc provides gfortran, which is needed to build MUMPS for Ipopt
+          # gcc provides gfortran, which is needed to build MUMPS for Ipopt.
+          # metis is not installed: on Intel, MUMPS' configure finds Homebrew's
+          # libmetis with clang, but linking with gfortran then fails with
+          # "ld: library 'metis' not found".
           - os: macos-26-intel
             build_static: false
             flags: CC=clang CXX=clang++
-            download_requirements: brew install metis bash gcc
+            download_requirements: brew install bash gcc
           - os: macos-26
             build_static: false
             flags: CC=gcc-15 CXX=g++-15 ADD_CXXFLAGS=-Wl,-ld_classic
-            download_requirements: brew install metis bash gcc
+            download_requirements: brew install bash gcc
           - os: macos-15
             build_static: false
             flags: CC=clang CXX=clang++
-            download_requirements: brew install metis bash gcc
+            download_requirements: brew install bash gcc
 
     steps:
       - name: Checkout source
