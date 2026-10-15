@@ -78,6 +78,9 @@ jobs:
           # Bonmin does not use Ipopt's Java interface, which fails to build
           # here (jni.h not found)
           ADD_BUILD_ARGS+=( --disable-java )
+          # Clp 1.17 calls the dummy MPI functions of MUMPS' libseq, which the
+          # DLL of ThirdParty-Mumps 3.0 does not export, so build static libraries
+          ADD_BUILD_ARGS+=( --disable-shared )
           ADD_BUILD_ARGS+=( --verbosity 2 )
           [[ ${{ matrix.debug }} == "true" ]] && ADD_BUILD_ARGS+=( --enable-debug )
           [[ ${{ matrix.arch }} == "msvc" ]] && ADD_BUILD_ARGS+=( --enable-msvc=MD )
