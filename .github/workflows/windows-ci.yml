@@ -21,12 +21,12 @@ jobs:
       fail-fast: false
       matrix:
         include: [
-          { os: windows-2022, arch: x86_64, msystem: mingw64, debug: true, suffix: "-dbg" },
-          { os: windows-2025, arch: x86_64, msystem: mingw64, debug: false, suffix: "" },
+          { os: windows-2022, arch: x86_64, msystem: ucrt64, debug: true, suffix: "-dbg" },
+          { os: windows-2025, arch: x86_64, msystem: ucrt64, debug: false, suffix: "" },
           # MSVC builds are disabled: Ipopt needs LAPACK and MUMPS, and the
           # runners have no Fortran compiler or MKL that works with cl.
-          # { os: windows-2022, arch: msvc, msystem: mingw64, debug: true, suffix: "-dbg" },
-          # { os: windows-2025, arch: msvc, msystem: mingw64, debug: false, suffix: "-md" },
+          # { os: windows-2022, arch: msvc, msystem: ucrt64, debug: true, suffix: "-dbg" },
+          # { os: windows-2025, arch: msvc, msystem: ucrt64, debug: false, suffix: "-md" },
         ]
     steps:
       - name: Checkout source
@@ -63,7 +63,7 @@ jobs:
       - name: Install requirements
         if: ${{ matrix.arch != 'msvc' }}
         run: |
-          pacman -S --noconfirm --needed mingw-w64-${{ matrix.arch }}-gcc mingw-w64-${{ matrix.arch }}-gcc-fortran mingw-w64-${{ matrix.arch }}-lapack mingw-w64-${{ matrix.arch }}-metis
+          pacman -S --noconfirm --needed ${MINGW_PACKAGE_PREFIX}-gcc ${MINGW_PACKAGE_PREFIX}-gcc-fortran ${MINGW_PACKAGE_PREFIX}-lapack ${MINGW_PACKAGE_PREFIX}-metis
         shell: msys2 {0}
       - name: Build project
         run: |
