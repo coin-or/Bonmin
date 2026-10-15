@@ -72,6 +72,9 @@ jobs:
           ADD_ARGS+=( --skip='ThirdParty/Metis ThirdParty/Blas ThirdParty/Lapack' )
           ADD_BUILD_ARGS=()
           ADD_BUILD_ARGS+=( --build=x86_64-w64-mingw32 --tests main --enable-relocatable )
+          # Bonmin does not use Ipopt's Java interface, which fails to build
+          # here (jni.h not found)
+          ADD_BUILD_ARGS+=( --disable-java )
           ADD_BUILD_ARGS+=( --verbosity 2 )
           [[ ${{ matrix.debug }} == "true" ]] && ADD_BUILD_ARGS+=( --enable-debug )
           [[ ${{ matrix.arch }} == "msvc" ]] && ADD_BUILD_ARGS+=( --enable-msvc )
