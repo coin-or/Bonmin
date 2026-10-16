@@ -35,6 +35,7 @@ namespace Bonmin
     ADD_MSG(FP_MILP_VAL, std_m,2,"MILP solution has value w.r.t original objective: %10g");
     ADD_MSG(FP_MAJOR_ITERATION, std_m,1,"Major iteration %i ub: %g");
     ADD_MSG(FP_MINOR_ITERATION, std_m,1,"Minor iteration %i ub: %g");
+    ADD_MSG(FP_STALLED, std_m,1,"MILP returned the same integer assignment again (cutoff not enforced within LP tolerances), stopping. Increasing cutoff_decr may help.");
   }
 
 }//end namespace Bonmin
