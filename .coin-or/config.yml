@@ -13,9 +13,9 @@ Description:
     are exact when the problem is convex and act as heuristics otherwise.
   Manager: Pierre Bonami
   Homepage: https://github.com/coin-or/Bonmin
-  License: Eclipse Public License 1.0
-  LicenseURL: http://www.opensource.org/licenses/EPL-1.0
-  Zenodo: 28551157
+  License: Eclipse Public License 2.0
+  LicenseURL: http://www.opensource.org/licenses/EPL-2.0
+  Zenodo:
   IncludedIn:
     Package: Bonmin
   Language:
