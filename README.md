@@ -48,15 +48,13 @@ information at http://egon.cheme.cmu.edu/ibm/page.htm, in particular
 Bonmin was developed by Pierre Bonami and the other contributors listed in
 [AUTHORS](AUTHORS). 
 
-Bonmin is written in C++ and is released as open source under the [Eclipse Public License 1.0](http://www.opensource.org/licenses/EPL-1.0).
+Bonmin is written in C++ and is released as open source under the [Eclipse Public License 2.0](http://www.opensource.org/licenses/EPL-2.0).
 
 It is distributed under the auspices of the [COIN-OR Foundation](https://www.coin-or.org).
 
 The Bonmin development site is https://github.com/coin-or/Bonmin.
 
 ## CITE
-
-Code: [![DOI](https://zenodo.org/badge/28551157.svg)](https://zenodo.org/badge/latestdoi/28551157)
 
 Paper: https://doi.org/10.1016/j.disopt.2006.10.011
 
