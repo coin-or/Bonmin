@@ -18,6 +18,14 @@ popd > /dev/null
 
 create_variables $SCRIPT_DIR/config.yml
 
+# Binary packages of this project that make_build_info lists (see
+# make_binary_packages in coinbrew's scripts/generate_readme)
+Package_Repology="coin-or-bonmin"
+Package_Debian="coinor-libbonmin-dev"
+Package_Fedora="coin-or-Bonmin coin-or-Bonmin-devel"
+Package_FreeBSD="math/bonmin"
+Package_Conda="coin-or-bonmin"
+
 make_header
 
 echo "Bonmin (*B*asic *O*pen-source *N*onlinear *M*ixed *IN*teger programming) is
@@ -54,12 +62,7 @@ information at http://egon.cheme.cmu.edu/ibm/page.htm, in particular
 Bonmin was developed by Pierre Bonami and the other contributors listed in
 [AUTHORS](Bonmin/AUTHORS). "
 
-# There is no Homebrew formula for Bonmin and Debian/Ubuntu only provide the
-# library package, so drop the Homebrew entries and fix the apt command.
-make_build_info | awk '
-  /^   \* linuxbrew:/ || /^ \* \*Mac OS X\*:/ { skip = 1; fences = 0; next }
-  skip { if (/```/ && ++fences == 2) skip = 0; next }
-  { sub(/coinor-bonmin coinor-libbonmin-dev/, "coinor-libbonmin-dev"); print }'
+make_build_info
 
 echo "### Linear solvers for Ipopt
 
