@@ -39,7 +39,7 @@ Dependencies:
     Required: Recommended
   - Description: ThirdParty wrapper for building Metis
     URL: https://github.com/coin-or-tools/ThirdParty-Metis
-    Version: master
+    Version: stable/2.0
     Required: Optional
   - Description: ThirdParty wrapper for building Mumps
     URL: https://github.com/coin-or-tools/ThirdParty-Mumps
